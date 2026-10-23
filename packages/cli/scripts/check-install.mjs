@@ -5,14 +5,14 @@
 // - every docs example, pasted as the docs page shows it;
 // - the app's own typecheck, lint and production build pass;
 // - `nxds-cli doctor` passes;
-// - `add` keeps a file you edited.
+// - `add` and `update` keep a file you edited.
 // The CLI installs from a registry built from this checkout, and the app gets
 // this checkout's @nxds/core as a packed tarball, since neither may be
 // published yet.
 // usage: node packages/cli/scripts/check-install.mjs [next|vite]
 // Needs the built CLI (packages/cli/dist), the built core (packages/core/dist)
 // and the docs demos (apps/docs/__generated__/demos).
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   mkdirSync,
@@ -94,11 +94,12 @@ function runCli(args) {
   run('node', cliArgs(args));
 }
 
+/** The `--json` output, which carries `exitCode`, so a run that exits 3 is still read. */
 function cliJson(args) {
-  const output = execFileSync('node', [...cliArgs(args), '--json'], {
+  const { stdout } = spawnSync('node', [...cliArgs(args), '--json'], {
     encoding: 'utf8',
   });
-  return JSON.parse(output);
+  return JSON.parse(stdout);
 }
 
 function fail(message) {
@@ -140,21 +141,29 @@ function checkRerunsChangeNothing(items) {
   }
 }
 
-/** `add` and `update` keep a file you edited, and say so. */
+/**
+ * `add` keeps a file you edited and exits 3. `update` with no newer release
+ * has nothing to merge into it, so it leaves the file as it is.
+ */
 function checkEditedFileKept() {
   const { data } = cliJson(['info']);
   const file = 'components/button/button.tsx';
   const target = path.join(appDir, data.dir, file);
   const edited = `${readFileSync(target, 'utf8')}// edited by the app\n`;
   writeFileSync(target, edited);
-  for (const command of [['add', 'button'], ['update']]) {
-    const { data: result } = cliJson(command);
+  const expected = [
+    { command: ['add', 'button'], reports: 'skipped', exitCode: 3 },
+    { command: ['update'], reports: 'unchanged', exitCode: 0 },
+  ];
+  for (const { command, reports, exitCode } of expected) {
+    const result = cliJson(command);
     if (
-      !result.skipped.includes(file) ||
+      result.exitCode !== exitCode ||
+      !result.data[reports].includes(file) ||
       readFileSync(target, 'utf8') !== edited
     ) {
       fail(
-        `\`${command.join(' ')}\` replaced ${file}, which the app had edited.`
+        `\`${command.join(' ')}\` didn't keep ${file}, which the app had edited, under "${reports}" with exit code ${exitCode}:\n${JSON.stringify(result, null, 2)}`
       );
     }
   }

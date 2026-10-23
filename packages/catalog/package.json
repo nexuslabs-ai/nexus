@@ -2,7 +2,7 @@
   "name": "@nxds/catalog",
   "version": "0.0.0",
   "private": true,
-  "description": "The install catalog the docs read and the nxds CLI fetches, built from the React and Vue sources",
+  "description": "The install catalog the docs read and nxds-cli fetches, built from the React and Vue sources",
   "type": "module",
   "exports": {
     ".": "./scripts/catalog-schema.ts",
@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "@nxds/source-model": "workspace:*",
-    "semver": "^7.8.5"
+    "semver": "^7.8.5",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",

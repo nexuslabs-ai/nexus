@@ -31,11 +31,14 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
-      // Core engine, the `cn` merge, ESLint rules and cross-framework parity -
-      // jsdom for the first-paint script tests. One glob per non-story row of
-      // testing.md § Scope; the stories row belongs to the `storybook` projects.
+      // Core engine, the `cn` merge, ESLint rules, cross-framework parity and
+      // the CLI - jsdom for the first-paint script tests. One glob per
+      // non-story row of testing.md § Scope; the stories row belongs to the
+      // `storybook` projects.
       {
         extends: true,
+        // tsup inlines the CLI's version; the CLI tests read it from source.
+        define: { __VERSION__: JSON.stringify('0.0.0-test') },
         test: {
           name: 'unit',
           environment: 'jsdom',
@@ -44,6 +47,7 @@ export default defineConfig({
             'packages/react/src/lib/utils.test.ts',
             'packages/eslint-plugin/__tests__/*.test.js',
             'parity/*.test.ts',
+            'packages/cli/__tests__/*.test.ts',
           ],
         },
       },

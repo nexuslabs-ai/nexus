@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Writes `generated/catalog.json`: every item the `nxds` CLI installs,
+ * Writes `generated/catalog.json`: every item `nxds-cli` installs,
  * with each item's files, packages and the other items it needs.
  *
  * Items are framework-neutral; each carries one variant per framework that
@@ -30,6 +30,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { catalogSchema, issueLines } from './catalog-schema.ts';
 import {
   dependencyEntries,
   react,
@@ -270,12 +271,21 @@ export function buildCatalog() {
     },
   }));
 
-  return {
+  /** @type {Catalog} */
+  const catalog = {
     schema: 1,
     version: reactPackage.version,
     frameworks: ['react'],
     items: [setup, ...components, ...blocks],
   };
+  // Checked, not parsed: parsing would reorder keys in the written JSON.
+  const checked = catalogSchema.safeParse(catalog);
+  if (!checked.success) {
+    throw new Error(
+      `catalog: the built catalog doesn't match catalog-schema.ts:\n${issueLines(checked.error).join('\n')}`
+    );
+  }
+  return catalog;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

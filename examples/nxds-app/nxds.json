@@ -1,6 +1,6 @@
 {
   "framework": "react",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "dir": "components/nxds",
   "css": "app/globals.css",
   "items": [

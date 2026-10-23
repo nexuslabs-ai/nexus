@@ -14,9 +14,6 @@ import { readProject } from '../project';
 
 import type { CommandResult } from './result';
 
-const KINDS = ['component', 'block'] as const;
-type Kind = (typeof KINDS)[number];
-
 /** The release the app is on, else the latest: what `add` would install. */
 function appRelease(cwd: string, registry: string) {
   return loadRelease(registry, readConfig(cwd)?.version ?? 'latest');
@@ -46,11 +43,8 @@ function summaryLines(items: CatalogItem[]) {
 export async function list(
   cwd: string,
   registry: string,
-  kind: string | undefined
+  kind: 'component' | 'block' | undefined
 ): Promise<CommandResult> {
-  if (kind !== undefined && !KINDS.includes(kind as Kind)) {
-    throw new CliError(`--kind takes ${KINDS.join(' or ')}.`);
-  }
   const items = (await appRelease(cwd, registry)).items.filter(
     (item) => item.name !== SETUP && (kind === undefined || item.kind === kind)
   );
@@ -60,12 +54,8 @@ export async function list(
 export async function search(
   cwd: string,
   registry: string,
-  query: string | undefined
+  query: string
 ): Promise<CommandResult> {
-  if (!query)
-    throw new CliError(
-      `Give a search term, such as \`${CLI_COMMAND} search date\`.`
-    );
   const needle = query.toLowerCase();
   const rank = (item: CatalogItem) => {
     if (item.name.includes(needle)) return 0;
@@ -103,10 +93,8 @@ function projectFramework(cwd: string, catalog: Catalog): Framework {
 export async function view(
   cwd: string,
   registry: string,
-  name: string | undefined
+  name: string
 ): Promise<CommandResult> {
-  if (!name)
-    throw new CliError(`Name an item, such as \`${CLI_COMMAND} view button\`.`);
   const catalog = await appRelease(cwd, registry);
   const item = findItem(catalog, name);
   const variant = variantOf(item, projectFramework(cwd, catalog));

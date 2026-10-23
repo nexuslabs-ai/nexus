@@ -1,3 +1,4 @@
+import { relativePath } from '@nxds/catalog';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -14,16 +15,11 @@ import {
   variantOf,
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
+import { type Config, readConfig, requireConfig, writeConfig } from '../config';
+import { CliError, UsageError } from '../errors';
+import { conflictedFiles } from '../files';
 import {
-  type Config,
-  projectPath,
-  readConfig,
-  requireConfig,
-  writeConfig,
-} from '../config';
-import { CliError } from '../errors';
-import { NO_PREVIOUS } from '../files';
-import {
+  emptyInstallResult,
   installItems,
   type InstallOptions,
   type InstallResult,
@@ -54,6 +50,18 @@ function installLines(
   const verb = dryRun ? 'Would write' : 'Wrote';
   return [
     ...result.written.map((file) => `${verb} ${config.dir}/${file}`),
+    ...result.merged.map(
+      (file) =>
+        `${dryRun ? 'Would merge' : 'Merged'} nxds's changes into your edits in ${config.dir}/${file}`
+    ),
+    ...result.conflicted.map(
+      (file) =>
+        `${dryRun ? 'Would conflict' : 'Conflict'} in ${config.dir}/${file}: nxds changed lines you edited. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`
+    ),
+    ...result.unresolved.map(
+      (file) =>
+        `Still conflicted: ${config.dir}/${file}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`
+    ),
     ...result.skipped.map(
       (file) =>
         `Kept ${config.dir}/${file}: it differs from nxds's copy, so it may hold your edits. Pass --overwrite to replace it.`
@@ -67,10 +75,19 @@ function installLines(
   ];
 }
 
+/** Whether no file was kept or left with conflict markers for the person to sort out. */
+function settled(result: InstallResult) {
+  return (
+    result.skipped.length === 0 &&
+    result.conflicted.length === 0 &&
+    result.unresolved.length === 0
+  );
+}
+
 function nxdsDir(dir: string) {
-  const normalized = projectPath(dir);
+  const normalized = relativePath(dir);
   if (normalized) return normalized;
-  throw new CliError(
+  throw new UsageError(
     `--dir takes a folder inside your app, such as components/nxds, not "${dir}".`
   );
 }
@@ -140,7 +157,7 @@ export async function init(
     project,
     config,
     [SETUP],
-    NO_PREVIOUS,
+    null,
     options
   );
 
@@ -157,7 +174,7 @@ export async function init(
   const [createVerb, editVerb] = options.dryRun
     ? ['Would create', 'Would edit']
     : ['Created', 'Edited'];
-  const done = wiring.manual.length === 0;
+  const done = wiring.manual.length === 0 && settled(installed);
   return {
     data: {
       setup: project.setup,
@@ -207,11 +224,6 @@ export async function add(
   names: string[],
   options: InstallOptions
 ): Promise<CommandResult> {
-  if (names.length === 0) {
-    throw new CliError(
-      `Name at least one item, such as \`${CLI_COMMAND} add button\`.`
-    );
-  }
   const config = requireConfig(cwd);
   const catalog = await loadRelease(registry, config.version);
   const installed = installItems(
@@ -219,7 +231,7 @@ export async function add(
     readProject(cwd),
     config,
     names,
-    NO_PREVIOUS,
+    null,
     options
   );
   if (!options.dryRun) writeConfig(cwd, config);
@@ -228,13 +240,13 @@ export async function add(
     data: { dryRun: options.dryRun, ...installed },
     lines: [
       ...installLines(config, installed, options),
-      ...(installed.written.length === 0 && installed.skipped.length === 0
+      ...(installed.written.length === 0 && settled(installed)
         ? [
             `${names.join(', ')} ${names.length === 1 ? 'is' : 'are'} already up to date.`,
           ]
         : []),
     ],
-    ok: true,
+    ok: settled(installed),
   };
 }
 
@@ -247,30 +259,42 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
   );
 }
 
+type UpdateData = InstallResult & {
+  dryRun: boolean;
+  from: string;
+  version: string;
+  removed: string[];
+  orphaned: string[];
+};
+
 /**
- * Re-installs every installed item from the latest release. A file that still
- * matches the app's release is replaced; a changed one is kept. Items the
- * release dropped leave `nxds.json`, and files no installed item has any more
- * are reported. An app behind the latest release moves to it only when no
- * changed file was kept, since a kept file is still from the older release.
+ * Re-installs every installed item from the latest release, so one app never
+ * mixes two releases. A file that still matches the app's release is
+ * replaced; nxds's changes are merged into an edited one, with conflict
+ * markers where both changed the same lines. A file the app's release didn't
+ * have merges against an empty one. Items the release dropped leave
+ * `nxds.json`, and files no installed item has any more are reported.
+ *
+ * The app moves to the latest release even with conflicts this run writes,
+ * since a conflicted file already holds the latest release's lines. Its
+ * markers are then the only record of the conflict, so every later run
+ * reports the file until they are resolved. A file still conflicted when a
+ * newer release is out holds an older release's lines, so `update` changes
+ * nothing until it is resolved, then merges from the app's release. The app
+ * also stays behind when its release is gone from the registry and an edited
+ * file is kept.
  */
 export async function update(
   cwd: string,
   registry: string,
-  names: string[],
   options: InstallOptions
 ): Promise<CommandResult> {
-  if (names.length > 0) {
-    throw new CliError(
-      `\`${CLI_COMMAND} update\` updates every installed item, so one app never mixes two releases. Run it without item names.`
-    );
-  }
-
   const config = requireConfig(cwd);
+  const from = config.version;
   const latest = await loadRelease(registry, 'latest');
-  const previous = await fetchRelease(registry, config.version);
   const { known, removed } = splitInstalled(latest, config.items);
   const current = filesOf(latest, config.framework, known);
+  const previous = await fetchRelease(registry, from);
   const installedBefore = previous
     ? filesOf(
         previous,
@@ -278,6 +302,31 @@ export async function update(
         splitInstalled(previous, config.items).known
       )
     : new Set<string>();
+
+  const unresolved =
+    from === latest.version || options.overwrite
+      ? []
+      : conflictedFiles(cwd, config, new Set([...current, ...installedBefore]));
+  if (unresolved.length > 0) {
+    const data: UpdateData = {
+      ...emptyInstallResult(),
+      dryRun: options.dryRun,
+      from,
+      version: from,
+      unresolved,
+      removed: [],
+      orphaned: [],
+    };
+    return {
+      data,
+      lines: [
+        ...unresolved.map((file) => `Still conflicted: ${config.dir}/${file}`),
+        `Changed nothing, and nxds.json stays on ${from}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`,
+      ],
+      ok: false,
+    };
+  }
+
   const orphaned = [...installedBefore].filter(
     (file) => !current.has(file) && existsSync(path.join(cwd, config.dir, file))
   );
@@ -287,24 +336,24 @@ export async function update(
     readProject(cwd),
     config,
     known,
-    previous ? releaseFiles(previous, config.framework) : NO_PREVIOUS,
+    previous && releaseFiles(previous, config.framework),
     options
   );
 
-  const from = config.version;
   const stays = from !== latest.version && installed.skipped.length > 0;
   if (!stays) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
+  const data: UpdateData = {
+    dryRun: options.dryRun,
+    from,
+    version: config.version,
+    ...installed,
+    removed,
+    orphaned,
+  };
   return {
-    data: {
-      dryRun: options.dryRun,
-      from,
-      version: config.version,
-      ...installed,
-      removed,
-      orphaned,
-    },
+    data,
     lines: [
       ...(previous
         ? []
@@ -322,9 +371,9 @@ export async function update(
           `No installed item uses ${config.dir}/${file} any more. Delete it once nothing in your app imports it.`
       ),
       stays
-        ? `nxds.json stays on ${from} until every kept file is replaced.`
+        ? `nxds.json stays on ${from} until every file above is resolved or replaced.`
         : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,
     ],
-    ok: !stays,
+    ok: settled(installed),
   };
 }

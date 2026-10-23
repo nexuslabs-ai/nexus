@@ -3,7 +3,7 @@ export const description =
 
 # Install
 
-Set up a React app with the `nxds` CLI, then add any component. For a Vue app,
+Set up a React app with `nxds-cli`, then add any component. For a Vue app,
 follow [Install by hand](#install-by-hand).
 
 ## Set up your app
@@ -51,8 +51,16 @@ npx nxds-cli@latest update
 `diff` lists the files that differ from the latest release. `update` moves
 every installed item to it.
 
-`update` replaces a file only if it still matches your current version, so
-your edits stay. To replace an edited file too, pass `--overwrite`.
+`update` replaces a file you haven't edited. If you edited a file, `update`
+merges the release's changes into it. Line endings and trailing spaces don't
+count as edits.
+
+If you and the release changed the same lines, `update` marks them like a git
+conflict. Keep the lines you want, delete the `<<<<<<<`, `=======` and
+`>>>>>>>` markers, then run `update` again. If a newer release comes out
+before you resolve every conflict, `update` changes no files, keeps `nxds.json`
+on your release and exits `3`. To replace an edited file with the release's
+copy, pass `--overwrite`.
 
 ## Find setup problems
 
@@ -63,14 +71,28 @@ npx nxds-cli@latest doctor
 `doctor` checks the provider, the CSS entry, the files and the packages, and
 says how to fix each problem.
 
-| Option         | What it does                                         |
-| -------------- | ---------------------------------------------------- |
-| `--dry-run`    | Shows what would change, without changing anything   |
-| `--json`       | Prints `{ ok, data }`, or `{ ok, error }` on failure |
-| `--no-install` | Skips installing npm packages                        |
-| `--cwd <path>` | Runs in another folder                               |
+## Options
 
-Run `npx nxds-cli@latest --help` to list every command.
+| Option                   | What it does                                                             |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `--dry-run`              | Shows what would change, without changing anything                       |
+| `--json`                 | Prints `{ ok, exitCode, data }`, or `{ ok, exitCode, error }` on failure |
+| `--no-install`           | Skips installing npm packages                                            |
+| `--cwd <path>`           | Runs in another folder                                                   |
+| `--registry <url\|path>` | Installs from another registry. `NXDS_REGISTRY_URL` sets it too          |
+
+Run `npx nxds-cli@latest --help` to list every command, or
+`npx nxds-cli@latest add --help` for one command's options.
+
+Behind a proxy, set `HTTPS_PROXY`. The CLI also reads `HTTP_PROXY` and
+`NO_PROXY`.
+
+| Exit code | Meaning                                                                                 |
+| --------- | --------------------------------------------------------------------------------------- |
+| `0`       | Done                                                                                    |
+| `1`       | Error, such as no network or an invalid release                                         |
+| `2`       | Usage error, such as an unknown option or item                                          |
+| `3`       | Done, with something left for you: conflicts, kept files, manual steps or failed checks |
 
 ## Install by hand
 

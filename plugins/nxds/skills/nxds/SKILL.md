@@ -1,15 +1,18 @@
 ---
 name: nxds
-description: 'Add and use nxds components with the nxds CLI. Use when the user asks for nxds or Nexus UI, when the project has an nxds.json, or when code uses nx: classes or @nxds/core.'
+description: 'Add and use nxds components with nxds-cli. Use when the user asks for nxds or Nexus UI, when the project has an nxds.json, or when code uses nx: classes or @nxds/core.'
 ---
 
 # nxds
 
 nxds is a design system: React components you copy into the app and own,
-themed by one engine, `@nxds/core`. Install everything with the
-`nxds` CLI. It never prompts, and every command takes `--json` and
-`--dry-run`. With `--json` it prints `{ "ok": true, "data": … }`, or
-`{ "ok": false, "error": "…" }` with exit code 1.
+themed by one engine, `@nxds/core`. Install everything with `nxds-cli`. It
+never prompts, and `--json` prints one object: `{ "ok": true, "exitCode": 0,
+"data": … }`, or `{ "ok": false, "exitCode": …, "error": "…" }`.
+
+Exit codes: `0` done, `1` error, `2` usage error (unknown option or item), `3`
+done with something left to do (conflicts, kept files, manual steps, failed checks).
+`npx nxds-cli@latest <command> --help` lists a command's options.
 
 ## Before you change anything
 
@@ -30,6 +33,10 @@ themed by one engine, `@nxds/core`. Install everything with the
   `components/nxds/components/button/button`.
 - `add` installs from the version in `nxds.json`. If an item is missing
   there, run `npx nxds-cli@latest update` first.
+- `update` merges the release's changes into files the user edited. If it
+  exits `3` with `data.conflicted` or `data.unresolved`, resolve the
+  `<<<<<<<` markers in those files, keeping the user's intent, then run
+  `update` again.
 - Don't pass `--overwrite` unless the user asks. It replaces files they edited.
 - After `init` or `add`, run `npx nxds-cli@latest doctor` and fix every failed
   check.
