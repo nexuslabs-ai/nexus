@@ -102,8 +102,10 @@ export type WriteResult = {
   unchanged: string[];
   /** Edited files that nxds's changes were merged into cleanly. */
   merged: string[];
-  /** Files holding conflict markers, from this run or an earlier `update`. */
+  /** Files this run wrote conflict markers into. */
   conflicted: string[];
+  /** Files still holding conflict markers from an earlier `update`, left alone. */
+  unresolved: string[];
   /** Files left alone because they differ from nxds's copy and there is no previous release to merge from. */
   skipped: string[];
 };
@@ -134,6 +136,7 @@ export function writeFiles(
     unchanged: [],
     merged: [],
     conflicted: [],
+    unresolved: [],
     skipped: [],
   };
   const write = (file: string, content: string) => {
@@ -155,7 +158,7 @@ export function writeFiles(
       continue;
     }
     if (state === 'conflicted') {
-      result.conflicted.push(file.path);
+      result.unresolved.push(file.path);
       continue;
     }
     const base = baseOf(previous, file.path);

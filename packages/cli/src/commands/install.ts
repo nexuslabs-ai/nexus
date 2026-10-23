@@ -56,6 +56,10 @@ function installLines(
       (file) =>
         `${dryRun ? 'Would conflict' : 'Conflict'} in ${config.dir}/${file}: nxds changed lines you edited. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} doctor\`.`
     ),
+    ...result.unresolved.map(
+      (file) =>
+        `Still conflicted: ${config.dir}/${file}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} doctor\`.`
+    ),
     ...result.skipped.map(
       (file) =>
         `Kept ${config.dir}/${file}: it differs from nxds's copy, so it may hold your edits. Pass --overwrite to replace it.`
@@ -71,7 +75,11 @@ function installLines(
 
 /** Whether no file was kept or left with conflict markers for the person to sort out. */
 function settled(result: InstallResult) {
-  return result.skipped.length === 0 && result.conflicted.length === 0;
+  return (
+    result.skipped.length === 0 &&
+    result.conflicted.length === 0 &&
+    result.unresolved.length === 0
+  );
 }
 
 function nxdsDir(dir: string) {
@@ -257,11 +265,13 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * have merges against an empty one. Items the release dropped leave
  * `nxds.json`, and files no installed item has any more are reported.
  *
- * The app moves to the latest release even with conflicts, since a
- * conflicted file already holds the latest release's lines. Its markers are
- * then the only record of the conflict, so every later run reports the file
- * until they are resolved. The app stays behind only when its release is gone
- * from the registry, so an edited file can't be merged and is kept as it is.
+ * The app moves to the latest release even with conflicts this run writes,
+ * since a conflicted file already holds the latest release's lines. Its
+ * markers are then the only record of the conflict, so every later run
+ * reports the file until they are resolved. The app stays behind when a file
+ * is left alone: one still conflicted from an earlier run holds an older
+ * release's lines, and an edited file is kept when the app's release is gone
+ * from the registry. The next `update` then merges from the app's release.
  */
 export async function update(
   cwd: string,
@@ -294,7 +304,9 @@ export async function update(
   );
 
   const from = config.version;
-  const stays = from !== latest.version && installed.skipped.length > 0;
+  const stays =
+    from !== latest.version &&
+    installed.skipped.length + installed.unresolved.length > 0;
   if (!stays) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
@@ -324,7 +336,7 @@ export async function update(
           `No installed item uses ${config.dir}/${file} any more. Delete it once nothing in your app imports it.`
       ),
       stays
-        ? `nxds.json stays on ${from} until every kept file is replaced.`
+        ? `nxds.json stays on ${from} until every file above is resolved or replaced.`
         : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,
     ],
     ok: settled(installed),

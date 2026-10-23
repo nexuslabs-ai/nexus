@@ -46,6 +46,18 @@ function nextRelease(): Catalog {
   return next;
 }
 
+// A line the release after that changes: the small size's padding.
+const SM_PADDING = 'nx:h-8 nx:px-2.5';
+
+/** The release after `nextRelease`, with Button's small padding changed too. */
+function laterRelease(): Catalog {
+  const later = nextRelease();
+  later.version = '0.4.8';
+  const file = buttonSource(later);
+  file.content = file.content.replace(SM_PADDING, 'nx:h-8 nx:px-2');
+  return later;
+}
+
 const NEXT_LAYOUT = `import type { Metadata } from 'next';
 import './globals.css';
 
@@ -266,8 +278,43 @@ describe('update', () => {
     const { exitCode, body } = await cliJson(['update'], context);
 
     expect(exitCode).toBe(EXIT_CODES.attention);
-    expect(body.data.conflicted).toEqual([BUTTON]);
+    expect(body.data).toMatchObject({ conflicted: [], unresolved: [BUTTON] });
     expect(readApp(context.app, NXDS_BUTTON)).toBe(conflicted);
+  });
+
+  it("stays on the conflicted release until you resolve it, then merges the next one's changes", async () => {
+    const context = setup();
+    await installButton(context);
+    writeApp(
+      context.app,
+      NXDS_BUTTON,
+      readApp(context.app, NXDS_BUTTON).replace(ICON_SIZE, 'nx:[&_svg]:size-5')
+    );
+    writeRegistry(context.registry, [RELEASE, nextRelease()]);
+    await cli(['update'], context);
+    writeRegistry(context.registry, [RELEASE, nextRelease(), laterRelease()]);
+
+    const held = await cliJson(['update'], context);
+
+    expect(held.exitCode).toBe(EXIT_CODES.attention);
+    expect(held.body.data.unresolved).toEqual([BUTTON]);
+    expect(nxdsVersion(context.app)).toBe('0.4.7');
+
+    // Keep your side of the conflict.
+    const resolved = buttonSource(nextRelease()).content.replace(
+      'nx:[&_svg]:size-4',
+      'nx:[&_svg]:size-5'
+    );
+    writeApp(context.app, NXDS_BUTTON, resolved);
+
+    const { exitCode, body } = await cliJson(['update'], context);
+
+    expect(exitCode).toBe(EXIT_CODES.ok);
+    expect(body.data.merged).toEqual([BUTTON]);
+    const merged = readApp(context.app, NXDS_BUTTON);
+    expect(merged).toContain('nx:[&_svg]:size-5');
+    expect(merged).toContain("'nx:h-8 nx:px-2 ");
+    expect(nxdsVersion(context.app)).toBe('0.4.8');
   });
 });
 

@@ -34,8 +34,9 @@ done with something left to do (conflicts, kept files, manual steps, failed chec
 - `add` installs from the version in `nxds.json`. If an item is missing
   there, run `npx nxds-cli@latest update` first.
 - `update` merges the release's changes into files the user edited. If it
-  exits `3` with `data.conflicted`, resolve the `<<<<<<<` markers in those
-  files, keeping the user's intent, then run `doctor`.
+  exits `3` with `data.conflicted` or `data.unresolved`, resolve the
+  `<<<<<<<` markers in those files, keeping the user's intent, then run
+  `doctor`. After resolving `data.unresolved`, run `update` again.
 - Don't pass `--overwrite` unless the user asks. It replaces files they edited.
 - After `init` or `add`, run `npx nxds-cli@latest doctor` and fix every failed
   check.
