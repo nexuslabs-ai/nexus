@@ -27,6 +27,7 @@ export const planned = [
   'context-menu',
   'date-picker',
   'description-list',
+  'dock',
   'drawer',
   'dropdown-menu',
   'empty-state',
