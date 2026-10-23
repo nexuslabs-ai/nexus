@@ -29,9 +29,9 @@ import {
 } from '@nxds/source-model/react-sources.mjs';
 import { reactRoot, reactSrc, toRepoPath } from '@nxds/source-model/roots.mjs';
 
-import { dependencyEntries } from '../../../packages/catalog/scripts/dependency-plans.mjs';
-import { buildCatalog } from '../../../packages/catalog/scripts/generate-catalog.mjs';
-import { CATALOG_FILE } from '../../../packages/catalog/scripts/roots.mjs';
+import { dependencyEntries } from '@nxds/catalog/scripts/dependency-plans.mjs';
+import { buildCatalog } from '@nxds/catalog/scripts/generate-catalog.mjs';
+import { CATALOG_FILE } from '@nxds/catalog/scripts/roots.mjs';
 
 import { componentUsage, entryUsage } from './component-usage.ts';
 import { docsRoot } from './docs-root.mjs';

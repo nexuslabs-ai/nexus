@@ -13,6 +13,7 @@ import {
   variantOf,
 } from '../catalog';
 import { type Config, readConfig, requireConfig } from '../config';
+import { CLI_COMMAND } from '../errors';
 import { type FileState, fileState, NO_PREVIOUS } from '../files';
 import { installedVersion } from '../packages';
 import {
@@ -55,9 +56,9 @@ export async function diff(
   );
   const differing = files.filter((file) => file.state !== 'current');
   const advice: Record<Exclude<FileState, 'current'>, string> = {
-    outdated: '`nxds update` replaces it',
-    changed: "differs from nxds's copy; `nxds update --overwrite` replaces it",
-    missing: '`nxds update` restores it',
+    outdated: `\`${CLI_COMMAND} update\` replaces it`,
+    changed: `differs from nxds's copy; \`${CLI_COMMAND} update --overwrite\` replaces it`,
+    missing: `\`${CLI_COMMAND} update\` restores it`,
   };
 
   return {
@@ -69,7 +70,7 @@ export async function diff(
       ),
       ...removed.map(
         (name) =>
-          `removed   ${name}  (no longer in nxds; \`nxds update\` drops it)`
+          `removed   ${name}  (no longer in nxds; \`${CLI_COMMAND} update\` drops it)`
       ),
       ...(differing.length === 0 && removed.length === 0
         ? [`Every file matches nxds ${latest.version}.`]
@@ -84,7 +85,7 @@ type Check = { name: string; ok: boolean; message: string };
 function tailwindMessage(project: Project) {
   const declared = project.dependencies.tailwindcss;
   if (declared === undefined) {
-    return 'Tailwind 4 is not installed. Run `nxds init`.';
+    return `Tailwind 4 is not installed. Run \`${CLI_COMMAND} init\`.`;
   }
   const tailwindMajor = majorVersion(project, 'tailwindcss');
   if (tailwindMajor === 4) return `tailwindcss ${declared}`;
@@ -168,7 +169,7 @@ export async function doctor(
   check(
     'config',
     config !== null,
-    config ? 'nxds.json found' : 'No nxds.json. Run `nxds init`.'
+    config ? 'nxds.json found' : `No nxds.json. Run \`${CLI_COMMAND} init\`.`
   );
   if (!project.setup) {
     check('app', false, 'Not a Next.js App Router or Vite + React app.');
@@ -181,7 +182,7 @@ export async function doctor(
     catalog !== null,
     catalog
       ? `Files come from nxds ${config.version}`
-      : `${registry} has no nxds ${config.version}. Run \`nxds update\`.`
+      : `${registry} has no nxds ${config.version}. Run \`${CLI_COMMAND} update\`.`
   );
 
   check(
@@ -196,7 +197,7 @@ export async function doctor(
     'css entry',
     importsTokens,
     !css
-      ? `${config.css} is missing. Run \`nxds init\`.`
+      ? `${config.css} is missing. Run \`${CLI_COMMAND} init\`.`
       : importsTokens
         ? `${config.css} imports the nxds tokens`
         : `${config.css} does not import ${config.dir}/tailwind/nxds.css. Add the @import back.`
@@ -239,7 +240,7 @@ export async function doctor(
     scriptSource.includes(scriptMarker),
     scriptSource.includes(scriptMarker)
       ? 'The theme script runs before first paint'
-      : 'The theme script is missing, so the page can flash the wrong theme. Run `nxds init`.'
+      : `The theme script is missing, so the page can flash the wrong theme. Run \`${CLI_COMMAND} init\`.`
   );
 
   if (!catalog) return report(checks);
@@ -250,7 +251,7 @@ export async function doctor(
     removed.length === 0,
     removed.length === 0
       ? `${known.length} installed items, all in this release`
-      : `No longer in nxds: ${removed.join(', ')}. Run \`nxds update\`.`
+      : `No longer in nxds: ${removed.join(', ')}. Run \`${CLI_COMMAND} update\`.`
   );
 
   const items = resolveItems(catalog, config.framework, known);
@@ -266,7 +267,7 @@ export async function doctor(
     missingFiles.length === 0,
     missingFiles.length === 0
       ? `All files for ${known.length} installed items are present`
-      : `Missing ${missingFiles.join(', ')}. Run \`nxds add\` for those items.`
+      : `Missing ${missingFiles.join(', ')}. Run \`${CLI_COMMAND} add\` for those items.`
   );
 
   const problems = packageProblems(project, config, items);
@@ -275,7 +276,7 @@ export async function doctor(
     problems.length === 0,
     problems.length === 0
       ? 'Every package the installed items need is installed in range, @nxds/core included'
-      : `${problems.join('; ')}. Run \`nxds update\`, then your package manager's install.`
+      : `${problems.join('; ')}. Run \`${CLI_COMMAND} update\`, then your package manager's install.`
   );
 
   return report(checks);

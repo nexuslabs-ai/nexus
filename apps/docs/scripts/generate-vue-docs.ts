@@ -5,6 +5,8 @@
 //   docs.ts                     titles, captions, sources and imports
 //   props/{slug}.json           each part's own props
 // usage: node scripts/generate-vue-docs.ts
+import { vue, vueWalks } from '@nxds/catalog/scripts/dependency-plans.mjs';
+import { packageName } from '@nxds/catalog/scripts/install-plans.ts';
 import { humanize } from '@nxds/source-model/humanize.ts';
 import {
   type PropsFile,
@@ -25,12 +27,6 @@ import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import prettier from 'prettier';
 import ts from 'typescript';
-
-import {
-  vue,
-  vueWalks,
-} from '../../../packages/catalog/scripts/dependency-plans.mjs';
-import { packageName } from '../../../packages/catalog/scripts/install-plans.ts';
 
 import { docsRoot } from './docs-root.mjs';
 

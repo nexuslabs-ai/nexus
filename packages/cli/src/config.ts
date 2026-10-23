@@ -2,7 +2,7 @@ import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { valid } from 'semver';
 
-import { CliError, readJson } from './errors';
+import { CLI_COMMAND, CliError, readJson } from './errors';
 
 export const CONFIG_FILE = 'nxds.json';
 
@@ -71,14 +71,16 @@ export function readConfig(root: string): Config | null {
   const field = invalidField(value as Record<string, unknown>);
   if (field === null) return value as Config;
   throw new CliError(
-    `${CONFIG_FILE} has a missing or invalid "${field}". Fix it, or delete ${CONFIG_FILE} and run \`nxds init\` again.`
+    `${CONFIG_FILE} has a missing or invalid "${field}". Fix it, or delete ${CONFIG_FILE} and run \`${CLI_COMMAND} init\` again.`
   );
 }
 
 export function requireConfig(root: string): Config {
   const config = readConfig(root);
   if (config) return config;
-  throw new CliError(`nxds is not set up here. Run \`nxds init\` first.`);
+  throw new CliError(
+    `nxds is not set up here. Run \`${CLI_COMMAND} init\` first.`
+  );
 }
 
 export function writeConfig(root: string, config: Config) {

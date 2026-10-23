@@ -20,7 +20,7 @@ import {
   requireConfig,
   writeConfig,
 } from '../config';
-import { CliError } from '../errors';
+import { CLI_COMMAND, CliError } from '../errors';
 import { NO_PREVIOUS } from '../files';
 import {
   installItems,
@@ -182,7 +182,9 @@ export async function init(
       ),
       ...manualLines(wiring.manual),
       ...(done && !options.dryRun
-        ? ['nxds is set up. Add a component with `nxds add button`.']
+        ? [
+            `nxds is set up. Add a component with \`${CLI_COMMAND} add button\`.`,
+          ]
         : []),
     ],
     ok: done,
@@ -192,7 +194,7 @@ export async function init(
 function manualLines(manual: ManualStep[]) {
   if (manual.length === 0) return [];
   return [
-    'Finish these steps by hand, then run `nxds doctor`:',
+    `Finish these steps by hand, then run \`${CLI_COMMAND} doctor\`:`,
     ...manual.map(({ file, step }) => `  ${file}: ${step}`),
   ];
 }
@@ -205,7 +207,9 @@ export async function add(
   options: InstallOptions
 ): Promise<CommandResult> {
   if (names.length === 0) {
-    throw new CliError('Name at least one item, such as `nxds add button`.');
+    throw new CliError(
+      `Name at least one item, such as \`${CLI_COMMAND} add button\`.`
+    );
   }
   const config = requireConfig(cwd);
   const catalog = await loadRelease(registry, config.version);
@@ -257,7 +261,7 @@ export async function update(
 ): Promise<CommandResult> {
   if (names.length > 0) {
     throw new CliError(
-      '`nxds update` updates every installed item, so one app never mixes two releases. Run it without item names.'
+      `\`${CLI_COMMAND} update\` updates every installed item, so one app never mixes two releases. Run it without item names.`
     );
   }
 

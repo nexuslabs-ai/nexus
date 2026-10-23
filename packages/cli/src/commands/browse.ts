@@ -8,7 +8,7 @@ import {
   variantOf,
 } from '../catalog';
 import { readConfig } from '../config';
-import { CliError } from '../errors';
+import { CLI_COMMAND, CliError } from '../errors';
 import { readProject } from '../project';
 
 import type { CommandResult } from './result';
@@ -62,7 +62,9 @@ export async function search(
   query: string | undefined
 ): Promise<CommandResult> {
   if (!query)
-    throw new CliError('Give a search term, such as `nxds search date`.');
+    throw new CliError(
+      `Give a search term, such as \`${CLI_COMMAND} search date\`.`
+    );
   const needle = query.toLowerCase();
   const rank = (item: CatalogItem) => {
     if (item.name.includes(needle)) return 0;
@@ -93,7 +95,7 @@ function projectFramework(cwd: string, catalog: Catalog): Framework {
   const [only, ...others] = catalog.frameworks;
   if (only && others.length === 0) return only;
   throw new CliError(
-    'This release has several frameworks. Run `nxds init` first, so nxds knows which one your app uses.'
+    `This release has several frameworks. Run \`${CLI_COMMAND} init\` first, so nxds knows which one your app uses.`
   );
 }
 
@@ -102,7 +104,8 @@ export async function view(
   registry: string,
   name: string | undefined
 ): Promise<CommandResult> {
-  if (!name) throw new CliError('Name an item, such as `nxds view button`.');
+  if (!name)
+    throw new CliError(`Name an item, such as \`${CLI_COMMAND} view button\`.`);
   const catalog = await appRelease(cwd, registry);
   const item = findItem(catalog, name);
   const variant = variantOf(item, projectFramework(cwd, catalog));
@@ -157,7 +160,7 @@ export function info(cwd: string): CommandResult {
       `Tailwind: ${project.dependencies.tailwindcss ?? 'not installed'}`,
       config
         ? `nxds: ${config.version} in ${config.dir}, CSS entry ${config.css}`
-        : 'nxds: not set up. Run `nxds init`.',
+        : `nxds: not set up. Run \`${CLI_COMMAND} init\`.`,
       ...(config && config.items.length > 0
         ? [
             `Installed: ${config.items.filter((item) => item !== SETUP).join(', ') || 'setup only'}`,

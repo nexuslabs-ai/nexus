@@ -6,7 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./scripts/catalog-schema.ts",
-    "./catalog.json": "./generated/catalog.json"
+    "./catalog.json": "./generated/catalog.json",
+    "./scripts/*": "./scripts/*"
   },
   "scripts": {
     "clean": "rm -rf generated",

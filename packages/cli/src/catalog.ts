@@ -11,7 +11,7 @@ import path from 'node:path';
 import { valid, validRange } from 'semver';
 
 import { projectPath } from './config';
-import { CliError, readJson } from './errors';
+import { CLI_COMMAND, CliError, readJson } from './errors';
 
 export type {
   Catalog,
@@ -195,7 +195,7 @@ export async function fetchRelease(
 
   if (isRecord(value) && typeof value.schema === 'number' && value.schema > 1) {
     throw new CliError(
-      `nxds ${version} needs a newer CLI. Run \`npx nxds-cli@latest\` instead.`
+      `nxds ${version} needs a newer CLI. Run \`${CLI_COMMAND}\` instead.`
     );
   }
   const problem = releaseProblem(value, version);
@@ -215,7 +215,7 @@ export async function loadRelease(
   throw new CliError(
     version === 'latest'
       ? `${registry} has no nxds release.`
-      : `${registry} has no nxds ${version}, the release this app is on. Run \`nxds update\` to move to the latest release.`
+      : `${registry} has no nxds ${version}, the release this app is on. Run \`${CLI_COMMAND} update\` to move to the latest release.`
   );
 }
 
@@ -223,7 +223,7 @@ export function findItem(catalog: Catalog, name: string): CatalogItem {
   const item = catalog.items.find((candidate) => candidate.name === name);
   if (item) return item;
   throw new CliError(
-    `nxds ${catalog.version} has no item named "${name}". Run \`nxds search ${name}\` to find the right name, or \`nxds update\` if it's newer.`
+    `nxds ${catalog.version} has no item named "${name}". Run \`${CLI_COMMAND} search ${name}\` to find the right name, or \`${CLI_COMMAND} update\` if it's newer.`
   );
 }
 

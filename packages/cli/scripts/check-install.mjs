@@ -25,9 +25,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { releaseCatalog } from '../../catalog/scripts/catalog-schema.ts';
-import { buildCatalog } from '../../catalog/scripts/generate-catalog.mjs';
-import { writeRegistry } from '../../catalog/scripts/registry.mjs';
+import { releaseCatalog } from '@nxds/catalog/scripts/catalog-schema.ts';
+import { buildCatalog } from '@nxds/catalog/scripts/generate-catalog.mjs';
+import { writeRegistry } from '@nxds/catalog/scripts/registry.mjs';
 
 const cliRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

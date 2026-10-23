@@ -9,9 +9,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { releaseCatalog } from '../../packages/catalog/scripts/catalog-schema.ts';
-import { buildCatalog } from '../../packages/catalog/scripts/generate-catalog.mjs';
-import { writeRegistry } from '../../packages/catalog/scripts/registry.mjs';
+import { releaseCatalog } from '@nxds/catalog/scripts/catalog-schema.ts';
+import { buildCatalog } from '@nxds/catalog/scripts/generate-catalog.mjs';
+import { writeRegistry } from '@nxds/catalog/scripts/registry.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const cli = path.join(repoRoot, 'packages/cli/dist/index.js');

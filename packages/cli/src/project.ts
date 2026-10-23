@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { major, minVersion, validRange } from 'semver';
 
-import { CliError, readJson } from './errors';
+import { CLI_COMMAND, CliError, readJson } from './errors';
 import { installedVersion } from './packages';
 
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';
@@ -65,7 +65,7 @@ export function readProject(root: string): Project {
   const manifestPath = path.join(root, 'package.json');
   if (!existsSync(manifestPath)) {
     throw new CliError(
-      `No package.json in ${root}. Run nxds from your app's root folder, or pass --cwd.`
+      `No package.json in ${root}. Run \`${CLI_COMMAND}\` from your app's root folder, or pass --cwd.`
     );
   }
   const manifest = readJson(manifestPath) as {

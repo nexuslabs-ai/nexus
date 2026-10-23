@@ -5,7 +5,7 @@ import path from 'node:path';
 import {
   readReleases,
   writeRegistry,
-} from '../../../packages/catalog/scripts/registry.mjs';
+} from '@nxds/catalog/scripts/registry.mjs';
 
 import { docsRoot } from './docs-root.mjs';
 
