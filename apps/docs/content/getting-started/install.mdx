@@ -57,8 +57,9 @@ count as edits.
 
 If you and the release changed the same lines, `update` marks them like a git
 conflict. Keep the lines you want, delete the `<<<<<<<`, `=======` and
-`>>>>>>>` markers, then run `doctor`. To replace an edited file with the
-release's copy, pass `--overwrite`.
+`>>>>>>>` markers, then run `doctor`. Until you do, `update` leaves the file
+alone and exits `3`. To replace an edited file with the release's copy, pass
+`--overwrite`.
 
 ## Find setup problems
 
@@ -85,12 +86,12 @@ Run `npx nxds-cli@latest --help` to list every command, or
 Behind a proxy, set `HTTPS_PROXY`. The CLI also reads `HTTP_PROXY` and
 `NO_PROXY`.
 
-| Exit code | Meaning                                                                     |
-| --------- | --------------------------------------------------------------------------- |
-| `0`       | Done                                                                        |
-| `1`       | Error, such as no network or an invalid release                             |
-| `2`       | Usage error, such as an unknown option or item                              |
-| `3`       | Done, with something left for you: conflicts, manual steps or failed checks |
+| Exit code | Meaning                                                                                 |
+| --------- | --------------------------------------------------------------------------------------- |
+| `0`       | Done                                                                                    |
+| `1`       | Error, such as no network or an invalid release                                         |
+| `2`       | Usage error, such as an unknown option or item                                          |
+| `3`       | Done, with something left for you: conflicts, kept files, manual steps or failed checks |
 
 ## Install by hand
 

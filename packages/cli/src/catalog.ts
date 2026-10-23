@@ -44,6 +44,14 @@ export function resolveRegistry(option: string | undefined) {
   return isUrl(option) ? option.replace(/\/+$/, '') : path.resolve(option);
 }
 
+/** The timeout's signal also aborts reading the body, so both steps check for it. */
+function timeoutError(url: string, error: unknown) {
+  if (!(error instanceof Error) || error.name !== 'TimeoutError') return null;
+  return new CliError(
+    `${url} did not answer within ${FETCH_TIMEOUT_MS / 1000}s. Check your connection, then run the command again.`
+  );
+}
+
 async function fetchJson(url: string): Promise<unknown> {
   let response: Awaited<ReturnType<typeof fetch>>;
   try {
@@ -52,6 +60,8 @@ async function fetchJson(url: string): Promise<unknown> {
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
   } catch (error) {
+    const timeout = timeoutError(url, error);
+    if (timeout) throw timeout;
     // undici reports "fetch failed" and keeps the reason, such as ENOTFOUND, in `cause`.
     const { message, cause } = error as Error;
     const reason = cause instanceof Error ? cause.message : message;
@@ -68,8 +78,11 @@ async function fetchJson(url: string): Promise<unknown> {
   try {
     return await response.json();
   } catch (error) {
-    throw new CliError(
-      `${url} is not valid JSON (${(error as Error).message}). Run the command again later.`
+    throw (
+      timeoutError(url, error) ??
+      new CliError(
+        `${url} is not valid JSON (${(error as Error).message}). Run the command again later.`
+      )
     );
   }
 }

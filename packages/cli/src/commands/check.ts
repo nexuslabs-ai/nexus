@@ -16,10 +16,10 @@ import {
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig } from '../config';
 import {
+  baseOf,
   type FileState,
   fileState,
   hasConflictMarkers,
-  NO_PREVIOUS,
   sameContent,
 } from '../files';
 import { installedVersion } from '../packages';
@@ -44,9 +44,7 @@ export async function diff(
   const config = requireConfig(cwd);
   const latest = await loadRelease(registry, 'latest');
   const previous = await fetchRelease(registry, config.version);
-  const previousFiles = previous
-    ? releaseFiles(previous, config.framework)
-    : NO_PREVIOUS;
+  const previousFiles = previous && releaseFiles(previous, config.framework);
   const { known, removed } = splitInstalled(latest, config.items);
   const items = resolveItems(
     latest,
@@ -55,18 +53,22 @@ export async function diff(
   );
 
   const update = `\`${CLI_COMMAND} update\``;
+  const overwrite = `\`${CLI_COMMAND} update --overwrite\``;
   /** What `update` does with a file in `state`. */
   function advice(state: FileState, file: CatalogFile) {
     if (state === 'outdated') return `${update} replaces it`;
     if (state === 'missing') return `${update} restores it`;
-    const base = previousFiles.get(file.path);
+    if (state === 'conflicted') {
+      return `has conflict markers; resolve them, or ${overwrite} replaces it`;
+    }
+    const base = baseOf(previousFiles, file.path);
     if (base === undefined) {
-      return `has your edits; ${update} keeps it, \`update --overwrite\` replaces it`;
+      return `has your edits; ${update} keeps it, ${overwrite} replaces it`;
     }
     if (sameContent(base, file.content)) {
       return `has your edits; nxds hasn't changed it since ${config.version}`;
     }
-    return `has your edits; ${update} merges nxds's changes into it, \`update --overwrite\` replaces it`;
+    return `has your edits; ${update} merges nxds's changes into it, ${overwrite} replaces it`;
   }
 
   const files = items.flatMap((item) =>
@@ -86,11 +88,11 @@ export async function diff(
     data: { version: config.version, latest: latest.version, files, removed },
     lines: [
       ...differing.map(
-        (file) => `${file.state.padEnd(8)}  ${file.path}  (${file.advice})`
+        (file) => `${file.state.padEnd(10)}  ${file.path}  (${file.advice})`
       ),
       ...removed.map(
         (name) =>
-          `removed   ${name}  (no longer in nxds; \`${CLI_COMMAND} update\` drops it)`
+          `${'removed'.padEnd(10)}  ${name}  (no longer in nxds; \`${CLI_COMMAND} update\` drops it)`
       ),
       ...(differing.length === 0 && removed.length === 0
         ? [`Every file matches nxds ${latest.version}.`]

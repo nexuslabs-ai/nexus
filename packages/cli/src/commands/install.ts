@@ -17,7 +17,6 @@ import {
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig, writeConfig } from '../config';
 import { CliError, UsageError } from '../errors';
-import { NO_PREVIOUS } from '../files';
 import {
   installItems,
   type InstallOptions,
@@ -68,6 +67,11 @@ function installLines(
       (line) => `${dryRun ? 'Would add' : 'Added'} ${line}`
     ),
   ];
+}
+
+/** Whether no file was kept or left with conflict markers for the person to sort out. */
+function settled(result: InstallResult) {
+  return result.skipped.length === 0 && result.conflicted.length === 0;
 }
 
 function nxdsDir(dir: string) {
@@ -143,7 +147,7 @@ export async function init(
     project,
     config,
     [SETUP],
-    NO_PREVIOUS,
+    null,
     options
   );
 
@@ -160,7 +164,7 @@ export async function init(
   const [createVerb, editVerb] = options.dryRun
     ? ['Would create', 'Would edit']
     : ['Created', 'Edited'];
-  const done = wiring.manual.length === 0;
+  const done = wiring.manual.length === 0 && settled(installed);
   return {
     data: {
       setup: project.setup,
@@ -217,7 +221,7 @@ export async function add(
     readProject(cwd),
     config,
     names,
-    NO_PREVIOUS,
+    null,
     options
   );
   if (!options.dryRun) writeConfig(cwd, config);
@@ -226,13 +230,13 @@ export async function add(
     data: { dryRun: options.dryRun, ...installed },
     lines: [
       ...installLines(config, installed, options),
-      ...(installed.written.length === 0 && installed.skipped.length === 0
+      ...(installed.written.length === 0 && settled(installed)
         ? [
             `${names.join(', ')} ${names.length === 1 ? 'is' : 'are'} already up to date.`,
           ]
         : []),
     ],
-    ok: true,
+    ok: settled(installed),
   };
 }
 
@@ -249,13 +253,15 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * Re-installs every installed item from the latest release, so one app never
  * mixes two releases. A file that still matches the app's release is
  * replaced; nxds's changes are merged into an edited one, with conflict
- * markers where both changed the same lines. Items the release dropped leave
+ * markers where both changed the same lines. A file the app's release didn't
+ * have merges against an empty one. Items the release dropped leave
  * `nxds.json`, and files no installed item has any more are reported.
  *
  * The app moves to the latest release even with conflicts, since a
- * conflicted file already holds the latest release's lines. It stays behind
- * only when the app's release is gone from the registry, so an edited file
- * can't be merged and is kept as it is.
+ * conflicted file already holds the latest release's lines. Its markers are
+ * then the only record of the conflict, so every later run reports the file
+ * until they are resolved. The app stays behind only when its release is gone
+ * from the registry, so an edited file can't be merged and is kept as it is.
  */
 export async function update(
   cwd: string,
@@ -283,7 +289,7 @@ export async function update(
     readProject(cwd),
     config,
     known,
-    previous ? releaseFiles(previous, config.framework) : NO_PREVIOUS,
+    previous && releaseFiles(previous, config.framework),
     options
   );
 
@@ -321,6 +327,6 @@ export async function update(
         ? `nxds.json stays on ${from} until every kept file is replaced.`
         : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,
     ],
-    ok: !stays && installed.conflicted.length === 0,
+    ok: settled(installed),
   };
 }

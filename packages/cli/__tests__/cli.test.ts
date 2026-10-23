@@ -173,7 +173,7 @@ describe('init and add', () => {
 
     const { exitCode, body } = await cliJson(['add', 'button'], context);
 
-    expect(exitCode).toBe(EXIT_CODES.ok);
+    expect(exitCode).toBe(EXIT_CODES.attention);
     expect(body.data.skipped).toContain(BUTTON);
     expect(readApp(context.app, NXDS_BUTTON)).toBe(edited);
   });
@@ -250,6 +250,38 @@ describe('update', () => {
       expect.objectContaining({ name: 'conflicts', ok: false })
     );
   });
+
+  it('keeps reporting a conflict until you resolve it', async () => {
+    const context = setup();
+    await installButton(context);
+    writeApp(
+      context.app,
+      NXDS_BUTTON,
+      readApp(context.app, NXDS_BUTTON).replace(ICON_SIZE, 'nx:[&_svg]:size-5')
+    );
+    writeRegistry(context.registry, [RELEASE, nextRelease()]);
+    await cli(['update'], context);
+    const conflicted = readApp(context.app, NXDS_BUTTON);
+
+    const { exitCode, body } = await cliJson(['update'], context);
+
+    expect(exitCode).toBe(EXIT_CODES.attention);
+    expect(body.data.conflicted).toEqual([BUTTON]);
+    expect(readApp(context.app, NXDS_BUTTON)).toBe(conflicted);
+  });
+});
+
+describe('help', () => {
+  it.each([[['help', 'add']], [['add', '--help']]])(
+    'prints help for %j and exits 0',
+    async (args) => {
+      const run = await cli(args, setup());
+
+      expect(run.exitCode).toBe(EXIT_CODES.ok);
+      expect(run.stdout).toMatch(/add components or blocks/);
+      expect(run.stderr).toBe('');
+    }
+  );
 });
 
 describe('errors', () => {
@@ -268,7 +300,7 @@ describe('errors', () => {
 
   it('exits 2 for an item the release does not have', async () => {
     const context = setup();
-    await cli(['init'], context);
+    expect((await cli(['init'], context)).exitCode).toBe(EXIT_CODES.ok);
 
     const run = await cli(['add', 'buton'], context);
 

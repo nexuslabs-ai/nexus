@@ -1,4 +1,9 @@
-import type { Catalog, Variant } from '@nxds/catalog';
+import {
+  CATALOG_SCHEMA,
+  catalogSchema,
+  issueLines,
+  type Variant,
+} from '@nxds/catalog';
 import catalogJson from '@nxds/catalog/catalog.json';
 
 import type { Framework } from './frameworks';
@@ -7,12 +12,13 @@ import 'server-only';
 
 const SETUP = 'setup';
 
-const catalog = catalogJson as unknown as Catalog;
-if (catalog.schema !== 1) {
+const parsed = catalogSchema.safeParse(catalogJson);
+if (!parsed.success) {
   throw new Error(
-    `catalog: @nxds/catalog/catalog.json has schema ${String(catalog.schema)}, but the docs read schema 1. Rerun \`pnpm --filter @nxds/catalog generate:catalog\`.`
+    `catalog: @nxds/catalog/catalog.json is not a schema ${CATALOG_SCHEMA} catalog:\n${issueLines(parsed.error).join('\n')}\nRerun \`pnpm --filter @nxds/catalog generate:catalog\`.`
   );
 }
+const catalog = parsed.data;
 
 const items = new Map(catalog.items.map((item) => [item.name, item]));
 

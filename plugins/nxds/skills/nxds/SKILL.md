@@ -11,7 +11,7 @@ never prompts, and `--json` prints one object: `{ "ok": true, "exitCode": 0,
 "data": … }`, or `{ "ok": false, "exitCode": …, "error": "…" }`.
 
 Exit codes: `0` done, `1` error, `2` usage error (unknown option or item), `3`
-done with something left to do (conflicts, manual steps, failed checks).
+done with something left to do (conflicts, kept files, manual steps, failed checks).
 `npx nxds-cli@latest <command> --help` lists a command's options.
 
 ## Before you change anything

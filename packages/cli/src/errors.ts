@@ -10,14 +10,16 @@ export const EXIT_CODES = {
   attention: 3,
 } as const;
 
+export type ExitCode = (typeof EXIT_CODES)[keyof typeof EXIT_CODES];
+
 /** An error the person running the CLI can fix; printed without a stack. */
 export class CliError extends Error {
-  exitCode: number = EXIT_CODES.error;
+  exitCode: ExitCode = EXIT_CODES.error;
 }
 
 /** A command run the wrong way. */
 export class UsageError extends CliError {
-  override exitCode: number = EXIT_CODES.usage;
+  override exitCode: ExitCode = EXIT_CODES.usage;
 }
 
 export function readJson(file: string): unknown {

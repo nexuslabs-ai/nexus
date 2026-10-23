@@ -22,12 +22,12 @@ command would change, and `--json` prints the result for the agent to read.
 With `--json`, a command prints one object: `{ "ok": true, "exitCode": 0,
 "data": … }`, or `{ "ok": false, "exitCode": …, "error": "…" }` if it fails.
 
-| Exit code | Meaning                                                                     |
-| --------- | --------------------------------------------------------------------------- |
-| `0`       | Done                                                                        |
-| `1`       | Error, such as no network or an invalid release                             |
-| `2`       | Usage error, such as an unknown option or item                              |
-| `3`       | Done, with something left for you: conflicts, manual steps or failed checks |
+| Exit code | Meaning                                                                                 |
+| --------- | --------------------------------------------------------------------------------------- |
+| `0`       | Done                                                                                    |
+| `1`       | Error, such as no network or an invalid release                                         |
+| `2`       | Usage error, such as an unknown option or item                                          |
+| `3`       | Done, with something left for you: conflicts, kept files, manual steps or failed checks |
 
 ## Add the nxds skill
 

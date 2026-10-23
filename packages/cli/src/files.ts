@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { diff3Merge } from 'node-diff3';
+import { merge } from 'node-diff3';
 
 import type { CatalogFile } from './catalog';
 import type { Config } from './config';
@@ -8,15 +8,37 @@ import type { Config } from './config';
 /**
  * - `current`: matches the catalog.
  * - `outdated`: matches the app's previous release, so nobody edited it.
+ * - `conflicted`: still holds conflict markers from an earlier `update`.
  * - `changed`: matches neither: edited in the app, or not written by nxds.
  * - `missing`: not on disk.
  */
-export type FileState = 'current' | 'outdated' | 'changed' | 'missing';
+export type FileState =
+  | 'current'
+  | 'outdated'
+  | 'conflicted'
+  | 'changed'
+  | 'missing';
 
-/** Each file of the release the app is moving from, by path. */
-export type PreviousFiles = ReadonlyMap<string, string>;
+/**
+ * Each file of the release the app is moving from, by path, or null when
+ * there is no such release to merge from.
+ */
+export type PreviousFiles = ReadonlyMap<string, string> | null;
 
-export const NO_PREVIOUS: PreviousFiles = new Map();
+/**
+ * The copy of `file` to merge the app's edits against, or undefined when
+ * there is no previous release. A file the previous release didn't have
+ * merges against an empty one.
+ */
+export function baseOf(previous: PreviousFiles, file: string) {
+  if (!previous) return undefined;
+  return previous.get(file) ?? '';
+}
+
+/** `content` with LF line endings and one final newline. */
+function withLf(content: string) {
+  return `${content.replace(/\r\n?/g, '\n').replace(/\n+$/, '')}\n`;
+}
 
 /**
  * `content` with LF line endings, no trailing whitespace and one final
@@ -24,8 +46,7 @@ export const NO_PREVIOUS: PreviousFiles = new Map();
  * count as an edit.
  */
 function normalize(content: string) {
-  const lines = content
-    .replace(/\r\n?/g, '\n')
+  const lines = withLf(content)
     .split('\n')
     .map((line) => line.trimEnd());
   return `${lines.join('\n').trimEnd()}\n`;
@@ -33,6 +54,14 @@ function normalize(content: string) {
 
 export function sameContent(a: string, b: string | undefined) {
   return b !== undefined && normalize(a) === normalize(b);
+}
+
+const OURS_LABEL = 'your file';
+const CONFLICT_START = `<<<<<<< ${OURS_LABEL}`;
+
+/** Whether `content` still holds conflict markers `update` wrote. */
+export function hasConflictMarkers(content: string) {
+  return content.split(/\r?\n/).includes(CONFLICT_START);
 }
 
 export function fileState(
@@ -45,21 +74,15 @@ export function fileState(
   if (!existsSync(target)) return 'missing';
 
   const onDisk = readFileSync(target, 'utf8');
+  if (hasConflictMarkers(onDisk)) return 'conflicted';
   if (sameContent(onDisk, file.content)) return 'current';
-  return sameContent(onDisk, previous.get(file.path)) ? 'outdated' : 'changed';
-}
-
-const CONFLICT_START = '<<<<<<< your file';
-const CONFLICT_MIDDLE = '=======';
-
-/** Whether `content` still holds conflict markers `update` wrote. */
-export function hasConflictMarkers(content: string) {
-  return content.split(/\r?\n/).includes(CONFLICT_START);
+  return sameContent(onDisk, previous?.get(file.path)) ? 'outdated' : 'changed';
 }
 
 /**
- * Merges nxds's changes since `base` into the app's edited file. Where both
- * changed the same lines, writes git-style conflict markers around each side.
+ * Merges nxds's changes since `base` into the app's edited file, with LF line
+ * endings like every file nxds writes. Where both changed the same lines,
+ * writes git-style conflict markers around each side.
  */
 function mergeFile(
   ours: string,
@@ -67,25 +90,11 @@ function mergeFile(
   theirs: string,
   version: string
 ) {
-  const lines = (content: string) => normalize(content).split('\n');
-  const regions = diff3Merge(lines(ours), lines(base), lines(theirs), {
-    excludeFalseConflicts: true,
+  const lines = (content: string) => withLf(content).split('\n');
+  const { conflict, result } = merge(lines(ours), lines(base), lines(theirs), {
+    label: { a: OURS_LABEL, b: `nxds ${version}` },
   });
-  const merged = regions.flatMap((region) => {
-    if (!region.conflict) return region.ok ?? [];
-    return [
-      CONFLICT_START,
-      ...region.conflict.a,
-      CONFLICT_MIDDLE,
-      ...region.conflict.b,
-      `>>>>>>> nxds ${version}`,
-    ];
-  });
-  const eol = ours.includes('\r\n') ? '\r\n' : '\n';
-  return {
-    content: merged.join(eol),
-    conflict: regions.some((region) => region.conflict),
-  };
+  return { content: result.join('\n'), conflict };
 }
 
 export type WriteResult = {
@@ -93,7 +102,7 @@ export type WriteResult = {
   unchanged: string[];
   /** Edited files that nxds's changes were merged into cleanly. */
   merged: string[];
-  /** Edited files now holding conflict markers. */
+  /** Files holding conflict markers, from this run or an earlier `update`. */
   conflicted: string[];
   /** Files left alone because they differ from nxds's copy and there is no previous release to merge from. */
   skipped: string[];
@@ -108,9 +117,10 @@ export type WriteOptions = {
 
 /**
  * Writes `files` into the nxds folder. Missing and outdated files are
- * written. A changed file gets nxds's changes since `previous` merged in, is
- * kept when there is no previous copy to merge from, and is replaced with
- * `overwrite`.
+ * written. A changed file gets nxds's changes since `previous` merged in, and
+ * is kept when there is no previous release to merge from. A file with
+ * conflict markers is left for the person to resolve. `overwrite` replaces
+ * changed and conflicted files.
  */
 export function writeFiles(
   root: string,
@@ -139,12 +149,16 @@ export function writeFiles(
       result.unchanged.push(file.path);
       continue;
     }
-    const base = previous.get(file.path);
-    if (state !== 'changed' || overwrite) {
+    if (overwrite || state === 'missing' || state === 'outdated') {
       result.written.push(file.path);
       write(file.path, file.content);
       continue;
     }
+    if (state === 'conflicted') {
+      result.conflicted.push(file.path);
+      continue;
+    }
+    const base = baseOf(previous, file.path);
     if (base === undefined) {
       result.skipped.push(file.path);
       continue;
@@ -152,14 +166,14 @@ export function writeFiles(
 
     const target = path.join(root, config.dir, file.path);
     const ours = readFileSync(target, 'utf8');
-    const merge = mergeFile(ours, base, file.content, version);
+    const merged = mergeFile(ours, base, file.content, version);
     // nxds changed nothing in this file since `previous`: the edits stay as they are.
-    if (sameContent(ours, merge.content)) {
+    if (sameContent(ours, merged.content)) {
       result.unchanged.push(file.path);
       continue;
     }
-    result[merge.conflict ? 'conflicted' : 'merged'].push(file.path);
-    write(file.path, merge.content);
+    result[merged.conflict ? 'conflicted' : 'merged'].push(file.path);
+    write(file.path, merged.content);
   }
 
   return result;
