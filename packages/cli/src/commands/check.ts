@@ -12,8 +12,8 @@ import {
   splitInstalled,
   variantOf,
 } from '../catalog';
+import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig } from '../config';
-import { CLI_COMMAND } from '../errors';
 import { type FileState, fileState, NO_PREVIOUS } from '../files';
 import { installedVersion } from '../packages';
 import {

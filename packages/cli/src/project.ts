@@ -2,7 +2,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { major, minVersion, validRange } from 'semver';
 
-import { CLI_COMMAND, CliError, readJson } from './errors';
+import { CLI_COMMAND } from './cli-command';
+import { CliError, readJson } from './errors';
 import { installedVersion } from './packages';
 
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';

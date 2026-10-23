@@ -4,7 +4,7 @@
 // - running `init` again, and `add --dry-run`, change nothing;
 // - every docs example, pasted as the docs page shows it;
 // - the app's own typecheck, lint and production build pass;
-// - `nxds doctor` passes;
+// - `nxds-cli doctor` passes;
 // - `add` keeps a file you edited.
 // The CLI installs from a registry built from this checkout, and the app gets
 // this checkout's @nxds/core as a packed tarball, since neither may be
@@ -25,7 +25,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { releaseCatalog } from '@nxds/catalog/scripts/catalog-schema.ts';
+import { releaseCatalog } from '@nxds/catalog';
 import { buildCatalog } from '@nxds/catalog/scripts/generate-catalog.mjs';
 import { writeRegistry } from '@nxds/catalog/scripts/registry.mjs';
 

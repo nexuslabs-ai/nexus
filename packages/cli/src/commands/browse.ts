@@ -7,8 +7,9 @@ import {
   SETUP,
   variantOf,
 } from '../catalog';
+import { CLI_COMMAND } from '../cli-command';
 import { readConfig } from '../config';
-import { CLI_COMMAND, CliError } from '../errors';
+import { CliError } from '../errors';
 import { readProject } from '../project';
 
 import type { CommandResult } from './result';

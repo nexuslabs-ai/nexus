@@ -2,24 +2,27 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { resolveRegistry } from './catalog';
+import { CLI_COMMAND } from './cli-command';
 import { info, list, search, view } from './commands/browse';
 import { diff, doctor } from './commands/check';
 import { add, init, update } from './commands/install';
 import type { CommandResult } from './commands/result';
-import { CLI_COMMAND, CliError } from './errors';
+import { CliError } from './errors';
 
 const HELP = `nxds: add nxds to your app.
 
-Usage
-  ${CLI_COMMAND} init               Set up nxds: token CSS, provider, and the layout wiring
-  ${CLI_COMMAND} add <item...>      Add components or blocks, and everything they need
-  ${CLI_COMMAND} list [--kind k]    List components and blocks (k: component, block)
-  ${CLI_COMMAND} search <term>      Find items by name or description
-  ${CLI_COMMAND} view <item>        Show an item's files, packages and docs link
-  ${CLI_COMMAND} info               Show what the CLI detects in this app
-  ${CLI_COMMAND} update             Update every installed item to the latest release
-  ${CLI_COMMAND} diff [item...]     Compare your nxds files with the latest release
-  ${CLI_COMMAND} doctor             Check that nxds is wired up correctly
+Usage: ${CLI_COMMAND} <command> [options]
+
+Commands
+  init                   Set up nxds: token CSS, provider, and the layout wiring
+  add <item...>          Add components or blocks, and everything they need
+  list [--kind k]        List components and blocks (k: component, block)
+  search <term>          Find items by name or description
+  view <item>            Show an item's files, packages and docs link
+  info                   Show what the CLI detects in this app
+  update                 Update every installed item to the latest release
+  diff [item...]         Compare your nxds files with the latest release
+  doctor                 Check that nxds is wired up correctly
 
 Options
   --json                 Print machine-readable JSON

@@ -1,5 +1,5 @@
-// Syncs nxds into an example app with the local `nxds` CLI, the way a
-// consumer runs `nxds update`: the items in the app's nxds.json, byte for
+// Syncs nxds into an example app with the local `nxds-cli` build, the way a
+// consumer runs `nxds-cli update`: the items in the app's nxds.json, byte for
 // byte from a registry built from this checkout. Then rebuilds packages/core
 // and reinstalls it, since the app depends on it by file: path.
 // usage: node ../scripts/sync-nxds.mjs   (npm run nxds:add)
@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { releaseCatalog } from '@nxds/catalog/scripts/catalog-schema.ts';
+import { releaseCatalog } from '@nxds/catalog';
 import { buildCatalog } from '@nxds/catalog/scripts/generate-catalog.mjs';
 import { writeRegistry } from '@nxds/catalog/scripts/registry.mjs';
 

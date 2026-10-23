@@ -2,7 +2,8 @@ import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { valid } from 'semver';
 
-import { CLI_COMMAND, CliError, readJson } from './errors';
+import { CLI_COMMAND } from './cli-command';
+import { CliError, readJson } from './errors';
 
 export const CONFIG_FILE = 'nxds.json';
 

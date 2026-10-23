@@ -10,8 +10,9 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { valid, validRange } from 'semver';
 
+import { CLI_COMMAND } from './cli-command';
 import { projectPath } from './config';
-import { CLI_COMMAND, CliError, readJson } from './errors';
+import { CliError, readJson } from './errors';
 
 export type {
   Catalog,

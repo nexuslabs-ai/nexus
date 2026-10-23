@@ -1,8 +1,5 @@
 import { readFileSync } from 'node:fs';
 
-/** How the person runs the CLI, for usage lines and hints. */
-export const CLI_COMMAND = 'npx nxds-cli@latest';
-
 /** An error the person running the CLI can fix; printed without a stack. */
 export class CliError extends Error {}
 

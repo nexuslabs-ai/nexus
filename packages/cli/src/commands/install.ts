@@ -13,6 +13,7 @@ import {
   splitInstalled,
   variantOf,
 } from '../catalog';
+import { CLI_COMMAND } from '../cli-command';
 import {
   type Config,
   projectPath,
@@ -20,7 +21,7 @@ import {
   requireConfig,
   writeConfig,
 } from '../config';
-import { CLI_COMMAND, CliError } from '../errors';
+import { CliError } from '../errors';
 import { NO_PREVIOUS } from '../files';
 import {
   installItems,
@@ -96,7 +97,7 @@ export async function init(
   const project = readProject(cwd);
   if (!project.setup) {
     throw new CliError(
-      'nxds init supports Next.js App Router and Vite + React apps. For other setups, follow the manual steps at https://nxds.dev/getting-started/install.'
+      `\`${CLI_COMMAND} init\` supports Next.js App Router and Vite + React apps. For other setups, follow the manual steps at https://nxds.dev/getting-started/install.`
     );
   }
   if (!project.typescript) {
