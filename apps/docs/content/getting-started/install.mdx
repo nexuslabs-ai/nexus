@@ -9,7 +9,7 @@ follow [Install by hand](#install-by-hand).
 ## Set up your app
 
 ```bash
-npx nxds@latest init
+npx nxds-cli@latest init
 ```
 
 `init` sets up a Next.js App Router app or a Vite + React app that uses
@@ -32,7 +32,7 @@ another folder, pass `--dir`.
 ## Add a component
 
 ```bash
-npx nxds@latest add button
+npx nxds-cli@latest add button
 ```
 
 `add` copies the component, the components it uses and the packages it needs,
@@ -44,8 +44,8 @@ Copied files are yours to edit. Import them from the nxds folder, such as
 ## Update components
 
 ```bash
-npx nxds@latest diff
-npx nxds@latest update
+npx nxds-cli@latest diff
+npx nxds-cli@latest update
 ```
 
 `diff` lists the files that differ from the latest release. `update` moves
@@ -57,7 +57,7 @@ your edits stay. To replace an edited file too, pass `--overwrite`.
 ## Find setup problems
 
 ```bash
-npx nxds@latest doctor
+npx nxds-cli@latest doctor
 ```
 
 `doctor` checks the provider, the CSS entry, the files and the packages, and
@@ -70,7 +70,7 @@ says how to fix each problem.
 | `--no-install` | Skips installing npm packages                        |
 | `--cwd <path>` | Runs in another folder                               |
 
-Run `npx nxds@latest --help` to list every command.
+Run `npx nxds-cli@latest --help` to list every command.
 
 ## Install by hand
 

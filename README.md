@@ -11,8 +11,8 @@ Three layers compose into one consumable surface:
 Add nxds to your app with the `nxds` CLI:
 
 ```bash
-npx nxds@latest init
-npx nxds@latest add button
+npx nxds-cli@latest init
+npx nxds-cli@latest add button
 ```
 
 To give Claude Code the nxds skill, run `/plugin install nxds --marketplace nexuslabs-ai/nxds`.

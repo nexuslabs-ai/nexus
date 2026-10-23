@@ -195,7 +195,7 @@ export async function fetchRelease(
 
   if (isRecord(value) && typeof value.schema === 'number' && value.schema > 1) {
     throw new CliError(
-      `nxds ${version} needs a newer CLI. Run \`npx nxds@latest\` instead.`
+      `nxds ${version} needs a newer CLI. Run \`npx nxds-cli@latest\` instead.`
     );
   }
   const problem = releaseProblem(value, version);

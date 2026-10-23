@@ -148,10 +148,10 @@ export function SourceFile({ path, source }: { path: string; source: string }) {
 export function AddCommand({ name }: { name: string }) {
   return (
     <>
-      <CodeSample lang="bash">{`npx nxds@latest add ${name}`}</CodeSample>
+      <CodeSample lang="bash">{`npx nxds-cli@latest add ${name}`}</CodeSample>
       <p className="nx:mt-3 nx:typography-body-default nx:text-muted-foreground">
-        Run <code>npx nxds@latest init</code> first if nxds isn&rsquo;t set up
-        in your app yet. See{' '}
+        Run <code>npx nxds-cli@latest init</code> first if nxds isn&rsquo;t set
+        up in your app yet. See{' '}
         <Link
           href={requirePage('getting-started', 'install').route}
           className={LINK_CLASS}

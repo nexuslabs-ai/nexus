@@ -25,7 +25,7 @@ function run(command, args, cwd, stdio = 'pipe') {
   }
 }
 
-run('pnpm', ['turbo', 'run', 'build', '--filter=nxds', '--filter=@nxds/core'], repoRoot);
+run('pnpm', ['turbo', 'run', 'build', '--filter=nxds-cli', '--filter=@nxds/core'], repoRoot);
 const registry = mkdtempSync(path.join(tmpdir(), 'nxds-registry-'));
 writeRegistry(registry, [releaseCatalog(buildCatalog())]);
 run('node', [cli, 'update', '--overwrite', '--no-install', '--registry', registry], appDir, 'inherit');

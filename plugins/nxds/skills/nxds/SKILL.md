@@ -13,25 +13,25 @@ themed by one engine, `@nxds/core`. Install everything with the
 
 ## Before you change anything
 
-1. Run `npx nxds@latest info --json`. It reports the app setup, the nxds folder
+1. Run `npx nxds-cli@latest info --json`. It reports the app setup, the nxds folder
    and the installed items.
-2. If `initialized` is `false`, run `npx nxds@latest init`. It sets up Next.js
+2. If `initialized` is `false`, run `npx nxds-cli@latest init`. It sets up Next.js
    App Router and Vite + React apps that use TypeScript. For any other setup,
    follow https://nxds.dev/getting-started/install.md by hand.
 3. If `init` returns `"ok": false`, do each step in `data.manual` by hand.
 
 ## Add components
 
-- Find an item: `npx nxds@latest search <term> --json`. Read one:
-  `npx nxds@latest view <name> --json`.
-- Add items: `npx nxds@latest add <name...>`. To see the files and packages
+- Find an item: `npx nxds-cli@latest search <term> --json`. Read one:
+  `npx nxds-cli@latest view <name> --json`.
+- Add items: `npx nxds-cli@latest add <name...>`. To see the files and packages
   first, add `--dry-run --json`.
 - Import from the folder in `nxds.json` `dir`, keeping its layout, such as
   `components/nxds/components/button/button`.
 - `add` installs from the version in `nxds.json`. If an item is missing
-  there, run `npx nxds@latest update` first.
+  there, run `npx nxds-cli@latest update` first.
 - Don't pass `--overwrite` unless the user asks. It replaces files they edited.
-- After `init` or `add`, run `npx nxds@latest doctor` and fix every failed
+- After `init` or `add`, run `npx nxds-cli@latest doctor` and fix every failed
   check.
 
 ## Write nxds code

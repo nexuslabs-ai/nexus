@@ -25,7 +25,7 @@ export type InstallPlan = {
   styles: string[];
 };
 
-/** Whether `npx nxds add` installs `framework`'s variants. */
+/** Whether `npx nxds-cli add` installs `framework`'s variants. */
 export function cliInstalls(framework: Framework) {
   return catalog.frameworks.includes(framework);
 }
