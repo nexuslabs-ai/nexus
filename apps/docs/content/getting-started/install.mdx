@@ -57,9 +57,10 @@ count as edits.
 
 If you and the release changed the same lines, `update` marks them like a git
 conflict. Keep the lines you want, delete the `<<<<<<<`, `=======` and
-`>>>>>>>` markers, then run `doctor`. Until you do, `update` leaves the file
-alone, stays on its release and exits `3`. To replace an edited file with the
-release's copy, pass `--overwrite`.
+`>>>>>>>` markers, then run `update` again. If a newer release comes out
+before you resolve every conflict, `update` changes no files, keeps `nxds.json`
+on your release and exits `3`. To replace an edited file with the release's
+copy, pass `--overwrite`.
 
 ## Find setup problems
 

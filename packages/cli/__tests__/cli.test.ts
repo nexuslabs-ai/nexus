@@ -48,13 +48,23 @@ function nextRelease(): Catalog {
 
 // A line the release after that changes: the small size's padding.
 const SM_PADDING = 'nx:h-8 nx:px-2.5';
+const BUTTON_GROUP_CONTEXT = 'components/button-group/button-group-context.ts';
 
-/** The release after `nextRelease`, with Button's small padding changed too. */
+/**
+ * The release after `nextRelease`, with Button's small padding changed too,
+ * and a change to another file Button installs.
+ */
 function laterRelease(): Catalog {
   const later = nextRelease();
   later.version = '0.4.8';
   const file = buttonSource(later);
   file.content = file.content.replace(SM_PADDING, 'nx:h-8 nx:px-2');
+  const button = later.items.find((item) => item.name === 'button');
+  const context = button?.variants.react?.files.find(
+    (f) => f.path === BUTTON_GROUP_CONTEXT
+  );
+  if (!context) throw new Error(`0.4.8 has no ${BUTTON_GROUP_CONTEXT}`);
+  context.content += '\nexport const BUTTON_GROUP_SIZES = 3;\n';
   return later;
 }
 
@@ -282,7 +292,7 @@ describe('update', () => {
     expect(readApp(context.app, NXDS_BUTTON)).toBe(conflicted);
   });
 
-  it("stays on the conflicted release until you resolve it, then merges the next one's changes", async () => {
+  it("changes nothing until you resolve a conflict, then merges the next release's changes", async () => {
     const context = setup();
     await installButton(context);
     writeApp(
@@ -293,12 +303,13 @@ describe('update', () => {
     writeRegistry(context.registry, [RELEASE, nextRelease()]);
     await cli(['update'], context);
     writeRegistry(context.registry, [RELEASE, nextRelease(), laterRelease()]);
+    const before = readTree(context.app);
 
     const held = await cliJson(['update'], context);
 
     expect(held.exitCode).toBe(EXIT_CODES.attention);
     expect(held.body.data.unresolved).toEqual([BUTTON]);
-    expect(nxdsVersion(context.app)).toBe('0.4.7');
+    expect(readTree(context.app)).toEqual(before);
 
     // Keep your side of the conflict.
     const resolved = buttonSource(nextRelease()).content.replace(
@@ -310,10 +321,13 @@ describe('update', () => {
     const { exitCode, body } = await cliJson(['update'], context);
 
     expect(exitCode).toBe(EXIT_CODES.ok);
-    expect(body.data.merged).toEqual([BUTTON]);
+    expect(body.data).toMatchObject({
+      merged: [BUTTON],
+      written: [BUTTON_GROUP_CONTEXT],
+    });
     const merged = readApp(context.app, NXDS_BUTTON);
     expect(merged).toContain('nx:[&_svg]:size-5');
-    expect(merged).toContain("'nx:h-8 nx:px-2 ");
+    expect(merged).toContain('nx:h-8 nx:px-2 nx:gap-2');
     expect(nxdsVersion(context.app)).toBe('0.4.8');
   });
 });

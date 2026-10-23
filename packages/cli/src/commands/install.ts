@@ -17,6 +17,7 @@ import {
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig, writeConfig } from '../config';
 import { CliError, UsageError } from '../errors';
+import { conflictedFiles } from '../files';
 import {
   installItems,
   type InstallOptions,
@@ -54,11 +55,11 @@ function installLines(
     ),
     ...result.conflicted.map(
       (file) =>
-        `${dryRun ? 'Would conflict' : 'Conflict'} in ${config.dir}/${file}: nxds changed lines you edited. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} doctor\`.`
+        `${dryRun ? 'Would conflict' : 'Conflict'} in ${config.dir}/${file}: nxds changed lines you edited. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`
     ),
     ...result.unresolved.map(
       (file) =>
-        `Still conflicted: ${config.dir}/${file}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} doctor\`.`
+        `Still conflicted: ${config.dir}/${file}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`
     ),
     ...result.skipped.map(
       (file) =>
@@ -268,10 +269,11 @@ function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
  * The app moves to the latest release even with conflicts this run writes,
  * since a conflicted file already holds the latest release's lines. Its
  * markers are then the only record of the conflict, so every later run
- * reports the file until they are resolved. The app stays behind when a file
- * is left alone: one still conflicted from an earlier run holds an older
- * release's lines, and an edited file is kept when the app's release is gone
- * from the registry. The next `update` then merges from the app's release.
+ * reports the file until they are resolved. A file still conflicted when a
+ * newer release is out holds an older release's lines, so `update` changes
+ * nothing until it is resolved, then merges from the app's release. The app
+ * also stays behind when its release is gone from the registry and an edited
+ * file is kept.
  */
 export async function update(
   cwd: string,
@@ -279,10 +281,26 @@ export async function update(
   options: InstallOptions
 ): Promise<CommandResult> {
   const config = requireConfig(cwd);
+  const from = config.version;
   const latest = await loadRelease(registry, 'latest');
-  const previous = await fetchRelease(registry, config.version);
   const { known, removed } = splitInstalled(latest, config.items);
   const current = filesOf(latest, config.framework, known);
+  const unresolved =
+    from === latest.version || options.overwrite
+      ? []
+      : conflictedFiles(cwd, config, current);
+  if (unresolved.length > 0) {
+    return {
+      data: { dryRun: options.dryRun, from, version: from, unresolved },
+      lines: [
+        ...unresolved.map((file) => `Still conflicted: ${config.dir}/${file}`),
+        `Changed nothing, and nxds.json stays on ${from}. Resolve the <<<<<<< markers, then run \`${CLI_COMMAND} update\` again.`,
+      ],
+      ok: false,
+    };
+  }
+
+  const previous = await fetchRelease(registry, from);
   const installedBefore = previous
     ? filesOf(
         previous,
@@ -303,10 +321,7 @@ export async function update(
     options
   );
 
-  const from = config.version;
-  const stays =
-    from !== latest.version &&
-    installed.skipped.length + installed.unresolved.length > 0;
+  const stays = from !== latest.version && installed.skipped.length > 0;
   if (!stays) config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 

@@ -17,9 +17,9 @@ import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig } from '../config';
 import {
   baseOf,
+  conflictedFiles,
   type FileState,
   fileState,
-  hasConflictMarkers,
   sameContent,
 } from '../files';
 import { installedVersion } from '../packages';
@@ -292,11 +292,13 @@ export async function doctor(
       : `Missing ${missingFiles.join(', ')}. Run \`${CLI_COMMAND} add\` for those items.`
   );
 
-  const conflicted = items.flatMap((item) =>
-    variantOf(item, config.framework)
-      .files.map((file) => `${config.dir}/${file.path}`)
-      .filter((file) => hasConflictMarkers(read(cwd, file)))
-  );
+  const conflicted = conflictedFiles(
+    cwd,
+    config,
+    items.flatMap((item) =>
+      variantOf(item, config.framework).files.map((file) => file.path)
+    )
+  ).map((file) => `${config.dir}/${file}`);
   check(
     'conflicts',
     conflicted.length === 0,

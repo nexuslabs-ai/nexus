@@ -64,6 +64,20 @@ export function hasConflictMarkers(content: string) {
   return content.split(/\r?\n/).includes(CONFLICT_START);
 }
 
+/** The `files` in the nxds folder that still hold conflict markers. */
+export function conflictedFiles(
+  root: string,
+  config: Config,
+  files: Iterable<string>
+) {
+  return [...files].filter((file) => {
+    const target = path.join(root, config.dir, file);
+    return (
+      existsSync(target) && hasConflictMarkers(readFileSync(target, 'utf8'))
+    );
+  });
+}
+
 export function fileState(
   root: string,
   config: Config,
