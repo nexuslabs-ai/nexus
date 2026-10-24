@@ -63,7 +63,9 @@ const chapters = [
   },
   {
     id: 'coexist',
-    title: 'Build on what you use.',
+    title: 'Your next component shouldn’t change the rest.',
+    subtitle:
+      'Nexus components bring their own styles, so you can add what you need while keeping the look and feel you’ve already built.',
     cta: 'Explore integration',
     href: 'https://nxds.dev/getting-started/install',
     tabs: ['MUI', 'Ant Design', 'shadcn/ui'],
@@ -300,7 +302,7 @@ export function DockChapterJourney({
         ],
         default: 'hero-adoption',
       },
-      showCoexistence: { type: 'action', label: 'Show Build on what you use' },
+      showCoexistence: { type: 'action', label: 'Show incremental adoption' },
     },
     {
       id: 'nexus-story-coexistence-v1',
@@ -562,12 +564,9 @@ export function DockChapterJourney({
                     Change one setting. See your system respond.
                   </p>
                 )}
-              {current.id === 'coexist' &&
-                coexistence.iteration === 'diagram' && (
-                  <p className="coexistence-story-subtitle">
-                    Keep your components. Add Nexus where you need it.
-                  </p>
-                )}
+              {current.subtitle && (
+                <p className="coexistence-story-subtitle">{current.subtitle}</p>
+              )}
               <div className="story-ctas">
                 <Button asChild>
                   <a href="https://nxds.dev/docs">Get started</a>
