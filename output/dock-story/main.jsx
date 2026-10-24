@@ -1,12 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import {
-  DEFAULT_NEXUS_APPEARANCE,
-  sanitizeNexusAppearance,
-} from '@nexus_ds/core';
-import { Button } from '@nexus_ds/react';
-import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { DEFAULT_NXDS_APPEARANCE, sanitizeNxdsAppearance } from '@nxds/core';
+import { Button } from '@nxds/react';
+import { NxdsAppearanceProvider } from '@nxds/react/appearance';
 import { IconBrandGithub, IconMoon, IconSun } from '@tabler/icons-react';
 import { useDialKit } from 'dialkit';
 
@@ -36,13 +33,13 @@ function Page() {
   }, []);
 
   const [pageAppearance, setPageAppearance] = useState(() =>
-    sanitizeNexusAppearance({
-      ...DEFAULT_NEXUS_APPEARANCE,
+    sanitizeNxdsAppearance({
+      ...DEFAULT_NXDS_APPEARANCE,
       mode: 'dark',
       surfaceTone: 'neutral',
       corners: 'smooth',
       prefs: {
-        ...DEFAULT_NEXUS_APPEARANCE.prefs,
+        ...DEFAULT_NXDS_APPEARANCE.prefs,
         uiFont: 'DM Sans, Arial, sans-serif',
         uiFontSize: 16,
       },
@@ -70,7 +67,7 @@ function Page() {
 
   function updatePreviewAppearance(next) {
     setPreviewAppearance((current) =>
-      sanitizeNexusAppearance(typeof next === 'function' ? next(current) : next)
+      sanitizeNxdsAppearance(typeof next === 'function' ? next(current) : next)
     );
   }
   const setAppearance = sharedAppearance
@@ -78,7 +75,7 @@ function Page() {
     : setPageAppearance;
 
   return (
-    <NexusAppearanceProvider
+    <NxdsAppearanceProvider
       state={appearance}
       onStateChange={setAppearance}
       storageKey={false}
@@ -160,7 +157,7 @@ function Page() {
         </main>
         <SourceAudit />
       </div>
-    </NexusAppearanceProvider>
+    </NxdsAppearanceProvider>
   );
 }
 createRoot(document.getElementById('root')).render(<Page />);

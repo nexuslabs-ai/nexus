@@ -15,25 +15,22 @@ Next.js docs route. The existing docs homepage remains in
 - Historical source snapshots, screenshots, source-ownership audits, and
   measured browser evidence. Baseline directories are retained verbatim.
 
-## Preview dependencies
+## Preview
 
-The review server runs in a separate local Vite workspace. Its existing aliases
-use the older `@nexus_ds` homepage checkout and the separate reusable Dock
-checkout; newer source snapshots use `@nxds`. See `DOCK.md`, `APPEARANCE.md`, and
-`SHARED-APPEARANCE.md` for the exact boundaries. This archive does not supply a
-standalone server for every historical iteration.
-
-The reusable Dock and compact property-control package work belongs to
-[PR #889](https://github.com/nexuslabs-ai/nxds/pull/889). The homepage PR preserves
-its consumers and comparison snapshots without duplicating those package edits.
-
-The newest HeroUI comparison has an independent build configuration:
+Run the prototype from this directory:
 
 ```sh
-pnpm exec vite build --config output/dock-story/hero-adoption-preview/vite.config.mjs
+cd output/dock-story
+../../node_modules/.bin/vite --config ./vite.config.mjs --port 4188
 ```
 
-Serve the resulting `hero-adoption-built/` directory at
-`/hero-adoption-preview/` in the review server. Generated bundles are excluded
-from Git; their source and runtime evidence are retained. See
+`vite.config.mjs` resolves `@nxds/react` and `@nxds/core` from this repository's
+`packages/`. The bar, `PropertySlider` and the compact `ColorField` come from the
+Dock checkout at `/Users/temp/.codex/worktrees/nexus-dock/nexus`, which holds
+[PR #889](https://github.com/nexuslabs-ai/nxds/pull/889). The retired Dock loads
+from that checkout's `output/dock-retired/preview-dock.tsx`.
+
+The server also serves the HeroUI comparison at `/hero-adoption-preview/`. See
 `HEROUI-ADOPTION.md` for the experiment, caveats, and verification results.
+Baseline directories are historical snapshots. Some still import retired APIs and
+don't run.

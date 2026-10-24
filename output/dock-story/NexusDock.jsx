@@ -1,4 +1,4 @@
-import { Dock, DockItem, DockLabel, DockPanel } from '@nxds/react';
+import { Dock, DockItem, DockLabel, DockPanel } from '@nexus-dock/source';
 
 import { tabIcons } from './dock-icons';
 

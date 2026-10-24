@@ -1,5 +1,7 @@
 import { useId } from 'react';
 
+import { NxdsAppearanceColorField } from '@nexus-dock/color-field';
+import { PropertySlider } from '@nexus-dock/property-slider';
 import {
   BASE_TONE_OPTIONS,
   BRAND_COLOR_PRESETS,
@@ -15,8 +17,6 @@ import {
   FieldGroup,
   FieldLabel,
   NativeSelect,
-  NxdsAppearanceColorField,
-  PropertySlider,
   Switch,
 } from '@nxds/react';
 
