@@ -1,0 +1,75 @@
+/* Motion utilities - duration utilities are data-driven from canonical motion tokens; the ring-safe transitions and the presence bridge below are static. */
+
+@utility duration-0 {
+  --tw-duration: var(--nx-motion-duration-0);
+  transition-duration: var(--nx-motion-duration-0);
+}
+
+@utility duration-faster {
+  --tw-duration: var(--nx-motion-duration-faster);
+  transition-duration: var(--nx-motion-duration-faster);
+}
+
+@utility duration-fast {
+  --tw-duration: var(--nx-motion-duration-fast);
+  transition-duration: var(--nx-motion-duration-fast);
+}
+
+@utility duration-default {
+  --tw-duration: var(--nx-motion-duration-default);
+  transition-duration: var(--nx-motion-duration-default);
+}
+
+@utility duration-moderate {
+  --tw-duration: var(--nx-motion-duration-moderate);
+  transition-duration: var(--nx-motion-duration-moderate);
+}
+
+@utility duration-slow {
+  --tw-duration: var(--nx-motion-duration-slow);
+  transition-duration: var(--nx-motion-duration-slow);
+}
+
+@utility duration-slower {
+  --tw-duration: var(--nx-motion-duration-slower);
+  transition-duration: var(--nx-motion-duration-slower);
+}
+
+@utility transition-control {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: var(
+    --tw-ease,
+    --theme(--default-transition-timing-function)
+  );
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
+}
+
+@utility transition-field {
+  transition-property: color, background-color;
+  transition-timing-function: var(
+    --tw-ease,
+    --theme(--default-transition-timing-function)
+  );
+  transition-duration: var(
+    --tw-duration,
+    --theme(--default-transition-duration)
+  );
+}
+
+@keyframes nx-overlay-presence-exit {
+  from {
+    --nx-overlay-presence-phase: 0;
+  }
+  to {
+    --nx-overlay-presence-phase: 1;
+  }
+}
+
+@utility animate-overlay-presence-exit {
+  animation-name: nx-overlay-presence-exit;
+  animation-duration: var(--tw-duration, var(--nx-motion-duration-fast));
+  animation-timing-function: linear;
+}

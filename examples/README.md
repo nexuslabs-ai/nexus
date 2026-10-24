@@ -13,6 +13,7 @@ the ways a frontend team meets nxds.
 | [`shadcn-app`](shadcn-app) | Has a Next.js app built with shadcn/ui | The app, beside `components/ui` |
 | [`shadcn-package`](shadcn-package) | Has its own shadcn-based design-system package | The package (`app-via-package`), or the app beside the package (`app-direct`) |
 | [`mui-app`](mui-app) | Has a Vite app built with Material UI and no Tailwind | The app |
+| [`react18-app`](react18-app) | Has a Vite app on React 18.3 | The app, as the React 18 files |
 
 Each app installs `@nxds/core` from `packages/core` (`file:` with
 `install-links`), so the examples always run this repository's engine.

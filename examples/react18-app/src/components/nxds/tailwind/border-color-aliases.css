@@ -1,0 +1,57 @@
+/* Border Color Alias Utilities */
+
+@utility border-color-default {
+  border-color: var(--nx-color-border-default);
+}
+
+@utility border-color-default-alpha {
+  border-color: var(--nx-color-border-default-alpha);
+}
+
+@utility border-color-focus {
+  border-color: var(--nx-color-border-focus);
+}
+
+@utility border-color-disabled {
+  border-color: var(--nx-color-border-disabled);
+}
+
+@utility border-color-warning {
+  border-color: var(--nx-color-warning-border);
+}
+
+@utility border-color-warning-active {
+  border-color: var(--nx-color-border-warning-active);
+}
+
+@utility border-color-success {
+  border-color: var(--nx-color-success-border);
+}
+
+@utility border-color-success-active {
+  border-color: var(--nx-color-border-success-active);
+}
+
+@utility border-color-error {
+  border-color: var(--nx-color-error-border);
+}
+
+@utility border-color-error-active {
+  border-color: var(--nx-color-border-error-active);
+}
+
+@utility border-color-information {
+  border-color: var(--nx-color-information-border);
+}
+
+@utility border-color-information-active {
+  border-color: var(--nx-color-border-information-active);
+}
+
+@utility border-color-primary {
+  border-color: var(--nx-color-primary-border);
+}
+
+@utility border-color-primary-active {
+  border-color: var(--nx-color-primary-border-active);
+}

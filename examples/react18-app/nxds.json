@@ -1,0 +1,24 @@
+{
+  "framework": "react",
+  "react": 18,
+  "version": "0.4.6",
+  "dir": "src/components/nxds",
+  "css": "src/nxds.css",
+  "items": [
+    "setup",
+    "spinner",
+    "button",
+    "popover",
+    "dialog",
+    "dropdown-menu",
+    "tooltip",
+    "tabs",
+    "date-picker",
+    "badge",
+    "command",
+    "multi-select",
+    "select",
+    "sheet",
+    "combobox"
+  ]
+}

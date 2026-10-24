@@ -1,6 +1,7 @@
 // Installs nxds with the built CLI the way a new user would, into a fresh
-// Next.js App Router app and a fresh Vite + React app, then checks the result:
-// - `init`, then `add` with every catalog item;
+// Next.js App Router app, a fresh Vite + React app and the same Vite app moved
+// to React 18, then checks the result:
+// - `init`, then `add` with every catalog item, for the app's React;
 // - running `init` again, and `add --dry-run`, change nothing;
 // - every docs example, pasted as the docs page shows it;
 // - the app's own typecheck, lint and production build pass;
@@ -9,7 +10,7 @@
 // The CLI installs from a registry built from this checkout, and the app gets
 // this checkout's @nxds/core as a packed tarball, since neither may be
 // published yet.
-// usage: node packages/cli/scripts/check-install.mjs [next|vite]
+// usage: node packages/cli/scripts/check-install.mjs [next|vite|vite-react18]
 // Needs the built CLI (packages/cli/dist), the built core (packages/core/dist)
 // and the docs demos (apps/docs/__generated__/demos).
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -37,6 +38,24 @@ const cli = path.join(cliRoot, 'dist/index.js');
 const coreRoot = path.resolve(cliRoot, '../core');
 const demosDir = path.resolve(cliRoot, '../../apps/docs/__generated__/demos');
 
+const VITE = {
+  create: [
+    'create-vite@7',
+    'app',
+    '--template',
+    'react-ts',
+    '--no-interactive',
+  ],
+  install: true,
+  srcDir: 'src',
+  mount: (names) => mountInViteApp(names),
+  checks: [
+    ['npm', ['run', 'build']],
+    ['npx', ['eslint', 'src']],
+  ],
+  react: 19,
+};
+
 const APPS = {
   next: {
     create: [
@@ -59,22 +78,18 @@ const APPS = {
       ['npm', ['run', 'build']],
       ['npm', ['run', 'lint']],
     ],
+    react: 19,
   },
-  vite: {
-    create: [
-      'create-vite@7',
-      'app',
-      '--template',
-      'react-ts',
-      '--no-interactive',
+  vite: VITE,
+  'vite-react18': {
+    ...VITE,
+    prepare: [
+      'react@18.3.1',
+      'react-dom@18.3.1',
+      '@types/react@18.3.23',
+      '@types/react-dom@18.3.7',
     ],
-    install: true,
-    srcDir: 'src',
-    mount: (names) => mountInViteApp(names),
-    checks: [
-      ['npm', ['run', 'build']],
-      ['npx', ['eslint', 'src']],
-    ],
+    react: 18,
   },
 };
 
@@ -239,12 +254,22 @@ for (const [name, app] of Object.entries(APPS)) {
 
   run('npx', ['--yes', ...app.create], workDir);
   if (app.install) run('npm', ['install', '--no-audit', '--no-fund']);
+  if (app.prepare)
+    run('npm', ['install', '--no-audit', '--no-fund', ...app.prepare]);
   installLocalCore(workDir);
 
   registryDir = path.join(workDir, 'registry');
   writeRegistry(registryDir, [catalog]);
 
   runCli(['init']);
+  const { react } = JSON.parse(
+    readFileSync(path.join(appDir, 'nxds.json'), 'utf8')
+  );
+  if (react !== app.react) {
+    fail(
+      `\`init\` recorded React ${react} files in an app on React ${app.react}.`
+    );
+  }
   runCli(['add', ...items]);
   checkRerunsChangeNothing(items);
   app.mount(pasteDemos(app.srcDir));
