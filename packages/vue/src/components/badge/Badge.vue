@@ -15,7 +15,10 @@ export interface BadgeProps {
   fill?: BadgeVariants['fill'];
   /** Uppercase text with wider letter spacing. */
   isCaps?: boolean;
-  /** Round count badge that ignores icons. Add an `aria-label` such as "8 unread". */
+  /**
+   * Renders a round count badge from its children and ignores icons.
+   * Add an `aria-label` such as "8 unread", because a bare number lacks context.
+   */
   isNumber?: boolean;
   class?: HTMLAttributes['class'];
 }

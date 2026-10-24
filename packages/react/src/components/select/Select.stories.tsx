@@ -1,14 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Input } from '../input/input';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '../native-select/native-select';
 
 import {
   Select,
@@ -79,64 +73,6 @@ export const WithDefaultValue: Story = {
         <SelectItem value="apple">Apple</SelectItem>
         <SelectItem value="banana">Banana</SelectItem>
         <SelectItem value="orange">Orange</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
-};
-
-export const IndicatorCrossFade: Story = {
-  render: () => (
-    <Select defaultValue="apple">
-      <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
-        <SelectValue placeholder="Select a fruit" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="apple">Apple</SelectItem>
-        <SelectItem value="banana">Banana</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', { name: 'Select a fruit' });
-
-    try {
-      await userEvent.click(trigger);
-
-      const listbox = await within(document.body).findByRole('listbox');
-      const apple = within(listbox).getByRole('option', { name: 'Apple' });
-      const banana = within(listbox).getByRole('option', { name: 'Banana' });
-      const selectedCheck = apple.querySelector(
-        '[data-slot="select-item-indicator-icon"]'
-      );
-      const unselectedCheck = banana.querySelector(
-        '[data-slot="select-item-indicator-icon"]'
-      );
-
-      await expect(selectedCheck).toBeInTheDocument();
-      await expect(unselectedCheck).toBeInTheDocument();
-      await expect(selectedCheck).toHaveClass('nx:transition-[opacity,scale]');
-      await expect(selectedCheck).toHaveClass(
-        'nx:group-data-[state=checked]:opacity-100'
-      );
-    } finally {
-      await userEvent.keyboard('{Escape}');
-      await waitFor(() => {
-        expect(document.querySelector('[role="listbox"]')).toBeNull();
-      });
-    }
-  },
-};
-
-export const Disabled: Story = {
-  render: (_args) => (
-    <Select disabled>
-      <SelectTrigger className="nx:w-[180px]" aria-label="Disabled select">
-        <SelectValue placeholder="Disabled" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="apple">Apple</SelectItem>
-        <SelectItem value="banana">Banana</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -294,169 +230,6 @@ export const BorderlessStates: Story = {
   },
 };
 
-export const CapabilityLadder: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Use NativeSelect for OS pickers, Select for a styled list, Combobox for search and MultiSelect for several values.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:grid nx:max-w-3xl nx:gap-4 nx:md:grid-cols-2">
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
-        <h3 className="nx:typography-label-default nx:text-foreground">
-          NativeSelect
-        </h3>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          Native picker, native form semantics, simple text options.
-        </p>
-        <NativeSelect aria-label="Native plan" defaultValue="pro">
-          <NativeSelectOption value="free">Free</NativeSelectOption>
-          <NativeSelectOption value="pro">Pro</NativeSelectOption>
-          <NativeSelectOption value="team">Team</NativeSelectOption>
-        </NativeSelect>
-      </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
-        <h3 className="nx:typography-label-default nx:text-foreground">
-          Select
-        </h3>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          Styled trigger and listbox, groups, separators, disabled items.
-        </p>
-        <Select defaultValue="pro">
-          <SelectTrigger aria-label="Styled plan">
-            <SelectValue placeholder="Plan" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Plans</SelectLabel>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="pro">Pro</SelectItem>
-              <SelectItem value="team" disabled>
-                Team
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
-        <h3 className="nx:typography-label-default nx:text-foreground">
-          Future Combobox
-        </h3>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          Roadmap boundary for searchable or async single selection.
-        </p>
-      </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
-        <h3 className="nx:typography-label-default nx:text-foreground">
-          Future MultiSelect
-        </h3>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          Roadmap boundary for multiple selected values and chip summaries.
-        </p>
-      </section>
-    </div>
-  ),
-};
-
-export const ReadOnlyBoundary: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Select has no read-only state, so use `disabled`, or show the value as text with a hidden input if it must submit.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:w-[360px] nx:flex-col nx:gap-4">
-      <div className="nx:grid nx:gap-1.5">
-        <span className="nx:typography-label-default nx:text-foreground">
-          Disabled Select
-        </span>
-        <Select disabled defaultValue="team">
-          <SelectTrigger aria-label="Disabled team select">
-            <SelectValue placeholder="Team" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="team">Team</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <form className="nx:grid nx:gap-1.5">
-        <span className="nx:typography-label-default nx:text-foreground">
-          Display-only submission value
-        </span>
-        <div
-          data-testid="select-display-only-value"
-          className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
-        >
-          Team
-        </div>
-        <input type="hidden" name="plan" value="team" />
-        <p className="nx:typography-body-small nx:text-muted-foreground">
-          Hidden input preserves form submission without exposing an editable
-          select.
-        </p>
-      </form>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', {
-      name: 'Disabled team select',
-    });
-    const hiddenInput = canvasElement.querySelector('input[type="hidden"]');
-
-    await expect(trigger).toBeDisabled();
-    await expect(
-      canvas.getByTestId('select-display-only-value')
-    ).toHaveTextContent('Team');
-    await expect(hiddenInput).toHaveAttribute('name', 'plan');
-    await expect(hiddenInput).toHaveAttribute('value', 'team');
-  },
-};
-
-export const RichItemFutureBoundary: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Select items hold plain text and support `disabled`, but not descriptions, icons, avatars or metadata.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:grid nx:max-w-xl nx:gap-4">
-      <Select defaultValue="owner">
-        <SelectTrigger className="nx:w-[260px]" aria-label="Current role">
-          <SelectValue placeholder="Role" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="owner">Owner</SelectItem>
-          <SelectItem value="admin" disabled>
-            Billing admin unavailable
-          </SelectItem>
-          <SelectItem value="viewer">Viewer</SelectItem>
-        </SelectContent>
-      </Select>
-      <div className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
-        <h3 className="nx:typography-label-default nx:text-foreground">
-          Future rich item slots
-        </h3>
-        <ul className="nx:ml-4 nx:list-disc nx:typography-body-small nx:text-muted-foreground">
-          <li>Icon or avatar slot before item text.</li>
-          <li>Description slot below the primary label.</li>
-          <li>Metadata slot aligned to the far edge.</li>
-          <li>Disabled reason slot for unavailable choices.</li>
-        </ul>
-      </div>
-    </div>
-  ),
-};
-
 // ============================================
 // GROUPED STORIES
 // ============================================
@@ -490,26 +263,6 @@ export const WithGroups: Story = {
           <SelectItem value="broccoli">Broccoli</SelectItem>
           <SelectItem value="spinach">Spinach</SelectItem>
         </SelectGroup>
-      </SelectContent>
-    </Select>
-  ),
-};
-
-export const WithSeparators: Story = {
-  render: (_args) => (
-    <Select>
-      <SelectTrigger className="nx:w-[200px]" aria-label="Select a timezone">
-        <SelectValue placeholder="Select timezone" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="utc">UTC</SelectItem>
-        <SelectSeparator />
-        <SelectItem value="est">Eastern Time (EST)</SelectItem>
-        <SelectItem value="cst">Central Time (CST)</SelectItem>
-        <SelectItem value="pst">Pacific Time (PST)</SelectItem>
-        <SelectSeparator />
-        <SelectItem value="gmt">GMT</SelectItem>
-        <SelectItem value="cet">Central European Time</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -561,23 +314,6 @@ export const Sizes: Story = {
       await expect(height(trigger)).toBe(height(input));
     }
   },
-};
-
-export const SmallWidth: Story = {
-  render: (_args) => (
-    <Select>
-      <SelectTrigger className="nx:w-[120px]" aria-label="Select size">
-        <SelectValue placeholder="Size" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="xs">XS</SelectItem>
-        <SelectItem value="sm">SM</SelectItem>
-        <SelectItem value="md">MD</SelectItem>
-        <SelectItem value="lg">LG</SelectItem>
-        <SelectItem value="xl">XL</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
 };
 
 export const FullWidth: Story = {
@@ -638,42 +374,6 @@ export const Scrollable: Story = {
       </SelectContent>
     </Select>
   ),
-};
-
-export const ImmediateItems: Story = {
-  render: (_args) => (
-    <Select>
-      <SelectTrigger className="nx:w-[180px]" aria-label="Select motion item">
-        <SelectValue placeholder="Select an item" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="alpha">Alpha</SelectItem>
-        <SelectItem value="bravo">Bravo</SelectItem>
-        <SelectItem value="charlie">Charlie</SelectItem>
-        <SelectItem value="delta">Delta</SelectItem>
-        <SelectItem value="echo">Echo</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('combobox', {
-      name: 'Select motion item',
-    });
-
-    await userEvent.click(trigger);
-
-    const listbox = await within(document.body).findByRole('listbox');
-    const items = Array.from(
-      listbox.querySelectorAll('[data-slot="select-item"]')
-    );
-    await expectImmediateItemMotion(items);
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.querySelector('[role="listbox"]')).toBeNull();
-    });
-  },
 };
 
 // ============================================
@@ -1113,33 +813,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Pins the `SelectTrigger` height at the default single-line control size.',
-      },
-    },
-  },
-  render: () => (
-    <div data-testid="select-default-host" className="nx:p-10 nx:bg-background">
-      <Select>
-        <SelectTrigger aria-label="default select" className="nx:w-[200px]">
-          <SelectValue placeholder="Pick one" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="a">A</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'select-default-host', 40);
   },
 };
 

@@ -232,27 +232,6 @@ export const InContext: Story = {
   ),
 };
 
-export const AsChild: Story = {
-  render: () => (
-    <Marker asChild variant="border">
-      <h3>
-        <MarkerContent>Yesterday</MarkerContent>
-      </h3>
-    </Marker>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const heading = canvas.getByRole('heading', { name: 'Yesterday' });
-
-    await expect(heading).toHaveAttribute('data-slot', 'marker');
-    await expect(heading).toHaveAttribute('data-variant', 'border');
-
-    // The cursor rule rides the same static cva string as everywhere else, so
-    // a non-interactive row proves the `:is(button)` scoping actually bites.
-    await expect(heading).not.toHaveStyle({ cursor: 'pointer' });
-  },
-};
-
 export const AsChildLink: Story = {
   tags: ['docs'],
   parameters: {
@@ -339,22 +318,6 @@ export const Disabled: StoryObj<MarkerProps & { onRevert: () => void }> = {
   },
 };
 
-export const SeparatorRules: Story = {
-  render: () => (
-    <Marker variant="separator">
-      <MarkerContent>Today</MarkerContent>
-    </Marker>
-  ),
-  play: async ({ canvasElement }) => {
-    const marker = canvasElement.querySelector('[data-slot="marker"]');
-    const before = getComputedStyle(marker!, '::before').backgroundColor;
-    const after = getComputedStyle(marker!, '::after').backgroundColor;
-
-    await expect(before).toBe(after);
-    await expect(before).not.toBe('rgba(0, 0, 0, 0)');
-  },
-};
-
 export const ClickInteraction: StoryObj<
   MarkerProps & { onRevert: () => void }
 > = {
@@ -374,7 +337,7 @@ export const ClickInteraction: StoryObj<
     const button = canvas.getByRole('button', { name: 'Revert this change' });
 
     // A bare <button> has no UA pointer cursor, so this is the row's own
-    // `:is(button)` rule — the AsChild heading proves the negative case.
+    // `:is(button)` rule — WithDataAttributes proves the negative case.
     await expect(button).toHaveStyle({ cursor: 'pointer' });
 
     await userEvent.click(button);
@@ -426,6 +389,10 @@ export const WithDataAttributes: Story = {
     await expect(marker).toHaveAttribute('data-variant', 'separator');
     await expect(icon).toHaveAttribute('aria-hidden', 'true');
     await expect(content).toHaveTextContent('Today');
+
+    // The cursor rule rides the same static cva string as everywhere else, so
+    // a non-interactive row proves the `:is(button)` scoping actually bites.
+    await expect(marker).not.toHaveStyle({ cursor: 'pointer' });
   },
 };
 

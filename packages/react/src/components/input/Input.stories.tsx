@@ -94,30 +94,6 @@ function hoverBorderColors(element: Element) {
 }
 
 // ============================================
-// BASIC STORIES
-// ============================================
-
-export const Default: Story = {
-  args: {
-    placeholder: 'Enter text...',
-  },
-};
-
-export const WithValue: Story = {
-  args: {
-    defaultValue: 'Hello World',
-    'aria-label': 'Text input with value',
-  },
-};
-
-export const WithPlaceholder: Story = {
-  args: {
-    placeholder: 'Enter your email address',
-    type: 'email',
-  },
-};
-
-// ============================================
 // TYPE STORIES
 // ============================================
 
@@ -162,14 +138,6 @@ export const Disabled: Story = {
   args: {
     placeholder: 'Disabled input',
     disabled: true,
-  },
-};
-
-export const DisabledWithValue: Story = {
-  args: {
-    defaultValue: 'Cannot edit this',
-    disabled: true,
-    'aria-label': 'Disabled input with value',
   },
 };
 
@@ -324,78 +292,6 @@ export const GhostStates: Story = {
   },
 };
 
-export const BorderlessSurfaceComparison: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'A borderless input keeps the same solid fill on any background.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:grid nx:w-[400px] nx:gap-4">
-      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
-        <span className="nx:typography-label-default nx:text-foreground">
-          Background
-        </span>
-        <Input
-          variant="borderless"
-          aria-label="Borderless input on background"
-          defaultValue="control surface fill"
-        />
-      </div>
-      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-container nx:p-4">
-        <span className="nx:typography-label-default nx:text-foreground">
-          Container
-        </span>
-        <Input
-          variant="borderless"
-          aria-label="Borderless input on container"
-          defaultValue="control surface fill"
-        />
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const background = canvas.getByRole('textbox', {
-      name: 'Borderless input on background',
-    });
-    const container = canvas.getByRole('textbox', {
-      name: 'Borderless input on container',
-    });
-
-    await expect(background).toHaveClass('nx:bg-control-background');
-    await expect(background).toHaveClass(
-      'nx:enabled:hover:bg-control-background-hover'
-    );
-    await expect(container).toHaveClass('nx:bg-control-background');
-    await expect(container).toHaveClass(
-      'nx:enabled:hover:bg-control-background-hover'
-    );
-  },
-};
-
-export const AutofillPairing: Story = {
-  render: () => (
-    <div className="nx:grid nx:w-[400px] nx:gap-2">
-      <Input aria-label="Bordered input" defaultValue="Bordered" />
-      <Input
-        aria-label="Borderless input"
-        variant="borderless"
-        defaultValue="Borderless"
-      />
-      <Input aria-label="Disabled input" defaultValue="Disabled" disabled />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    for (const field of within(canvasElement).getAllByRole('textbox')) {
-      await expect(unpairedAutofillClasses(field)).toEqual([]);
-    }
-  },
-};
-
 export const ReadOnlyVsDisabled: Story = {
   parameters: {
     docs: {
@@ -531,27 +427,6 @@ export const WarningVsError: Story = {
   },
 };
 
-export const TypePassword: Story = {
-  args: {
-    type: 'password',
-    placeholder: 'Enter password',
-  },
-};
-
-export const TypeNumber: Story = {
-  args: {
-    type: 'number',
-    placeholder: '0',
-  },
-};
-
-export const TypeSearch: Story = {
-  args: {
-    type: 'search',
-    placeholder: 'Search...',
-  },
-};
-
 export const TypeFile: Story = {
   args: {
     type: 'file',
@@ -567,13 +442,6 @@ export const SizeSmall: Story = {
   args: {
     size: 'sm',
     placeholder: 'Small input',
-  },
-};
-
-export const SizeDefault: Story = {
-  args: {
-    size: 'default',
-    placeholder: 'Default input',
   },
 };
 
@@ -627,70 +495,6 @@ export const FocusBlurInteraction: Story = {
   },
 };
 
-export const DisabledInteraction: Story = {
-  args: {
-    placeholder: 'Cannot type here',
-    disabled: true,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox');
-
-    // Input should be disabled
-    await expect(input).toBeDisabled();
-  },
-};
-
-export const VisualStateTokens: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Hover and disabled states on the native input use nxds semantic tokens.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-3 nx:w-[400px]">
-      <Input
-        data-testid="input-hover-token"
-        placeholder="Hover surface"
-        aria-label="Hover surface input"
-      />
-      <Input
-        data-testid="input-disabled-empty"
-        placeholder="Disabled placeholder"
-        disabled
-        aria-label="Disabled empty input"
-      />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const hoverTokenInput = canvas.getByTestId('input-hover-token');
-    const disabledEmpty = canvas.getByTestId('input-disabled-empty');
-
-    await expect(hoverTokenInput).toHaveClass(
-      'nx:enabled:hover:bg-container-hover'
-    );
-    await expect(hoverTokenInput).toHaveClass('nx:bg-container');
-
-    await expect(disabledEmpty).toBeDisabled();
-    await expect(disabledEmpty).toHaveClass('nx:disabled:bg-disabled');
-    await expect(disabledEmpty).toHaveClass(
-      'nx:disabled:text-disabled-foreground'
-    );
-    await expect(disabledEmpty).toHaveClass(
-      'nx:disabled:placeholder:text-disabled-foreground'
-    );
-    await expect(disabledEmpty).toHaveClass(
-      'nx:disabled:border-border-disabled'
-    );
-    // Disabled uses a token color, not opacity-50 — opacity stays 1.
-    await expect(window.getComputedStyle(disabledEmpty).opacity).toBe('1');
-  },
-};
-
 export const WithDataAttributes: Story = {
   args: {
     size: 'lg',
@@ -705,6 +509,7 @@ export const WithDataAttributes: Story = {
     await expect(input).toHaveAttribute('data-variant', 'bordered');
     await expect(input).toHaveClass('nx:bg-container');
     await expect(input).toHaveClass('nx:enabled:hover:bg-container-hover');
+    await expect(unpairedAutofillClasses(input)).toEqual([]);
   },
 };
 

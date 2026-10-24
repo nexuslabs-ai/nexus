@@ -59,6 +59,9 @@ opencode.json
 # Playwright MCP (local browser session logs/snapshots)
 .playwright-mcp/
 
+# Vitest browser-mode failure screenshots
+__screenshots__/
+
 # Local scratch artifacts (throwaway screenshots, dependency reports, etc.)
 /dataviz-*.png
 /scrim-*.png
@@ -70,6 +73,7 @@ opencode.json
 
 # Docs build inputs, written by the `@nxds/docs#generate:*` tasks
 apps/docs/generated/
+packages/catalog/generated/
 apps/docs/__generated__/
 apps/docs/public/avatars/
 apps/docs/public/vue-demos/

@@ -78,7 +78,9 @@ function Table({
     <TableContext.Provider value={{ variant, density, stickyHeader }}>
       <div
         data-slot="table-container"
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a wide table has no focusable children, so its container takes focus to scroll (axe scrollable-region-focusable, WCAG 2.1.1)
+        // A wide table overflows horizontally and holds no focusable children, so
+        // the container itself must be keyboard-focusable to scroll into view
+        // (axe scrollable-region-focusable / WCAG 2.1.1).
         tabIndex={0}
         className={cn(
           'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
@@ -106,7 +108,7 @@ function Table({
 /**
  * Props for TableHeader.
  */
-interface TableHeaderProps extends React.ComponentProps<'thead'> {}
+type TableHeaderProps = React.ComponentProps<'thead'>;
 
 /**
  * `<thead>` that holds the column-header rows.
@@ -118,7 +120,7 @@ function TableHeader({ className, ...props }: TableHeaderProps) {
 /**
  * Props for TableBody.
  */
-interface TableBodyProps extends React.ComponentProps<'tbody'> {}
+type TableBodyProps = React.ComponentProps<'tbody'>;
 
 /**
  * `<tbody>` that holds the data rows.
@@ -136,7 +138,7 @@ function TableBody({ className, ...props }: TableBodyProps) {
 /**
  * Props for TableFooter.
  */
-interface TableFooterProps extends React.ComponentProps<'tfoot'> {}
+type TableFooterProps = React.ComponentProps<'tfoot'>;
 
 const tableFooterVariants = cva(
   'nx:bg-muted nx:typography-label-default nx:[&>tr]:last:border-b-0',
@@ -169,7 +171,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 /**
  * Props for TableRow.
  */
-interface TableRowProps extends React.ComponentProps<'tr'> {}
+type TableRowProps = React.ComponentProps<'tr'>;
 
 const tableRowVariants = cva(
   'nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
@@ -203,7 +205,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 /**
  * Props for TableHead.
  */
-interface TableHeadProps extends React.ComponentProps<'th'> {}
+type TableHeadProps = React.ComponentProps<'th'>;
 
 const tableHeadVariants = cva(
   'nx:px-2 nx:text-start nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:[&[aria-sort=ascending]]:text-foreground nx:[&[aria-sort=descending]]:text-foreground',
@@ -248,7 +250,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
 /**
  * Props for TableCell.
  */
-interface TableCellProps extends React.ComponentProps<'td'> {}
+type TableCellProps = React.ComponentProps<'td'>;
 
 const tableCellVariants = cva('nx:px-2 nx:align-middle nx:whitespace-nowrap', {
   variants: {
@@ -285,7 +287,7 @@ const tableSelectionCellClassName =
 /**
  * Props for TableSelectionHead.
  */
-interface TableSelectionHeadProps extends TableHeadProps {}
+type TableSelectionHeadProps = TableHeadProps;
 
 /**
  * First header cell, for your select-all Checkbox. Pair it with a
@@ -304,7 +306,7 @@ function TableSelectionHead({ className, ...props }: TableSelectionHeadProps) {
 /**
  * Props for TableSelectionCell.
  */
-interface TableSelectionCellProps extends TableCellProps {}
+type TableSelectionCellProps = TableCellProps;
 
 /**
  * Cell for your row Checkbox. Set the row's `data-state="selected"` from the
@@ -323,7 +325,7 @@ function TableSelectionCell({ className, ...props }: TableSelectionCellProps) {
 /**
  * Props for TableRowHeader.
  */
-interface TableRowHeaderProps extends React.ComponentProps<'th'> {}
+type TableRowHeaderProps = React.ComponentProps<'th'>;
 
 /**
  * Cell that names its row, such as an invoice number (`<th scope="row">`).
@@ -348,7 +350,7 @@ function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
 /**
  * Props for TableCaption.
  */
-interface TableCaptionProps extends React.ComponentProps<'caption'> {}
+type TableCaptionProps = React.ComponentProps<'caption'>;
 
 /**
  * Caption that describes the table, shown below it.

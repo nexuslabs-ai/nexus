@@ -1,5 +1,12 @@
 # @nxds/docs
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [a87db64]
+  - @nxds/react@0.4.6
+
 ## 0.0.14
 
 ### Patch Changes

@@ -45,9 +45,7 @@ function Accordion({
 /**
  * One section, holding an AccordionTrigger and an AccordionContent.
  */
-interface AccordionItemProps extends React.ComponentProps<
-  typeof AccordionPrimitive.Item
-> {}
+type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item>;
 
 function AccordionItem({ className, ...props }: AccordionItemProps) {
   return (
@@ -67,9 +65,9 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
 /**
  * Button that opens and closes its item. Its chevron flips when the item is open.
  */
-interface AccordionTriggerProps extends React.ComponentProps<
+type AccordionTriggerProps = React.ComponentProps<
   typeof AccordionPrimitive.Trigger
-> {}
+>;
 
 function AccordionTrigger({
   className,
@@ -104,9 +102,9 @@ function AccordionTrigger({
 /**
  * Content of an item. Its height animates as the item opens and closes.
  */
-interface AccordionContentProps extends React.ComponentProps<
+type AccordionContentProps = React.ComponentProps<
   typeof AccordionPrimitive.Content
-> {}
+>;
 
 function AccordionContent({
   className,

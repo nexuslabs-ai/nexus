@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Primitive, type PrimitiveProps } from 'reka-ui';
-import { computed, type HTMLAttributes, type VNode } from 'vue';
+import { Comment, computed, type HTMLAttributes, Text, type VNode } from 'vue';
 
 import { cn } from '../../lib/utils';
 import Spinner from '../spinner/Spinner.vue';
@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   as: 'button',
   variant: 'default',
   size: 'default',
+  loading: false,
   type: 'button',
 });
 
@@ -37,28 +38,53 @@ function isIconButtonSize(size: ButtonVariants['size']) {
 const isDisabled = computed(() => props.disabled || props.loading);
 const iconOnly = computed(() => isIconButtonSize(props.size));
 // `type` and `disabled` mean nothing on another tag, which also stays focusable.
-const isNativeButton = computed(() => !props.asChild && props.as === 'button');
+const isNativeButton = computed(() => props.as === 'button');
+const sharedAttrs = computed(() => ({
+  'data-slot': 'button',
+  'data-variant': props.variant,
+  'data-size': props.size,
+  'data-icon-only': iconOnly.value || undefined,
+  'data-loading': props.loading || undefined,
+  class: cn(
+    buttonVariants({ variant: props.variant, size: props.size }),
+    props.class
+  ),
+  'aria-busy': props.loading || undefined,
+  'aria-disabled': isDisabled.value || undefined,
+}));
+
+// `asChild` clones onto a single child element; any other child keeps the
+// native `<button>`, as React's Slot does.
+function rendersAsChild() {
+  if (!props.asChild) return false;
+  const nodes = (slots.default?.() ?? []).filter(
+    (node) =>
+      node.type !== Comment &&
+      !(node.type === Text && !String(node.children).trim())
+  );
+  return nodes.length === 1 && typeof nodes[0]?.type !== 'symbol';
+}
 </script>
 
 <template>
   <Primitive
-    data-slot="button"
-    :data-variant="variant"
-    :data-size="size"
-    :data-icon-only="iconOnly || undefined"
-    :data-loading="loading || undefined"
+    v-if="rendersAsChild()"
+    v-bind="sharedAttrs"
+    as-child
+    :tabindex="isDisabled ? -1 : undefined"
+  >
+    <slot />
+  </Primitive>
+  <Primitive
+    v-else
+    v-bind="sharedAttrs"
     :as="as"
-    :as-child="asChild"
-    :class="cn(buttonVariants({ variant, size }), props.class)"
     :type="isNativeButton ? type : undefined"
     :disabled="isNativeButton ? isDisabled : undefined"
     :tabindex="!isNativeButton && isDisabled ? -1 : undefined"
-    :aria-busy="loading || undefined"
-    :aria-disabled="isDisabled || undefined"
   >
-    <slot v-if="asChild" />
     <span
-      v-else-if="loading"
+      v-if="loading"
       data-slot="button-loading-content"
       class="nx:relative nx:inline-flex nx:items-center nx:justify-center"
     >

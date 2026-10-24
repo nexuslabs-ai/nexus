@@ -2,8 +2,8 @@ import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { NxdsAppearanceProvider } from '@/components/appearance/provider';
-import { NxdsAppearanceScript } from '@/components/appearance/provider/server';
+import { NxdsAppearanceProvider } from '@/components/nxds/components/appearance/provider';
+import { NxdsAppearanceScript } from '@/components/nxds/components/appearance/provider/server';
 
 import { AppShell } from './shell';
 

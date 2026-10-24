@@ -54,9 +54,9 @@ function NavigationMenu({
 /**
  * Props for the NavigationMenuList component.
  */
-interface NavigationMenuListProps extends React.ComponentProps<
+type NavigationMenuListProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.List
-> {}
+>;
 
 /**
  * Horizontal list of top-level navigation items.
@@ -77,9 +77,9 @@ function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
 /**
  * Props for the NavigationMenuItem component.
  */
-interface NavigationMenuItemProps extends React.ComponentProps<
+type NavigationMenuItemProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Item
-> {}
+>;
 
 /**
  * One top-level navigation item, with its trigger and content.
@@ -101,9 +101,9 @@ const navigationMenuTriggerStyle = cva(
 /**
  * Props for the NavigationMenuTrigger component.
  */
-interface NavigationMenuTriggerProps extends React.ComponentProps<
+type NavigationMenuTriggerProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Trigger
-> {}
+>;
 
 /**
  * Button that opens the item's flyout. Its chevron turns while open.
@@ -131,9 +131,9 @@ function NavigationMenuTrigger({
 /**
  * Props for the NavigationMenuContent component.
  */
-interface NavigationMenuContentProps extends React.ComponentProps<
+type NavigationMenuContentProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Content
-> {}
+>;
 
 /**
  * Flyout panel for a navigation item. Stacks at full width in a narrow menu
@@ -169,9 +169,9 @@ function NavigationMenuContent({
 /**
  * Props for the NavigationMenuViewport component.
  */
-interface NavigationMenuViewportProps extends React.ComponentProps<
+type NavigationMenuViewportProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Viewport
-> {}
+>;
 
 /**
  * Shared panel that shows the open item's content. Fits the content in a
@@ -201,9 +201,9 @@ function NavigationMenuViewport({
 /**
  * Props for the NavigationMenuLink component.
  */
-interface NavigationMenuLinkProps extends React.ComponentProps<
+type NavigationMenuLinkProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Link
-> {}
+>;
 
 /**
  * Link inside a flyout panel.
@@ -228,9 +228,9 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
 /**
  * Props for the NavigationMenuIndicator component.
  */
-interface NavigationMenuIndicatorProps extends React.ComponentProps<
+type NavigationMenuIndicatorProps = React.ComponentProps<
   typeof NavigationMenuPrimitive.Indicator
-> {}
+>;
 
 /**
  * Small arrow from the open trigger to its flyout.

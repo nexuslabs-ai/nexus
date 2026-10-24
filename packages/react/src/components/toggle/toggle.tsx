@@ -35,10 +35,8 @@ const toggleVariants = cva(
 /**
  * Props for Toggle.
  */
-interface ToggleProps
-  extends
-    React.ComponentProps<typeof TogglePrimitive.Root>,
-    VariantProps<typeof toggleVariants> {}
+type ToggleProps = React.ComponentProps<typeof TogglePrimitive.Root> &
+  VariantProps<typeof toggleVariants>;
 
 /**
  * Button that stays on or off, such as Bold. For a set of related toggles, use

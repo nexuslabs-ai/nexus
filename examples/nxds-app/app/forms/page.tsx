@@ -1,12 +1,12 @@
 'use client';
 
-import { Button } from '@/components/button/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card/card';
-import { Input } from '@/components/input/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/select/select';
-import { Switch } from '@/components/switch/switch';
-import { Textarea } from '@/components/textarea/textarea';
-import { toast } from '@/components/sonner/sonner';
+import { Button } from '@/components/nxds/components/button/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/nxds/components/card/card';
+import { Input } from '@/components/nxds/components/input/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/nxds/components/select/select';
+import { Switch } from '@/components/nxds/components/switch/switch';
+import { Textarea } from '@/components/nxds/components/textarea/textarea';
+import { toast } from '@/components/nxds/components/sonner/sonner';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import {

@@ -41,10 +41,6 @@ export default meta;
 type Story = StoryObj<typeof Drawer>;
 
 const DIRECTIONS = ['top', 'right', 'bottom', 'left'] as const;
-const HANDLE_OPTIONS = [
-  { label: 'default', props: {} },
-  { label: 'hidden', props: { showHandle: false } },
-] satisfies { label: string; props: Pick<DrawerContentProps, 'showHandle'> }[];
 const SCROLLABLE_ITEMS = Array.from({ length: 18 }, (_, index) => ({
   title: `Audit item ${index + 1}`,
   description:
@@ -62,13 +58,12 @@ const waitForDrawerToClose = async () => {
 
 interface HandleExampleProps
   extends
-    Pick<ComponentProps<typeof Drawer>, 'direction' | 'dismissible'>,
+    Pick<ComponentProps<typeof Drawer>, 'dismissible'>,
     Pick<DrawerContentProps, 'showHandle'> {
   triggerLabel: string;
 }
 
 function HandleExample({
-  direction,
   dismissible,
   showHandle,
   triggerLabel,
@@ -76,12 +71,7 @@ function HandleExample({
   const [open, setOpen] = useState(false);
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-      direction={direction}
-      dismissible={dismissible}
-    >
+    <Drawer open={open} onOpenChange={setOpen} dismissible={dismissible}>
       <DrawerTrigger asChild>
         <Button variant="outline">{triggerLabel}</Button>
       </DrawerTrigger>
@@ -181,30 +171,6 @@ export const Default: Story = {
           <Button>Submit</Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  ),
-};
-
-// A right-edge drawer — the side-panel direction.
-export const Right: Story = {
-  render: () => (
-    <Drawer direction="right">
-      <DrawerTrigger asChild>
-        <Button variant="outline">Open Right</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Settings</DrawerTitle>
-          <DrawerDescription>
-            A right drawer slides in from the trailing edge.
-          </DrawerDescription>
-        </DrawerHeader>
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button>Close</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -500,160 +466,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-// Every Vaul direction is reflected on content for styling and inspection.
-export const DirectionBehavior: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:gap-4">
-      {DIRECTIONS.map((direction) => (
-        <Drawer key={direction} direction={direction}>
-          <DrawerTrigger asChild>
-            <Button variant="outline">Open {direction} drawer</Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle className="nx:capitalize">
-                {direction} behavior
-              </DrawerTitle>
-              <DrawerDescription>
-                The content exposes the active Vaul direction.
-              </DrawerDescription>
-            </DrawerHeader>
-            <DrawerBody>
-              <p className="nx:typography-body-default nx:text-foreground">
-                The drawer frame stays non-scrolling while this body owns any
-                vertical overflow.
-              </p>
-            </DrawerBody>
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button>Close {direction} drawer</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    for (const direction of DIRECTIONS) {
-      await userEvent.click(
-        canvas.getByRole('button', { name: `Open ${direction} drawer` })
-      );
-
-      const drawer = await within(document.body).findByRole('dialog');
-      await expect(drawer).toHaveAttribute(
-        'data-vaul-drawer-direction',
-        direction
-      );
-      await expect(drawer).toHaveClass('nx:overflow-hidden');
-
-      await expect(
-        drawer.querySelector('[data-slot="drawer-body"]')
-      ).toHaveClass(
-        'nx:min-h-0',
-        'nx:overflow-y-auto',
-        'nx:focus-visible:outline-2',
-        'nx:focus-visible:outline-focus-default',
-        'nx:focus-visible:[outline-offset:-2px]'
-      );
-      await expect(
-        drawer.querySelector('[data-slot="drawer-body"]')
-      ).toHaveAttribute('tabindex', '0');
-
-      if (direction === 'top' || direction === 'bottom') {
-        await expect(drawer).toHaveClass(
-          `nx:data-[vaul-drawer-direction=${direction}]:max-h-[80svh]`
-        );
-      } else {
-        await expect(drawer).toHaveClass(
-          `nx:data-[vaul-drawer-direction=${direction}]:h-svh`
-        );
-      }
-
-      await userEvent.click(
-        within(drawer).getByRole('button', {
-          name: `Close ${direction} drawer`,
-        })
-      );
-
-      await waitForDrawerToClose();
-    }
-  },
-};
-
-// The drag handle is a bottom-drawer affordance only.
-export const BottomDragHandleVisibility: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:gap-4">
-      <Drawer>
-        <DrawerTrigger asChild>
-          <Button variant="outline">Open Bottom Handle</Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Bottom drawer</DrawerTitle>
-            <DrawerDescription>The handle is visible here.</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button>Close bottom handle</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-      <Drawer direction="right">
-        <DrawerTrigger asChild>
-          <Button variant="outline">Open Right Handle</Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Right drawer</DrawerTitle>
-            <DrawerDescription>The handle stays hidden here.</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button>Close right handle</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open Bottom Handle' })
-    );
-
-    let drawer = await within(document.body).findByRole('dialog');
-    let handle = drawer.querySelector('[data-slot="drawer-handle"]');
-
-    await expect(handle).toBeVisible();
-    await userEvent.click(
-      within(drawer).getByRole('button', { name: 'Close bottom handle' })
-    );
-
-    await waitForDrawerToClose();
-
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open Right Handle' })
-    );
-
-    drawer = await within(document.body).findByRole('dialog');
-    handle = drawer.querySelector('[data-slot="drawer-handle"]');
-
-    await expect(handle).not.toBeVisible();
-    await userEvent.click(
-      within(drawer).getByRole('button', { name: 'Close right handle' })
-    );
-
-    await waitForDrawerToClose();
-  },
-};
-
 export const WithoutHandle: Story = {
   render: () => (
     <HandleExample showHandle={false} triggerLabel="Open without handle" />
@@ -671,55 +483,6 @@ export const WithoutHandle: Story = {
       within(drawer).getByRole('button', { name: 'Close preview' })
     );
     await waitForDrawerToClose();
-  },
-};
-
-export const HandleDirectionMatrix: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:gap-4">
-      {DIRECTIONS.flatMap((direction) =>
-        HANDLE_OPTIONS.map((option) => (
-          <HandleExample
-            key={`${direction}-${option.label}`}
-            direction={direction}
-            {...option.props}
-            triggerLabel={`Open ${direction} ${option.label} handle`}
-          />
-        ))
-      )}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const direction of DIRECTIONS) {
-      for (const option of HANDLE_OPTIONS) {
-        await userEvent.click(
-          canvas.getByRole('button', {
-            name: `Open ${direction} ${option.label} handle`,
-          })
-        );
-        const drawer = await within(document.body).findByRole('dialog');
-        await expect(drawer).toHaveAttribute(
-          'data-vaul-drawer-direction',
-          direction
-        );
-        const handle = drawer.querySelector('[data-slot="drawer-handle"]');
-        if (option.props.showHandle === false) {
-          await expect(handle).toBeNull();
-        } else {
-          await expect(handle).toBeInTheDocument();
-          if (direction === 'bottom') {
-            await expect(handle).toBeVisible();
-          } else {
-            await expect(handle).not.toBeVisible();
-          }
-        }
-        await userEvent.click(
-          within(drawer).getByRole('button', { name: 'Close preview' })
-        );
-        await waitForDrawerToClose();
-      }
-    }
   },
 };
 

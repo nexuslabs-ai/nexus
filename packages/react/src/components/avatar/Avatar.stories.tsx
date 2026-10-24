@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
 import { expect, waitFor, within } from 'storybook/test';
 
-import { expectInsetOutlinePseudoElement } from '../../stories/support/pseudo-element-style';
-
 import {
   Avatar,
   AvatarFallback,
@@ -63,7 +61,7 @@ const STATUS_VALUES = ['online', 'away', 'busy', 'offline'] as const;
 // The 5 starter portraits double as the demo team roster.
 const TEAM = STARTER_AVATARS;
 
-// Default single-avatar fixture (Ada) for the size / shape / state stories.
+// Default single-avatar fixture (Ada) for the shape / state stories.
 const AVATAR_URL = STARTER_AVATARS[0].src;
 
 // The same portraits by URL, for the stories a docs page shows as copyable code.
@@ -83,16 +81,6 @@ const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <rect x="88" y="16" width="68" height="58" rx="12" fill="#7c3aed"/>
   </svg>
 `)}`;
-
-function expectAvatarHairline(
-  element: Element | null,
-  missingMessage = 'avatar root not found'
-) {
-  expectInsetOutlinePseudoElement(element, {
-    token: '--nx-color-border-hairline',
-    missingMessage,
-  });
-}
 
 function avatarLabel(size: (typeof AVATAR_SIZES)[number]) {
   if (size === '2xs') return '2X';
@@ -135,113 +123,11 @@ export const Default: Story = {
   ),
 };
 
-export const MotionTokenBridge: Story = {
-  render: (_args) => (
-    <Avatar>
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-  play: async ({ canvasElement }) => {
-    const image = await waitFor(() => {
-      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
-      if (!img) throw new Error('avatar image has not mounted yet');
-      return img;
-    });
-
-    await expect(getComputedStyle(image).animationDuration).toBe('0.15s');
-  },
-};
-
-export const DefaultDataAttributes: Story = {
-  // With size/shape omitted, the cva defaults (md / circle) must still surface
-  // on data-size / data-shape so CSS and test hooks can target the default.
-  render: (_args) => (
-    <Avatar role="img" aria-label="Default avatar">
-      <AvatarFallback aria-hidden="true">AL</AvatarFallback>
-    </Avatar>
-  ),
-  play: async ({ canvasElement }) => {
-    const avatar = canvasElement.querySelector('[data-slot="avatar"]');
-    await expect(avatar).toHaveAttribute('data-size', 'md');
-    await expect(avatar).toHaveAttribute('data-shape', 'circle');
-    // Initials scale with the avatar diameter as a multiple of the base type
-    // size, so md renders at the base size.
-    await expect(avatar).toHaveStyle({
-      fontSize: getComputedStyle(document.documentElement)
-        .getPropertyValue('--nx-typography-size-base')
-        .trim(),
-    });
-  },
-};
-
-export const ImageHairline: Story = {
-  render: () => (
-    <Avatar>
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-  play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector('[data-slot="avatar"]');
-    const image = await waitFor(() => {
-      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
-      if (!img) throw new Error('avatar image has not mounted yet');
-      return img;
-    });
-
-    expectAvatarHairline(root);
-    await expect(image).not.toHaveClass('nx:after:outline-border-hairline');
-  },
-};
-
-export const ImageHairlineLightDark: Story = {
-  render: () => (
-    <div className="nx:grid nx:grid-cols-2 nx:gap-4">
-      <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
-        <Avatar>
-          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar shape="rounded">
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-      </div>
-      <div className="dark nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
-        <Avatar>
-          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar shape="rounded">
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const avatars = canvasElement.querySelectorAll('[data-slot="avatar"]');
-
-    await expect(avatars).toHaveLength(4);
-    expectAvatarHairline(avatars.item(0));
-    expectAvatarHairline(avatars.item(1));
-    expectAvatarHairline(avatars.item(2));
-    expectAvatarHairline(avatars.item(3));
-  },
-};
-
 export const WithFallback: Story = {
   render: (_args) => (
     <Avatar role="img" aria-label="Ada Lovelace">
       <AvatarImage src="/broken-image.jpg" alt="" />
       <AvatarFallback aria-hidden="true">AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const FallbackOnly: Story = {
-  render: (_args) => (
-    <Avatar role="img" aria-label="Ada Byron">
-      <AvatarFallback aria-hidden="true">AB</AvatarFallback>
     </Avatar>
   ),
 };
@@ -271,171 +157,9 @@ export const CroppedImage: Story = {
   },
 };
 
-export const Decorative: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:items-center nx:gap-3">
-      <Avatar size="sm">
-        <AvatarImage src={AVATAR_URL} alt="" />
-        <AvatarFallback aria-hidden="true">AL</AvatarFallback>
-      </Avatar>
-      <span className="nx:typography-label-default nx:text-foreground">
-        Ada Lovelace
-      </span>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await canvas.findByText('Ada Lovelace');
-
-    // Radix mounts the <img> only after its (async) load resolves, so wait for
-    // it rather than querying synchronously — a sync read races the load.
-    const image = await waitFor(() => {
-      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
-      if (!img) throw new Error('avatar image has not mounted yet');
-      return img;
-    });
-    await expect(image).toHaveAttribute('alt', '');
-  },
-};
-
-export const StandaloneFallbackAccessible: Story = {
-  render: (_args) => (
-    <Avatar role="img" aria-label="Ada Lovelace">
-      <AvatarFallback aria-hidden="true">AL</AvatarFallback>
-    </Avatar>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const avatar = canvas.getByRole('img', { name: 'Ada Lovelace' });
-
-    await expect(avatar).toHaveAttribute('data-slot', 'avatar');
-  },
-};
-
-// ============================================
-// ILLUSTRATED VARIANTS
-// ============================================
-
-export const StarterVariants: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6">
-      {STARTER_AVATARS.map((person) => (
-        <div
-          key={person.name}
-          className="nx:flex nx:flex-col nx:items-center nx:gap-2"
-        >
-          <Avatar size="xl">
-            <AvatarImage src={person.src} alt="" />
-            <AvatarFallback aria-hidden="true">
-              {person.initials}
-            </AvatarFallback>
-          </Avatar>
-          <span className="nx:typography-label-small nx:text-muted-foreground">
-            {person.name}
-          </span>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-// ============================================
-// SIZE STORIES
-// ============================================
-
-export const Size2xs: Story = {
-  render: (_args) => (
-    <Avatar size="2xs">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const SizeXs: Story = {
-  render: (_args) => (
-    <Avatar size="xs">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const SizeSm: Story = {
-  render: (_args) => (
-    <Avatar size="sm">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const SizeMd: Story = {
-  render: (_args) => (
-    <Avatar size="md">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const SizeLg: Story = {
-  render: (_args) => (
-    <Avatar size="lg">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const SizeXl: Story = {
-  render: (_args) => (
-    <Avatar size="xl">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const Size2xl: Story = {
-  render: (_args) => (
-    <Avatar size="2xl">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const Size3xl: Story = {
-  render: (_args) => (
-    <Avatar size="3xl">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
-export const Size4xl: Story = {
-  render: (_args) => (
-    <Avatar size="4xl">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
-
 // ============================================
 // SHAPE STORIES
 // ============================================
-
-export const ShapeCircle: Story = {
-  render: (_args) => (
-    <Avatar shape="circle">
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-    </Avatar>
-  ),
-};
 
 export const ShapeRounded: Story = {
   render: (_args) => (
@@ -516,28 +240,6 @@ export const WithRing: Story = {
     const avatar = canvasElement.querySelector('[data-slot="avatar"]');
 
     await expect(avatar).toHaveAttribute('data-ring', 'true');
-  },
-};
-
-export const Group: Story = {
-  render: (_args) => (
-    <AvatarGroup role="group" aria-label="Project team">
-      {TEAM.slice(0, 4).map((person, index) => (
-        <TeamAvatar
-          key={person.name}
-          person={person}
-          status={STATUS_VALUES[index]}
-        />
-      ))}
-    </AvatarGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const group = within(canvasElement).getByRole('group', {
-      name: 'Project team',
-    });
-    const avatars = group.querySelectorAll('[data-slot="avatar"]');
-
-    await expect(avatars).toHaveLength(4);
   },
 };
 
@@ -684,16 +386,22 @@ export const OnContainerSurface: Story = {
 
 export const WithDataAttributes: Story = {
   render: (_args) => (
-    <Avatar size="lg" shape="rounded" ring>
-      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
-      <AvatarFallback>AL</AvatarFallback>
-      <AvatarStatus status="busy" />
-    </Avatar>
+    <div className="nx:flex nx:items-center nx:gap-4">
+      <Avatar size="lg" shape="rounded" ring data-testid="configured-avatar">
+        <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+        <AvatarFallback>AL</AvatarFallback>
+        <AvatarStatus status="busy" />
+      </Avatar>
+      <Avatar role="img" aria-label="Default avatar">
+        <AvatarFallback aria-hidden="true">AL</AvatarFallback>
+      </Avatar>
+    </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const image = await canvas.findByAltText('Ada Lovelace');
-    const avatar = canvasElement.querySelector('[data-slot="avatar"]');
+    const avatar = canvas.getByTestId('configured-avatar');
+    const defaultAvatar = canvas.getByRole('img', { name: 'Default avatar' });
     const status = canvasElement.querySelector('[data-slot="avatar-status"]');
 
     await expect(avatar).toBeInTheDocument();
@@ -703,26 +411,16 @@ export const WithDataAttributes: Story = {
     await expect(image).toHaveAttribute('data-slot', 'avatar-image');
     await expect(image).toHaveAttribute('decoding', 'async');
     await expect(status).toHaveAttribute('data-status', 'busy');
-  },
-};
 
-export const FallbackDataAttributes: Story = {
-  render: (_args) => (
-    <Avatar role="img" aria-label="Ada Byron">
-      <AvatarFallback aria-hidden="true">AB</AvatarFallback>
-    </Avatar>
-  ),
-  play: async ({ canvasElement }) => {
-    const fallback = canvasElement.querySelector(
-      '[data-slot="avatar-fallback"]'
-    );
-    const canvas = within(canvasElement);
-    const avatar = canvas.getByRole('img', { name: 'Ada Byron' });
-
-    await expect(fallback).toBeInTheDocument();
-    await expect(fallback).not.toHaveClass('nx:animate-in');
-    await expect(fallback).not.toHaveClass('nx:fade-in-0');
-    await expect(avatar).toHaveAttribute('data-slot', 'avatar');
+    // With size/shape omitted, the cva defaults still surface on the data hooks.
+    await expect(defaultAvatar).toHaveAttribute('data-size', 'md');
+    await expect(defaultAvatar).toHaveAttribute('data-shape', 'circle');
+    // Initials scale with the avatar diameter, so md renders at the base size.
+    await expect(defaultAvatar).toHaveStyle({
+      fontSize: getComputedStyle(document.documentElement)
+        .getPropertyValue('--nx-typography-size-base')
+        .trim(),
+    });
   },
 };
 

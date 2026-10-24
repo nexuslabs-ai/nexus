@@ -27,9 +27,9 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 /**
  * Props for the PopoverContent component.
  */
-interface PopoverContentProps extends React.ComponentProps<
+type PopoverContentProps = React.ComponentProps<
   typeof PopoverPrimitive.Content
-> {}
+>;
 
 /**
  * Floating panel next to the trigger, rendered in a portal on `document.body`.

@@ -1,11 +1,11 @@
 import { IconArrowDownRight, IconArrowUpRight } from '@tabler/icons-react';
 
-import { Avatar, AvatarFallback } from '@/components/avatar/avatar';
-import { Badge } from '@/components/badge/badge';
-import { Button } from '@/components/button/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card/card';
-import { Progress } from '@/components/progress/progress';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table/table';
+import { Avatar, AvatarFallback } from '@/components/nxds/components/avatar/avatar';
+import { Badge } from '@/components/nxds/components/badge/badge';
+import { Button } from '@/components/nxds/components/button/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/nxds/components/card/card';
+import { Progress } from '@/components/nxds/components/progress/progress';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/nxds/components/table/table';
 
 const STATS = [
   { label: 'Revenue', value: '$48,120', delta: '+12.4%', up: true },

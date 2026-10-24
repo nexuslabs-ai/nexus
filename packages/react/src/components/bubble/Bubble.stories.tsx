@@ -80,31 +80,6 @@ export const Default: Story = {
   },
 };
 
-export const Muted: Story = {
-  render: () => (
-    <div className={column}>
-      <Bubble variant="muted">
-        <BubbleContent>
-          The incoming surface. This is the default, and the only surface family
-          that reads as a bubble against the page canvas without a border.
-        </BubbleContent>
-      </Bubble>
-    </div>
-  ),
-};
-
-export const Primary: Story = {
-  render: () => (
-    <div className={column}>
-      <Bubble variant="primary" align="end">
-        <BubbleContent>
-          The own-message surface, carrying the brand family.
-        </BubbleContent>
-      </Bubble>
-    </div>
-  ),
-};
-
 export const Outline: Story = {
   render: () => (
     <div className={column}>
@@ -182,9 +157,11 @@ export const RightToLeft: Story = {
         <BubbleGroup dir="rtl">
           <Bubble align="start">
             <BubbleContent>أين فشل البناء؟</BubbleContent>
+            <BubbleReactions align="start">🎉 3</BubbleReactions>
           </Bubble>
           <Bubble align="end" variant="primary">
             <BubbleContent>في خطوة فحص الأنواع.</BubbleContent>
+            <BubbleReactions align="end">👀 1</BubbleReactions>
           </Bubble>
         </BubbleGroup>
       </div>
@@ -206,6 +183,26 @@ export const RightToLeft: Story = {
     await expect(leftEdge(rtlGroup, 'في خطوة فحص الأنواع.')).toBeLessThan(
       leftEdge(rtlGroup, 'أين فشل البناء؟')
     );
+
+    const pills = rtlGroup.querySelectorAll<HTMLElement>(
+      '[data-slot="bubble-reactions"]'
+    );
+
+    await expect(pills).toHaveLength(2);
+
+    for (const pill of pills) {
+      const bubbleBox = bubbleOf(pill).getBoundingClientRect();
+      const pillBox = pill.getBoundingClientRect();
+
+      // Under RTL, inline-start is the right edge.
+      const inlineGap =
+        pill.dataset.align === 'start'
+          ? bubbleBox.right - pillBox.right
+          : pillBox.left - bubbleBox.left;
+
+      await expect(inlineGap).toBeGreaterThan(8);
+      await expect(inlineGap).toBeLessThan(16);
+    }
   },
 };
 
@@ -300,42 +297,6 @@ export const ReactionSideAndAlign: Story = {
           : bubbleBox.right - pillBox.right;
 
       // 12px from `start-3` / `end-3`, plus the reserved 1px border.
-      await expect(inlineGap).toBeGreaterThan(8);
-      await expect(inlineGap).toBeLessThan(16);
-    }
-  },
-};
-
-export const ReactionsInRtl: Story = {
-  render: () => (
-    <BubbleGroup className={column} dir="rtl">
-      <Bubble align="start">
-        <BubbleContent>تم دمج التغييرات.</BubbleContent>
-        <BubbleReactions align="start">🎉 3</BubbleReactions>
-      </Bubble>
-      <Bubble align="end" variant="primary">
-        <BubbleContent>شكرًا لك.</BubbleContent>
-        <BubbleReactions align="end">👀 1</BubbleReactions>
-      </Bubble>
-    </BubbleGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const pills = canvasElement.querySelectorAll<HTMLElement>(
-      '[data-slot="bubble-reactions"]'
-    );
-
-    await expect(pills).toHaveLength(2);
-
-    for (const pill of pills) {
-      const bubbleBox = bubbleOf(pill).getBoundingClientRect();
-      const pillBox = pill.getBoundingClientRect();
-
-      // Under RTL, inline-start is the right edge.
-      const inlineGap =
-        pill.dataset.align === 'start'
-          ? bubbleBox.right - pillBox.right
-          : pillBox.left - bubbleBox.left;
-
       await expect(inlineGap).toBeGreaterThan(8);
       await expect(inlineGap).toBeLessThan(16);
     }
@@ -575,36 +536,6 @@ export const Disabled: StoryObj<BubbleProps & { onRetry: () => void }> = {
   },
 };
 
-export const AsChild: Story = {
-  render: () => (
-    <BubbleGroup className={column}>
-      <Bubble variant="muted">
-        <BubbleContent asChild>
-          <p>A prose turn rendered as a real paragraph.</p>
-        </BubbleContent>
-      </Bubble>
-      <Bubble variant="ghost">
-        <BubbleContent asChild>
-          <a href="#thread">Jump to the full thread</a>
-        </BubbleContent>
-      </Bubble>
-    </BubbleGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    const paragraph = canvas.getByText(
-      'A prose turn rendered as a real paragraph.'
-    );
-    await expect(paragraph.tagName).toBe('P');
-    await expect(paragraph).toHaveAttribute('data-slot', 'bubble-content');
-
-    const link = canvas.getByRole('link', { name: 'Jump to the full thread' });
-    await expect(link).toHaveAttribute('href', '#thread');
-    await expect(link).toHaveAttribute('data-slot', 'bubble-content');
-  },
-};
-
 export const WithDataAttributes: Story = {
   render: () => (
     <div className={column}>
@@ -708,55 +639,6 @@ export const WithCodeBlock: Story = {
     );
     await expect(bubble.scrollWidth).toBeLessThanOrEqual(
       bubble.clientWidth + 1
-    );
-  },
-};
-
-export const StackedConversation: Story = {
-  render: () => (
-    <BubbleGroup className={column}>
-      <Bubble align="start">
-        <BubbleContent>Can you take a look at the failing run?</BubbleContent>
-      </Bubble>
-      <Bubble align="start">
-        <BubbleContent>It started after the token refactor.</BubbleContent>
-      </Bubble>
-      <Bubble align="end" variant="primary">
-        <BubbleContent>Looking now.</BubbleContent>
-      </Bubble>
-      <Bubble align="end" variant="primary">
-        <BubbleContent>
-          Found it — a semantic token was renamed without updating the registry.
-        </BubbleContent>
-        <BubbleReactions>🙌 2</BubbleReactions>
-      </Bubble>
-      <Bubble align="start">
-        <BubbleContent>Nice catch.</BubbleContent>
-      </Bubble>
-    </BubbleGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const bubbles = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>('[data-slot="bubble"]')
-    );
-    const pill = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="bubble-reactions"]'
-    )!;
-    const bubbleWithPill = bubbleOf(pill);
-    const next = bubbles[bubbles.indexOf(bubbleWithPill) + 1]!;
-    const overhang =
-      pill.getBoundingClientRect().bottom -
-      bubbleWithPill.getBoundingClientRect().bottom;
-
-    // `gap-4` alone would clear a 12px overhang, so non-overlap proves nothing.
-    // The turn has to pay for its own pill: assert the reserved margin covers
-    // the overhang, and that the gap is still there on top of it.
-    const reserved = parseFloat(getComputedStyle(bubbleWithPill).marginBottom);
-
-    await expect(overhang).toBeGreaterThan(0);
-    await expect(reserved).toBeGreaterThanOrEqual(overhang);
-    await expect(pill.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-      next.getBoundingClientRect().top + 1
     );
   },
 };

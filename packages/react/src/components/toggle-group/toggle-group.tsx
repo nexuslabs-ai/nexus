@@ -93,10 +93,10 @@ const joinedItem = {
 /**
  * Props for ToggleGroupItem.
  */
-interface ToggleGroupItemProps
-  extends
-    React.ComponentProps<typeof ToggleGroupPrimitive.Item>,
-    VariantProps<typeof toggleVariants> {}
+type ToggleGroupItemProps = React.ComponentProps<
+  typeof ToggleGroupPrimitive.Item
+> &
+  VariantProps<typeof toggleVariants>;
 
 /**
  * One toggle in a `ToggleGroup`. Takes `variant` and `size` from the group

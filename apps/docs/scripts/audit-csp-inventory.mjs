@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { docsRoot } from './roots.mjs';
+import { docsRoot } from './docs-root.mjs';
 
 const outDir = path.join(docsRoot, 'out');
 const clientOutputDir = path.join(outDir, '_next', 'static');

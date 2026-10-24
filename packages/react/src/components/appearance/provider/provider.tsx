@@ -63,6 +63,10 @@ const NxdsAppearanceContext = createContext<NxdsAppearanceContextValue | null>(
 const canUseDOM = (): boolean =>
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
+function subscribeToNothing() {
+  return () => {};
+}
+
 function nextAppearanceState(
   update: SetStateAction<NxdsAppearanceState>,
   previous: NxdsAppearanceState
@@ -86,10 +90,23 @@ export function NxdsAppearanceProvider({
     () => sanitizeNxdsAppearance(defaultState ?? DEFAULT_NXDS_APPEARANCE),
     [defaultState]
   );
-  const [internalState, setInternalState] =
-    useState<NxdsAppearanceState>(initialState);
-  const activeState = state ?? internalState;
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
+  // The saved appearance, read once after hydration so the server and first client render agree.
+  const stored = useMemo(
+    () =>
+      mounted
+        ? readStoredNxdsAppearance(storageKey, initialState)
+        : initialState,
+    [initialState, mounted, storageKey]
+  );
+  /** The appearance picked in this session, which wins over the saved one. */
+  const [chosen, setChosen] = useState<NxdsAppearanceState | null>(null);
+  const chosenRef = useRef<NxdsAppearanceState | null>(null);
+  const activeState = state ?? chosen ?? stored;
   const systemDark = useSyncExternalStore(
     watchColorScheme,
     prefersDarkColorScheme,
@@ -97,31 +114,18 @@ export function NxdsAppearanceProvider({
   );
   const resolvedMode = resolveNxdsAppearanceMode(activeState.mode, systemDark);
 
-  const internalStateRef = useRef(internalState);
-
-  useEffect(() => {
-    if (!canUseDOM()) return;
-
-    setMounted(true);
-    if (isControlled) return;
-
-    const nextState = readStoredNxdsAppearance(storageKey, initialState);
-    internalStateRef.current = nextState;
-    setInternalState(nextState);
-  }, [initialState, isControlled, storageKey]);
-
   const setState = useCallback<Dispatch<SetStateAction<NxdsAppearanceState>>>(
     (update) => {
       if (isControlled) {
         onStateChange?.(nextAppearanceState(update, activeState));
         return;
       }
-      const next = nextAppearanceState(update, internalStateRef.current);
-      internalStateRef.current = next;
-      setInternalState(next);
+      const next = nextAppearanceState(update, chosenRef.current ?? stored);
+      chosenRef.current = next;
+      setChosen(next);
       onStateChange?.(next);
     },
-    [activeState, isControlled, onStateChange]
+    [activeState, isControlled, onStateChange, stored]
   );
 
   const reset = useCallback(() => {

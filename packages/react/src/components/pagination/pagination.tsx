@@ -9,7 +9,7 @@ import { type ButtonProps, buttonVariants } from '../button/button';
 /**
  * Props for the Pagination component.
  */
-interface PaginationProps extends React.ComponentProps<'nav'> {}
+type PaginationProps = React.ComponentProps<'nav'>;
 
 /**
  * Page navigation for lists and tables, in a `navigation` landmark. Your app
@@ -32,7 +32,7 @@ function Pagination({ className, ...props }: PaginationProps) {
 /**
  * Props for the PaginationContent component.
  */
-interface PaginationContentProps extends React.ComponentProps<'ul'> {}
+type PaginationContentProps = React.ComponentProps<'ul'>;
 
 /**
  * `<ul>` that lays out the pagination items in a row.
@@ -53,7 +53,7 @@ function PaginationContent({ className, ...props }: PaginationContentProps) {
 /**
  * Props for the PaginationItem component.
  */
-interface PaginationItemProps extends React.ComponentProps<'li'> {}
+type PaginationItemProps = React.ComponentProps<'li'>;
 
 /**
  * One `<li>` in the pagination row.
@@ -109,9 +109,7 @@ function PaginationLink({
 /**
  * Props for the PaginationPrevious component.
  */
-interface PaginationPreviousProps extends React.ComponentProps<
-  typeof PaginationLink
-> {}
+type PaginationPreviousProps = React.ComponentProps<typeof PaginationLink>;
 
 /**
  * Link to the previous page, with a left chevron and the label "Previous".
@@ -133,9 +131,7 @@ function PaginationPrevious({ children, ...props }: PaginationPreviousProps) {
 /**
  * Props for the PaginationNext component.
  */
-interface PaginationNextProps extends React.ComponentProps<
-  typeof PaginationLink
-> {}
+type PaginationNextProps = React.ComponentProps<typeof PaginationLink>;
 
 /**
  * Link to the next page, with the label "Next" and a right chevron.
@@ -157,7 +153,7 @@ function PaginationNext({ children, ...props }: PaginationNextProps) {
 /**
  * Props for the PaginationEllipsis component.
  */
-interface PaginationEllipsisProps extends React.ComponentProps<'span'> {}
+type PaginationEllipsisProps = React.ComponentProps<'span'>;
 
 /**
  * Marker for skipped page numbers. Screen readers skip it.

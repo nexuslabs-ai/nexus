@@ -8,6 +8,12 @@ import * as React from 'react';
  */
 const NARROW_QUERY = '(max-width: 47.99rem)';
 
+function subscribe(onChange: () => void) {
+  const mql = window.matchMedia(NARROW_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
 /**
  * useIsNarrow
  *
@@ -17,17 +23,9 @@ const NARROW_QUERY = '(max-width: 47.99rem)';
  * at or above `md`.
  */
 export function useIsNarrow() {
-  const [isNarrow, setIsNarrow] = React.useState<boolean | undefined>(
-    undefined
+  return React.useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(NARROW_QUERY).matches,
+    () => false
   );
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(NARROW_QUERY);
-    const onChange = () => setIsNarrow(mql.matches);
-    mql.addEventListener('change', onChange);
-    setIsNarrow(mql.matches);
-    return () => mql.removeEventListener('change', onChange);
-  }, []);
-
-  return !!isNarrow;
 }

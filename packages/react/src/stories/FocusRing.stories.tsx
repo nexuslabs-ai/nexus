@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
+import { Button } from '../components/button/button';
 import { Checkbox } from '../components/checkbox/checkbox';
 import { Input } from '../components/input/input';
 import {
@@ -419,26 +420,18 @@ export const FieldBorderWidthModes: Story = {
   },
 };
 
-/**
- * Tailwind's `transition-colors` expands to a list carrying `outline-color`, so
- * an element that paints a real ring fades it up from its resting colour over
- * the duration instead of landing it with the keypress. `transition-control`
- * and `transition-field` are the ring-safe replacements, generated from
- * `@nxds/core`. They are asserted on the compiled `transition-property`
- * rather than the class name: if either `@utility` stopped emitting, the class
- * would resolve to nothing and the property would fall back to its `all`
- * initial value — which transitions the ring again, silently.
- */
 export const RingSafeTransitions: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
       <Checkbox aria-label="control surface" />
+      <Button>Button surface</Button>
       <Input aria-label="field surface" />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const control = canvas.getByRole('checkbox', { name: 'control surface' });
+    const button = canvas.getByRole('button', { name: 'Button surface' });
     const field = canvas.getByRole('textbox', { name: 'field surface' });
 
     // A control's border is its own decoration, so it may fade across states.
@@ -451,5 +444,17 @@ export const RingSafeTransitions: Story = {
     await expect(getComputedStyle(field).transitionProperty).toBe(
       'color, background-color'
     );
+
+    // A control draws its ring as an outline alone; the button's sits offset.
+    for (const surface of [control, button]) {
+      await focusAsKeyboard(surface);
+      const styles = getComputedStyle(surface);
+      await expect(styles.outlineStyle).toBe('solid');
+      await expect(Number.parseFloat(styles.outlineWidth)).toBeGreaterThan(0);
+      await expect(styles.transitionProperty).not.toContain('outline');
+    }
+    await expect(
+      Number.parseFloat(getComputedStyle(button).outlineOffset)
+    ).toBeGreaterThan(0);
   },
 };

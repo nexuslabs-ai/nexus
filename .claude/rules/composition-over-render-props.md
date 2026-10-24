@@ -9,5 +9,6 @@ callbacks (`(...) => ReactNode`) or component references (`ComponentType` /
 `FC` / `ElementType`) fail `pnpm lint` and the pre-commit hook. Event-handler
 props (`on*`) are exempt; they return data, not JSX.
 
-Third-party APIs that mandate the shape opt out with a scoped
-`eslint-disable` plus a reason.
+Third-party APIs that mandate the shape opt out with a `@thirdPartyShape`
+JSDoc tag and a reason on the prop. Don't use `eslint-disable` for it: copied
+source has to lint clean in apps without the nxds plugin.

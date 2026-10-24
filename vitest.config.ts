@@ -1,4 +1,6 @@
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 import vue from '@vitejs/plugin-vue';
 import { playwright } from '@vitest/browser-playwright';
 import path from 'path';
@@ -29,11 +31,14 @@ export default defineConfig({
   test: {
     // Use projects feature (Vitest 4)
     projects: [
-      // Core engine, the `cn` merge, and ESLint rules - jsdom for the
-      // first-paint script tests. One glob per non-story row of testing.md
-      // § Scope; the stories row belongs to the `storybook` project below.
+      // Core engine, the `cn` merge, ESLint rules, cross-framework parity and
+      // the CLI - jsdom for the first-paint script tests. One glob per
+      // non-story row of testing.md § Scope; the stories row belongs to the
+      // `storybook` projects.
       {
         extends: true,
+        // tsup inlines the CLI's version; the CLI tests read it from source.
+        define: { __VERSION__: JSON.stringify('0.0.0-test') },
         test: {
           name: 'unit',
           environment: 'jsdom',
@@ -41,6 +46,8 @@ export default defineConfig({
             'packages/core/src/lib/*.test.ts',
             'packages/react/src/lib/utils.test.ts',
             'packages/eslint-plugin/__tests__/*.test.js',
+            'parity/*.test.ts',
+            'packages/cli/__tests__/*.test.ts',
           ],
         },
       },
@@ -84,6 +91,28 @@ export default defineConfig({
         root: path.resolve(__dirname, 'packages/vue'),
         test: {
           name: 'storybook-vue',
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      // Cross-framework parity of rendered DOM: each docs story mounted in
+      // React and in Vue, one after the other. Vue stories use `template:`
+      // strings, so Vue resolves to the build with the runtime compiler.
+      {
+        extends: true,
+        plugins: [react(), vue(), tailwindcss()],
+        resolve: {
+          alias: [
+            { find: /^vue$/, replacement: 'vue/dist/vue.esm-bundler.js' },
+          ],
+        },
+        test: {
+          name: 'parity',
+          include: ['parity/browser/*.test.ts'],
           browser: {
             enabled: true,
             provider: playwright(),

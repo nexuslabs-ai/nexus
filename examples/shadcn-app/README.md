@@ -7,7 +7,7 @@ and what adding nxds changes in the app.
 | Path | What it is |
 | ---- | ---------- |
 | `components/ui/` | The app's shadcn components, added with the shadcn CLI |
-| `components/nxds/` | nxds, copied from this repository by `npm run nxds:add`. Committed, like a consumer would |
+| `components/nxds/` | nxds, installed from this repository by `npm run nxds:add`. Committed, like a consumer would |
 | `components/nxds-kit.ts` | Re-exports the nxds components so pages import them as `N.Button` |
 | `app/nxds.css` | The nxds Tailwind entry, separate from `globals.css` |
 | `nxds.json` | Which nxds components to copy, and what `check.mjs` visits |
@@ -37,9 +37,9 @@ then shows what changed for consumers.
 
 ## How the app added nxds
 
-1. `npm run nxds:add` copies each component's files, the appearance provider
-   and the token CSS into `components/nxds/`, and installs `@nxds/core` from
-   `packages/core`.
+1. `npm run nxds:add` runs the local `nxds update`, which copies each
+   component's files, the appearance provider and the token CSS into
+   `components/nxds/`. It then installs `@nxds/core` from `packages/core`.
 2. `npm install` the packages it prints. nxds imports single `@radix-ui/*`
    packages; shadcn uses the combined `radix-ui` package.
 3. `app/nxds.css` imports the token CSS, `tw-animate-css` and the Progress

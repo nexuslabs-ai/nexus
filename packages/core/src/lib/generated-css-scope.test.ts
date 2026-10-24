@@ -8,7 +8,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 // scope and set variables. Tailwind's own internals are allowed by name.
 
 const TAILWIND_DIR = resolve(process.cwd(), 'packages/tailwind');
-const REACT_SRC = resolve(process.cwd(), 'packages/react/src');
+const COMPONENT_SOURCES = ['packages/react/src', 'packages/vue/src'].map(
+  (root) => resolve(process.cwd(), root)
+);
 const SCOPE = String.raw`(?::root|:host|\.dark|\[data-[a-z]+=['"]?[a-z-]+['"]?\])+`;
 const VARIABLE_SCOPE = new RegExp(`^${SCOPE}(?: ${SCOPE})*$`);
 const NXDS_CLASS = /^\.nx\\:/;
@@ -42,14 +44,16 @@ let rules: Rule[] = [];
 
 function nxdsCandidates(): string[] {
   const candidates = new Set<string>();
-  for (const file of readdirSync(REACT_SRC, {
-    recursive: true,
-    encoding: 'utf8',
-  })) {
-    if (!/\.tsx?$/.test(file)) continue;
-    const source = readFileSync(resolve(REACT_SRC, file), 'utf8');
-    for (const [candidate] of source.matchAll(/nx:[^\s'"`{}]+/g)) {
-      candidates.add(candidate);
+  for (const root of COMPONENT_SOURCES) {
+    for (const file of readdirSync(root, {
+      recursive: true,
+      encoding: 'utf8',
+    })) {
+      if (!/\.(?:tsx?|vue)$/.test(file)) continue;
+      const source = readFileSync(resolve(root, file), 'utf8');
+      for (const [candidate] of source.matchAll(/nx:[^\s'"`{}]+/g)) {
+        candidates.add(candidate);
+      }
     }
   }
   return [...candidates];

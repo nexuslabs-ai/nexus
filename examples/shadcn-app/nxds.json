@@ -1,5 +1,10 @@
 {
-  "components": [
+  "framework": "react",
+  "version": "0.4.6",
+  "dir": "components/nxds",
+  "css": "app/nxds.css",
+  "items": [
+    "setup",
     "alert",
     "avatar",
     "badge",
@@ -20,10 +25,9 @@
     "table",
     "tabs",
     "textarea",
-    "tooltip"
+    "tooltip",
+    "spinner"
   ],
-  "sourceDir": "components/nxds",
-  "cssDir": "components/nxds/tailwind",
   "check": {
     "cssEntry": "app/nxds.css",
     "providerModules": [

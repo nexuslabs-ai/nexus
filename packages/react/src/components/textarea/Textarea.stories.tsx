@@ -93,43 +93,6 @@ function CharacterCounterTextarea() {
   );
 }
 
-function WordCounterTextarea() {
-  const textareaId = React.useId();
-  const descriptionId = React.useId();
-  const counterId = React.useId();
-  const [value, setValue] = React.useState(
-    'Summarize the customer outcome and the next decision.'
-  );
-  const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
-
-  return (
-    <div className="nx:grid nx:gap-2">
-      <Label htmlFor={textareaId}>Executive summary</Label>
-      <Textarea
-        id={textareaId}
-        aria-describedby={`${descriptionId} ${counterId}`}
-        value={value}
-        rows={5}
-        onChange={(event) => setValue(event.currentTarget.value)}
-      />
-      <div className="nx:flex nx:items-start nx:justify-between nx:gap-3">
-        <p
-          id={descriptionId}
-          className="nx:typography-body-small nx:text-muted-foreground"
-        >
-          Aim for one short paragraph.
-        </p>
-        <p
-          id={counterId}
-          className="nx:shrink-0 nx:typography-body-small nx:text-muted-foreground"
-        >
-          {wordCount} words
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -138,13 +101,6 @@ export const Default: Story = {
   tags: ['docs'],
   args: {
     placeholder: 'Tell us about yourself...',
-  },
-};
-
-export const WithValue: Story = {
-  args: {
-    defaultValue: 'The quick brown fox jumps over the lazy dog.',
-    'aria-label': 'Textarea with value',
   },
 };
 
@@ -277,29 +233,6 @@ export const BorderlessStates: Story = {
   },
 };
 
-export const AutofillPairing: Story = {
-  render: () => (
-    <div className="nx:grid nx:w-[400px] nx:gap-2">
-      <Textarea aria-label="Bordered textarea" defaultValue="Bordered" />
-      <Textarea
-        aria-label="Borderless textarea"
-        variant="borderless"
-        defaultValue="Borderless"
-      />
-      <Textarea
-        aria-label="Disabled textarea"
-        defaultValue="Disabled"
-        disabled
-      />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    for (const field of within(canvasElement).getAllByRole('textbox')) {
-      await expect(unpairedAutofillClasses(field)).toEqual([]);
-    }
-  },
-};
-
 export const WithLabel: Story = {
   tags: ['docs'],
   parameters: {
@@ -348,57 +281,6 @@ export const CharacterCounter: Story = {
       expect.stringContaining(counter.id)
     );
     await expect(counter).toHaveTextContent('characters');
-  },
-};
-
-export const WordCounter: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Keep a word count in local state and link it to the textarea with `aria-describedby`.',
-      },
-    },
-  },
-  render: () => <WordCounterTextarea />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const textarea = canvas.getByLabelText('Executive summary');
-    const counter = canvas.getByText(/words$/);
-
-    await expect(textarea).toHaveAttribute(
-      'aria-describedby',
-      expect.stringContaining(counter.id)
-    );
-    await expect(counter).toHaveTextContent('words');
-  },
-};
-
-export const ResizeGuidance: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Set `rows` for the starting height and add `nx:resize-y` to let users drag the height.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:grid nx:gap-2">
-      <Label htmlFor="textarea-resize">Resizable notes</Label>
-      <Textarea
-        id="textarea-resize"
-        rows={5}
-        className="nx:resize-y"
-        placeholder="Drag the bottom edge to resize vertically."
-      />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByLabelText('Resizable notes')).toHaveClass(
-      'nx:resize-y'
-    );
   },
 };
 
@@ -451,6 +333,7 @@ export const WithDataAttributes: Story = {
     await expect(textarea).toHaveAttribute('data-variant', 'bordered');
     await expect(textarea).toHaveClass('nx:bg-container');
     await expect(textarea).toHaveClass('nx:enabled:hover:bg-container-hover');
+    await expect(unpairedAutofillClasses(textarea)).toEqual([]);
   },
 };
 

@@ -54,10 +54,8 @@ const inputGroupVariants = cva(
 /**
  * Props for the InputGroup component.
  */
-interface InputGroupProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof inputGroupVariants> {}
+type InputGroupProps = React.ComponentProps<'div'> &
+  VariantProps<typeof inputGroupVariants>;
 
 /**
  * Frames an `InputGroupInput` or `InputGroupTextarea` with `InputGroupAddon`s
@@ -99,10 +97,8 @@ const inputGroupAddonVariants = cva(
 /**
  * Props for the InputGroupAddon component.
  */
-interface InputGroupAddonProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof inputGroupAddonVariants> {}
+type InputGroupAddonProps = React.ComponentProps<'div'> &
+  VariantProps<typeof inputGroupAddonVariants>;
 
 /**
  * Slot for icons, text, buttons or key hints beside or above the control.
@@ -144,10 +140,8 @@ const inputGroupButtonVariants = cva(
 /**
  * Props for the InputGroupButton component.
  */
-interface InputGroupButtonProps
-  extends
-    Omit<React.ComponentProps<typeof Button>, 'size'>,
-    VariantProps<typeof inputGroupButtonVariants> {}
+type InputGroupButtonProps = Omit<React.ComponentProps<typeof Button>, 'size'> &
+  VariantProps<typeof inputGroupButtonVariants>;
 
 /**
  * Compact button sized to fit inside an `InputGroupAddon`. Uses the `ghost`
@@ -175,7 +169,7 @@ function InputGroupButton({
 /**
  * Props for the InputGroupText component.
  */
-interface InputGroupTextProps extends React.ComponentProps<'span'> {}
+type InputGroupTextProps = React.ComponentProps<'span'>;
 
 /**
  * Addon text, such as a unit, label or prefix.
@@ -196,10 +190,7 @@ function InputGroupText({ className, ...props }: InputGroupTextProps) {
 /**
  * Props for the InputGroupInput component.
  */
-interface InputGroupInputProps extends Omit<
-  React.ComponentProps<typeof Input>,
-  'variant'
-> {}
+type InputGroupInputProps = Omit<React.ComponentProps<typeof Input>, 'variant'>;
 
 /**
  * Text input for an `InputGroup`. The group supplies its border, focus ring
@@ -223,10 +214,10 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
 /**
  * Props for the InputGroupTextarea component.
  */
-interface InputGroupTextareaProps extends Omit<
+type InputGroupTextareaProps = Omit<
   React.ComponentProps<typeof Textarea>,
   'variant'
-> {}
+>;
 
 /**
  * Textarea for an `InputGroup`. The group supplies its border and focus

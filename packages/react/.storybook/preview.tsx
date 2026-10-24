@@ -336,7 +336,6 @@ const preview: Preview = {
           icon: option.icon,
           title: option.label,
         })),
-        showName: true,
         dynamicTitle: true,
       },
     },
@@ -346,7 +345,6 @@ const preview: Preview = {
       toolbar: {
         icon: 'paintbrush',
         items: toolbarItems(BASE_TONE_OPTIONS),
-        showName: true,
         dynamicTitle: true,
       },
     },
@@ -356,7 +354,6 @@ const preview: Preview = {
       toolbar: {
         icon: 'expand',
         items: toolbarItems(DENSITY_OPTIONS),
-        showName: true,
         dynamicTitle: true,
       },
     },
@@ -366,7 +363,6 @@ const preview: Preview = {
       toolbar: {
         icon: 'circlehollow',
         items: toolbarItems(CORNER_OPTIONS),
-        showName: true,
         dynamicTitle: true,
       },
     },
@@ -376,7 +372,6 @@ const preview: Preview = {
       toolbar: {
         icon: 'contrast',
         items: toolbarItems(ELEVATION_OPTIONS),
-        showName: true,
         dynamicTitle: true,
       },
     },
@@ -386,7 +381,6 @@ const preview: Preview = {
       toolbar: {
         icon: 'outline',
         items: toolbarItems(STROKE_OPTIONS),
-        showName: true,
         dynamicTitle: true,
       },
     },

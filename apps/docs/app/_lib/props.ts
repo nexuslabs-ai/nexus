@@ -1,19 +1,21 @@
 import { cache } from 'react';
 
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import type {
   ComponentEntry,
   PropsFile,
   PropsIndex,
-} from '../../scripts/props-entries.ts';
+} from '@nxds/source-model/props-entries.ts';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 import type { Framework } from './frameworks';
 
 import 'server-only';
 
-export type { ComponentEntry, PropEntry } from '../../scripts/props-entries.ts';
+export type {
+  ComponentEntry,
+  PropEntry,
+} from '@nxds/source-model/props-entries.ts';
 
 /** Where each framework's props JSON lives, and the script that writes it. */
 const FRAMEWORK_PROPS: Record<Framework, { dir: string; generate: string }> = {

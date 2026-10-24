@@ -16,7 +16,7 @@ import {
  *
  * Props for the Command component.
  */
-interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
+type CommandProps = React.ComponentProps<typeof CommandPrimitive>;
 
 /**
  * A searchable command palette with keyboard navigation. Pass a `label` or
@@ -94,9 +94,7 @@ function CommandDialog({
  *
  * Props for the CommandInput component.
  */
-interface CommandInputProps extends React.ComponentProps<
-  typeof CommandPrimitive.Input
-> {}
+type CommandInputProps = React.ComponentProps<typeof CommandPrimitive.Input>;
 
 /**
  * The search field, with a leading search icon.
@@ -127,9 +125,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
  *
  * Props for the CommandList component.
  */
-interface CommandListProps extends React.ComponentProps<
-  typeof CommandPrimitive.List
-> {}
+type CommandListProps = React.ComponentProps<typeof CommandPrimitive.List>;
 
 /**
  * Scrollable container for command groups and items.
@@ -152,9 +148,7 @@ function CommandList({ className, ...props }: CommandListProps) {
  *
  * Props for the CommandEmpty component.
  */
-interface CommandEmptyProps extends React.ComponentProps<
-  typeof CommandPrimitive.Empty
-> {}
+type CommandEmptyProps = React.ComponentProps<typeof CommandPrimitive.Empty>;
 
 /**
  * Shown when the search matches no items.
@@ -177,9 +171,9 @@ function CommandEmpty({ className, ...props }: CommandEmptyProps) {
  *
  * Props for the CommandLoading component.
  */
-interface CommandLoadingProps extends React.ComponentProps<
+type CommandLoadingProps = React.ComponentProps<
   typeof CommandPrimitive.Loading
-> {}
+>;
 
 /**
  * Shown while async results load. Place it outside CommandList, and pass
@@ -206,9 +200,7 @@ function CommandLoading({ className, ...props }: CommandLoadingProps) {
  *
  * Props for the CommandGroup component.
  */
-interface CommandGroupProps extends React.ComponentProps<
-  typeof CommandPrimitive.Group
-> {}
+type CommandGroupProps = React.ComponentProps<typeof CommandPrimitive.Group>;
 
 /**
  * Groups related items under an optional `heading`.
@@ -234,9 +226,9 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
  *
  * Props for the CommandSeparator component.
  */
-interface CommandSeparatorProps extends React.ComponentProps<
+type CommandSeparatorProps = React.ComponentProps<
   typeof CommandPrimitive.Separator
-> {}
+>;
 
 /**
  * A decorative divider between groups or items. Screen readers skip it.
@@ -260,9 +252,7 @@ function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
  *
  * Props for the CommandItem component.
  */
-interface CommandItemProps extends React.ComponentProps<
-  typeof CommandPrimitive.Item
-> {}
+type CommandItemProps = React.ComponentProps<typeof CommandPrimitive.Item>;
 
 /**
  * A selectable command. The highlighted item gets `data-selected`, and a
@@ -290,7 +280,7 @@ function CommandItem({ className, ...props }: CommandItemProps) {
  *
  * Props for the CommandShortcut component.
  */
-interface CommandShortcutProps extends React.ComponentProps<'span'> {}
+type CommandShortcutProps = React.ComponentProps<'span'>;
 
 /**
  * A keyboard shortcut hint, right-aligned in a CommandItem.

@@ -29,7 +29,7 @@ Pick the surface you're working on — each is one `make` command that turbo orc
 | `make docs`    | the docs site **+ live `@nxds/react`**                                      |
 | `make dev-all` | everything: docs + storybook + all package watchers                         |
 
-> **The docs site's generated inputs come from the turbo graph**, not from its package scripts, and none of them are committed: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map), `generate:demos` (the docs code generated from every story tagged `docs`, under `__generated__/`), `generate:dependencies` (the install JSON) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`, and the two the TypeScript graph imports — `generate:manifest` and `generate:demos` — ahead of `typecheck`. `make build`, `make docs` and `make typecheck` get them. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nxds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nxds/docs dev` runs only the docs-story watcher: on a clean checkout there is no page manifest, demo index or install JSON, so start the docs with `make docs`.
+> **The docs site's generated inputs come from the turbo graph**, not from its package scripts, and none of them are committed: `apps/docs/turbo.json` puts `generate:manifest` (the page manifest and its loader map), `generate:demos` (the docs code generated from every story tagged `docs`, under `__generated__/`), `@nxds/catalog#generate:catalog` (the install catalog the docs and the `nxds` CLI share) and `generate:props` (the per-component props JSON that `PropsTable` reads) ahead of both `build` and `dev`, and the two the TypeScript graph imports — `generate:manifest` and `generate:demos` — ahead of `typecheck`. `make build`, `make docs` and `make typecheck` get them. `PropsTable` reads the props JSON on each request, so after changing a component's props or JSDoc during `make docs`, rerun `pnpm --filter @nxds/docs generate:props` and reload — no restart. A bare `pnpm --filter @nxds/docs dev` runs only the docs-story watcher: on a clean checkout there is no page manifest, demo index or install catalog, so start the docs with `make docs`.
 
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nxds-docs-mcp)).
 
@@ -43,7 +43,7 @@ make verify       # the full gate: lint + format check + typecheck + tests + tok
 
 - `make lint` — ESLint (cheap; run it constantly)
 - `make typecheck` — `tsc` across the packages
-- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules)
+- `pnpm test:unit` — just the unit tests (core engine, `cn` merge, ESLint rules, parity, CLI)
 - `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
 
 The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
@@ -77,10 +77,12 @@ preference — the `unit` project's `include` list in `vitest.config.ts` is one
 glob per non-story row of [`.claude/rules/testing.md`](.claude/rules/testing.md)
 § Scope, and a component test file matches none of them.
 
-Outside stories, three kinds of unit test exist, all under the `unit` project
+Outside stories, five kinds of unit test exist, all under the `unit` project
 (jsdom): the core engine's behaviour (`packages/core/src/lib`), the nxds `cn`
-merge (`packages/react/src/lib/utils.test.ts`), and the ESLint plugin's rules
-(`packages/eslint-plugin/__tests__`). Apps, repo scripts and hooks have no
+merge (`packages/react/src/lib/utils.test.ts`), the ESLint plugin's rules
+(`packages/eslint-plugin/__tests__`), and cross-framework parity (`parity/`,
+see [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md)), and `nxds-cli`
+run against a throwaway app (`packages/cli/__tests__`). Apps, repo scripts and hooks have no
 tests of their own, and nothing uses snapshots.
 
 The spec lives in the rules, not here — what earns a test and what is
@@ -94,12 +96,12 @@ coverage; this section is orientation only.
 
 `make verify` runs the whole suite (plus lint / typecheck / audits). To run or debug tests directly:
 
-| Command                  | What it does                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` (Chromium) |
-| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules                                |
-| `pnpm test:storybook`    | every React and Vue story's play function in a real browser                      |
-| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                |
+| Command                  | What it does                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `pnpm test`              | every vitest project — `unit` (jsdom) + `storybook` + `storybook-vue` + `parity` (Chromium) |
+| `pnpm test:unit`         | unit only — core engine, `cn` merge, ESLint rules, parity                                   |
+| `pnpm test:storybook`    | every React and Vue story's play function, and rendered parity, in a real browser           |
+| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails                           |
 
 The first storybook-project run launches Storybook in the background — the cold start takes a few extra seconds.
 
@@ -142,19 +144,39 @@ The index DB ships **inside** the image, never in git — the live index is the 
 
 The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claude/rules/docs-mcp.md).
 
+## Browser MCP (chrome-devtools)
+
+`.mcp.json` and `.codex/config.toml` start `chrome-devtools-mcp`, which launches Google Chrome stable. If you don't have Chrome, or want another Chromium browser, point the server at it in its own config file. On macOS, for Brave:
+
+```json
+{
+  "executablePath": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+}
+```
+
+| OS            | Config file                                                                 |
+| ------------- | --------------------------------------------------------------------------- |
+| macOS / Linux | `$XDG_CONFIG_HOME/cd4a/config.json`, else `~/.config/cd4a/config.json`      |
+| Windows       | `%LOCALAPPDATA%\Google\cd4a\config.json`, else `~/.config/cd4a/config.json` |
+
+The file applies in every MCP client, so you don't edit the repo config. A user-level `chrome-devtools` entry in Claude Code or Codex doesn't work, because the project config wins. Make the file and its folder read-only to agents. An agent that edits the file controls the browser, its flags and the URLs it may open.
+
 ---
 
 ## Releasing
 
-Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Only the two runtime packages publish to npm; everything else is either internal or copy/own.
+Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Three packages publish to npm; everything else is either internal or copy/own.
 
-| Package               | Published? | Why                                                                     |
-| --------------------- | ---------- | ----------------------------------------------------------------------- |
-| `@nxds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
-| `@nxds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
-| `@nxds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
-| `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
-| `@nxds/docs`          | private    | App                                                                     |
+| Package               | Published? | Why                                                                      |
+| --------------------- | ---------- | ------------------------------------------------------------------------ |
+| `@nxds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it      |
+| `@nxds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                                |
+| `nxds-cli`            | **npm**    | The `nxds` CLI that installs nxds into an app from the nxds.dev registry |
+| `@nxds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices  |
+| `@nxds/react`         | copy/own   | Components are copied and owned; delivered by the `nxds` CLI             |
+| `@nxds/catalog`       | private    | Builds the install catalog and commits one per `@nxds/react` release     |
+| `@nxds/docs`          | private    | App                                                                      |
+| `@nxds/source-model`  | private    | Reads component sources for the docs generators and the parity tests     |
 
 Everything lives under the `@nxds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nxds/*`, e.g. `@nxds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
 
@@ -172,7 +194,7 @@ The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a t
 
 ### Day-to-day: adding a changeset
 
-Any PR that changes `@nxds/core` or `@nxds/eslint-plugin` includes a changeset describing the bump:
+Any PR that changes `@nxds/core`, `@nxds/eslint-plugin`, `nxds-cli` or what `@nxds/react` installs includes a changeset describing the bump. An `@nxds/react` bump is what gives apps a new release to `nxds update` to:
 
 ```bash
 pnpm changeset        # pick packages + semver bump, write a summary
@@ -184,8 +206,8 @@ Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: 
 
 The `Release` workflow runs on every push to `main`:
 
-1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
-2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core` and `@nxds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s. `pnpm version-packages` also commits `packages/catalog/releases/<version>.json` for a new `@nxds/react` version. The docs site serves it at `nxds.dev/r/<version>.json` and as `nxds.dev/r/latest.json`, which is what the `nxds` CLI installs. A release catalog never changes once committed.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nxds/core`, `@nxds/eslint-plugin` and `nxds-cli` to npm with provenance. Private packages are skipped automatically.
 
 `@nxds/core` and `@nxds/eslint-plugin` were bootstrapped at `0.7.2` and `0.4.0` by the manual publish, so those two versions carry no provenance. Provenance starts with the first release the workflow publishes. Verify any release with a fresh external install:
 

@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 /**
  * Props for the Label component.
  */
-interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {}
+type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root>;
 
 /**
  * Accessible name for a form control, linked by setting `htmlFor` to the

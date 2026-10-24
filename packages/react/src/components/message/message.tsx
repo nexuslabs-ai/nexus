@@ -103,7 +103,7 @@ function MessageAvatar({
 /**
  * Props for the MessageContent component.
  */
-interface MessageContentProps extends React.ComponentProps<'div'> {}
+type MessageContentProps = React.ComponentProps<'div'>;
 
 /**
  * Column beside the avatar for the header, body and footer of the turn.
@@ -128,7 +128,7 @@ const messageMetaClassName =
 /**
  * Props for the MessageHeader component.
  */
-interface MessageHeaderProps extends React.ComponentProps<'div'> {}
+type MessageHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Line above the turn for the speaker name, time or role.
@@ -147,7 +147,7 @@ function MessageHeader({ className, ...props }: MessageHeaderProps) {
 /**
  * Props for the MessageFooter component.
  */
-interface MessageFooterProps extends React.ComponentProps<'div'> {}
+type MessageFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Line below the turn for delivery status, time or actions.

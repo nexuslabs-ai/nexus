@@ -16,6 +16,10 @@ export {
   type DialogHeaderProps,
 } from './DialogHeader.vue';
 export {
+  default as DialogOverlay,
+  type DialogOverlayProps,
+} from './DialogOverlay.vue';
+export {
   default as DialogTitle,
   type DialogTitleProps,
 } from './DialogTitle.vue';
@@ -23,6 +27,8 @@ export {
   DialogRoot as Dialog,
   DialogClose,
   type DialogCloseProps,
+  DialogPortal,
+  type DialogPortalProps,
   type DialogRootProps as DialogProps,
   DialogTrigger,
   type DialogTriggerProps,

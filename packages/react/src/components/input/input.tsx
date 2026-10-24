@@ -39,10 +39,8 @@ const inputVariants = cva(
  *
  * Props for the Input component.
  */
-interface InputProps
-  extends
-    Omit<React.ComponentProps<'input'>, 'size'>,
-    VariantProps<typeof inputVariants> {}
+type InputProps = Omit<React.ComponentProps<'input'>, 'size'> &
+  VariantProps<typeof inputVariants>;
 
 /**
  * A one-line text field. Accepts every native input attribute.

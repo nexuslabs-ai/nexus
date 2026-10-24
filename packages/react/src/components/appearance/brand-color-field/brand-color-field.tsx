@@ -15,10 +15,11 @@ import {
   type NxdsAppearanceColorFieldProps,
 } from '../color-field/color-field';
 
-export interface NxdsAppearanceBrandColorFieldProps
-  extends
-    Omit<ComponentProps<'div'>, 'onChange' | 'children'>,
-    NxdsAppearanceColorFieldProps {}
+export type NxdsAppearanceBrandColorFieldProps = Omit<
+  ComponentProps<'div'>,
+  'onChange' | 'children'
+> &
+  NxdsAppearanceColorFieldProps;
 
 export function NxdsAppearanceBrandColorField({
   value,

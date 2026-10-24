@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 /**
  * Props for the PageHeader component.
  */
-interface PageHeaderProps extends React.ComponentProps<'header'> {}
+type PageHeaderProps = React.ComponentProps<'header'>;
 
 /**
  * Title block of a page or section, with optional description, metadata and
@@ -30,7 +30,7 @@ function PageHeader({ className, ...props }: PageHeaderProps) {
 /**
  * Props for the PageHeaderContent component.
  */
-interface PageHeaderContentProps extends React.ComponentProps<'div'> {}
+type PageHeaderContentProps = React.ComponentProps<'div'>;
 
 /**
  * Stack of metadata, title and description. Fills the row and keeps a
@@ -52,7 +52,7 @@ function PageHeaderContent({ className, ...props }: PageHeaderContentProps) {
 /**
  * Props for the PageHeaderMeta component.
  */
-interface PageHeaderMetaProps extends React.ComponentProps<'p'> {}
+type PageHeaderMetaProps = React.ComponentProps<'p'>;
 
 /**
  * Short line above the title, such as a record ID or parent project.
@@ -73,7 +73,7 @@ function PageHeaderMeta({ className, ...props }: PageHeaderMetaProps) {
 /**
  * Props for the PageHeaderTitleRow component.
  */
-interface PageHeaderTitleRowProps extends React.ComponentProps<'div'> {}
+type PageHeaderTitleRowProps = React.ComponentProps<'div'>;
 
 /**
  * Row that puts a status, such as a Badge, beside the title. The status
@@ -126,7 +126,7 @@ function PageHeaderTitle({
 /**
  * Props for the PageHeaderDescription component.
  */
-interface PageHeaderDescriptionProps extends React.ComponentProps<'p'> {}
+type PageHeaderDescriptionProps = React.ComponentProps<'p'>;
 
 /**
  * Supporting text under the title.
@@ -150,7 +150,7 @@ function PageHeaderDescription({
 /**
  * Props for the PageHeaderActions component.
  */
-interface PageHeaderActionsProps extends React.ComponentProps<'div'> {}
+type PageHeaderActionsProps = React.ComponentProps<'div'>;
 
 /**
  * Primary actions of the page. Buttons wrap onto more lines when they don't

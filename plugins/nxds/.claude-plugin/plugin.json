@@ -1,0 +1,10 @@
+{
+  "name": "nxds",
+  "version": "0.1.0",
+  "description": "Add and use nxds components with the nxds CLI.",
+  "author": { "name": "Nexus Labs", "url": "https://github.com/nexuslabs-ai" },
+  "homepage": "https://nxds.dev",
+  "repository": "https://github.com/nexuslabs-ai/nxds",
+  "license": "MIT",
+  "keywords": ["nxds", "design-system", "components", "tailwindcss"]
+}

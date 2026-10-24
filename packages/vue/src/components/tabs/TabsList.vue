@@ -11,11 +11,13 @@ import { computed, type HTMLAttributes, provide } from 'vue';
 
 import { cn } from '../../lib/utils';
 
-import { TabsListKey, type TabsSize, type TabsVariant } from '.';
+import { TabsListKey } from '.';
 
 export interface TabsListProps extends RekaTabsListProps {
-  variant?: TabsVariant;
-  size?: TabsSize;
+  /** Visual style of every trigger in the list. */
+  variant?: 'default' | 'underline';
+  /** Size of every trigger in the list. */
+  size?: 'sm' | 'default' | 'lg';
   class?: HTMLAttributes['class'];
 }
 
@@ -42,7 +44,7 @@ const isVertical = computed(() => orientation.value === 'vertical');
     :class="
       cn(
         'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
-        isVertical && 'nx:flex-col nx:items-stretch',
+        'nx:data-[orientation=vertical]:flex-col nx:data-[orientation=vertical]:items-stretch',
         variant === 'default' &&
           'nx:rounded-md nx:bg-control-background nx:p-1',
         props.class

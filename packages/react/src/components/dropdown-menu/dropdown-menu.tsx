@@ -90,9 +90,9 @@ function DropdownMenuSubTrigger({
  *
  * Props for the DropdownMenuSubContent component.
  */
-interface DropdownMenuSubContentProps extends React.ComponentProps<
+type DropdownMenuSubContentProps = React.ComponentProps<
   typeof DropdownMenuPrimitive.SubContent
-> {}
+>;
 
 /**
  * The panel that holds a submenu's items.
@@ -121,9 +121,9 @@ function DropdownMenuSubContent({
  *
  * Props for the DropdownMenuContent component.
  */
-interface DropdownMenuContentProps extends React.ComponentProps<
+type DropdownMenuContentProps = React.ComponentProps<
   typeof DropdownMenuPrimitive.Content
-> {}
+>;
 
 /**
  * The menu panel. Opens next to the trigger in a portal.
@@ -212,9 +212,9 @@ function DropdownMenuItem({
  *
  * Props for the DropdownMenuCheckboxItem component.
  */
-interface DropdownMenuCheckboxItemProps extends React.ComponentProps<
+type DropdownMenuCheckboxItemProps = React.ComponentProps<
   typeof DropdownMenuPrimitive.CheckboxItem
-> {}
+>;
 
 /**
  * A menu item that toggles on and off.
@@ -266,9 +266,9 @@ function DropdownMenuCheckboxItem({
  *
  * Props for the DropdownMenuRadioItem component.
  */
-interface DropdownMenuRadioItemProps extends React.ComponentProps<
+type DropdownMenuRadioItemProps = React.ComponentProps<
   typeof DropdownMenuPrimitive.RadioItem
-> {}
+>;
 
 /**
  * A menu item for picking one option from a DropdownMenuRadioGroup.
@@ -353,9 +353,9 @@ function DropdownMenuLabel({
  *
  * Props for the DropdownMenuSeparator component.
  */
-interface DropdownMenuSeparatorProps extends React.ComponentProps<
+type DropdownMenuSeparatorProps = React.ComponentProps<
   typeof DropdownMenuPrimitive.Separator
-> {}
+>;
 
 /**
  * A divider between menu items.
@@ -381,7 +381,7 @@ function DropdownMenuSeparator({
  *
  * Props for the DropdownMenuShortcut component.
  */
-interface DropdownMenuShortcutProps extends React.ComponentProps<'span'> {}
+type DropdownMenuShortcutProps = React.ComponentProps<'span'>;
 
 /**
  * A keyboard shortcut hint, right-aligned in a DropdownMenuItem.

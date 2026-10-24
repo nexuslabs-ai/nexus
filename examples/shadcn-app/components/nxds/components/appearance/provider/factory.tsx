@@ -1,9 +1,11 @@
 'use client';
 
-import type { NxdsAppearanceState } from '@nxds/core';
+import type {
+  NxdsAppearanceCookieOptions,
+  NxdsAppearanceState,
+} from '@nxds/core';
 
 import {
-  type NxdsAppearanceCookieOptions,
   NxdsAppearanceProvider,
   type NxdsAppearanceProviderProps,
 } from './provider';

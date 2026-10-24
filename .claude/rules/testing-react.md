@@ -195,7 +195,7 @@ pnpm test
 # Run only storybook tests (components)
 pnpm test:storybook
 
-# Run only unit tests (core engine, cn merge, ESLint rules)
+# Run only unit tests (core engine, cn merge, ESLint rules, parity, CLI)
 pnpm test:unit
 
 # Watch mode for storybook

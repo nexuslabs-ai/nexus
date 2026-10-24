@@ -9,9 +9,7 @@ import { cn } from '../../lib/utils';
  * Props for ScrollArea, from the Radix ScrollArea Root. `type` sets when the
  * scrollbars show. `scrollHideDelay` sets how long they stay after scrolling.
  */
-interface ScrollAreaProps extends React.ComponentProps<
-  typeof ScrollAreaPrimitive.Root
-> {}
+type ScrollAreaProps = React.ComponentProps<typeof ScrollAreaPrimitive.Root>;
 
 /**
  * Scrollable region with custom scrollbars that look the same on every
@@ -49,9 +47,9 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
  * Props for ScrollBar, from the Radix Scrollbar. `orientation` picks the axis
  * the bar controls.
  */
-interface ScrollBarProps extends React.ComponentProps<
+type ScrollBarProps = React.ComponentProps<
   typeof ScrollAreaPrimitive.ScrollAreaScrollbar
-> {}
+>;
 
 const scrollBarVariants = cva(
   'nx:flex nx:touch-none nx:select-none nx:p-px nx:transition-colors',

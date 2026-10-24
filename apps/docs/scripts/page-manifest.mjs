@@ -30,10 +30,13 @@ import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 import prettier from 'prettier';
 
-import { DOCS_TAG } from './docs-stories.ts';
-import { humanize, pascal } from './humanize.ts';
-import { blockSources, exportedComponentSlugs } from './react-sources.mjs';
-import { reactSrc } from './roots.mjs';
+import { DOCS_TAG } from '@nxds/source-model/docs-stories.ts';
+import { humanize, pascal } from '@nxds/source-model/humanize.ts';
+import {
+  blockSources,
+  componentLabel,
+  exportedComponentSlugs,
+} from '@nxds/source-model/react-sources.mjs';
 
 /** Nav metadata source, relative to the docs app root. */
 export const REGISTRY_FILE = 'page-registry/index.ts';
@@ -128,21 +131,6 @@ function assertLabelsAvoidTheCardJoiner(section) {
 
 const COMPONENTS_SECTION = 'components';
 const BLOCKS_SECTION = 'blocks';
-
-/** A component's name as its own source spells it (`InputOTP`), else its slug in PascalCase. */
-function componentLabel(slug) {
-  const name = pascal(slug);
-  const dir = path.join(reactSrc, 'components', slug);
-  const source = fs
-    .readdirSync(dir)
-    .filter((file) => file.endsWith('.tsx') && !file.endsWith('.stories.tsx'))
-    .map((file) => fs.readFileSync(path.join(dir, file), 'utf8'))
-    .join('\n');
-  const spelled = source
-    .match(/\b[A-Z][A-Za-z0-9]*\b/g)
-    ?.find((word) => word.toLowerCase() === name.toLowerCase());
-  return spelled ?? name;
-}
 
 function assertNoWrittenGeneratedPages(sources) {
   for (const source of sources) {

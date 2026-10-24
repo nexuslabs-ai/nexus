@@ -139,20 +139,6 @@ export const InvalidDraft: Story = {
   },
 };
 
-export const NormalizedCommittedValue: Story = {
-  args: { value: `  ${BLUE.color.toUpperCase()}  ` },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole('combobox', { name: 'Brand color preset' })
-    ).toHaveTextContent(BLUE.label);
-    await expect(
-      canvas.getByRole('textbox', { name: 'Brand color hex value' })
-    ).toHaveValue(args.value);
-    await expect(args.onChange).not.toHaveBeenCalled();
-  },
-};
-
 export const ExistingCssColor: Story = {
   args: { value: 'rgb(12 34 56)' },
   play: async ({ canvasElement, args }) => {

@@ -1,0 +1,12 @@
+{
+  "name": "nxds",
+  "description": "nxds for Claude Code.",
+  "owner": { "name": "Nexus Labs", "url": "https://github.com/nexuslabs-ai" },
+  "plugins": [
+    {
+      "name": "nxds",
+      "source": "./plugins/nxds",
+      "description": "Add and use nxds components with the nxds CLI."
+    }
+  ]
+}

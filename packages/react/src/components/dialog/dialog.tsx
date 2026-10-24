@@ -50,9 +50,7 @@ const DialogClose = DialogPrimitive.Close;
  *
  * Props for the DialogOverlay component.
  */
-interface DialogOverlayProps extends React.ComponentProps<
-  typeof DialogPrimitive.Overlay
-> {}
+type DialogOverlayProps = React.ComponentProps<typeof DialogPrimitive.Overlay>;
 
 /**
  * Semi-transparent backdrop behind the dialog.
@@ -159,7 +157,7 @@ function DialogContent({
  *
  * Props for the DialogHeader component.
  */
-interface DialogHeaderProps extends React.ComponentProps<'div'> {}
+type DialogHeaderProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the dialog title and description. If `DialogContent` also gets a
@@ -186,7 +184,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
  *
  * Props for the DialogBody component.
  */
-interface DialogBodyProps extends React.ComponentProps<'div'> {}
+type DialogBodyProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the dialog's main content. Scrolls when the content overflows.
@@ -196,7 +194,7 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
     <div
       data-slot="dialog-body"
       className={cn(overlayBodyClassName, className)}
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
       tabIndex={0}
       {...props}
     />
@@ -208,7 +206,7 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
  *
  * Props for the DialogFooter component.
  */
-interface DialogFooterProps extends React.ComponentProps<'div'> {}
+type DialogFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Holds the dialog's action buttons. Stacks them on narrow screens and lines
@@ -235,9 +233,7 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
  *
  * Props for the DialogTitle component.
  */
-interface DialogTitleProps extends React.ComponentProps<
-  typeof DialogPrimitive.Title
-> {}
+type DialogTitleProps = React.ComponentProps<typeof DialogPrimitive.Title>;
 
 /**
  * The dialog's title. Place it inside DialogHeader.
@@ -257,9 +253,9 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
  *
  * Props for the DialogDescription component.
  */
-interface DialogDescriptionProps extends React.ComponentProps<
+type DialogDescriptionProps = React.ComponentProps<
   typeof DialogPrimitive.Description
-> {}
+>;
 
 /**
  * Supporting text that explains the dialog.

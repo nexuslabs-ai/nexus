@@ -36,10 +36,8 @@ const nativeSelectVariants = cva(
 /**
  * Props for the NativeSelect component.
  */
-interface NativeSelectProps
-  extends
-    Omit<React.ComponentProps<'select'>, 'size'>,
-    VariantProps<typeof nativeSelectVariants> {}
+type NativeSelectProps = Omit<React.ComponentProps<'select'>, 'size'> &
+  VariantProps<typeof nativeSelectVariants>;
 
 /**
  * Styled native `<select>` that opens the system picker on mobile. Set

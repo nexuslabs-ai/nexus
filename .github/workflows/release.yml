@@ -1,14 +1,15 @@
 name: Release
 
-# Publishes @nxds/core and @nxds/eslint-plugin to npm via changesets,
-# authenticated by npm trusted publishing (OIDC) — there is no npm token in the
-# repo. Standalone from ci.yml: this is a post-merge push:main workflow, not a
+# Publishes @nxds/core, @nxds/eslint-plugin and nxds-cli to npm via
+# changesets, authenticated by npm trusted publishing (OIDC) — there is no npm
+# token in the repo. Standalone from ci.yml: this is a post-merge push:main workflow, not a
 # PR check, so it is not part of the `CI Status` branch-protection aggregator.
 #
 # Flow: on push to main, changesets/action either opens/updates a "Version
 # Packages" PR (when unreleased changesets exist) or — once that PR merges and
 # the changesets are consumed — runs `pnpm release` to build and publish.
-# Only the two non-private packages publish; changesets skips private ones.
+# Only the non-private packages (@nxds/core, @nxds/eslint-plugin and
+# the nxds CLI) publish; changesets skips private ones.
 #
 # Auth: each published package has a trusted publisher registered on npmjs.com
 # pointing at this repo + this workflow file (release.yml). At publish time npm

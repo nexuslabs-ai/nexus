@@ -2,11 +2,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import {
-  frameworkSourceRoot,
-  loadInstallPlan,
-  loadSource,
-} from '../_lib/dependencies';
+import { cliInstalls, loadInstallPlan } from '../_lib/catalog';
 import type { Framework } from '../_lib/frameworks';
 import { requirePage } from '../_lib/manifest';
 
@@ -15,24 +11,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './nxds';
 
 type Step = { title: string; body?: ReactNode };
 
-/** The Installation section of a component page: Command and Manual tabs. */
-export async function ComponentInstallation({
+/** Where a copied file goes: the CLI's folder for React, the app's `@/` root otherwise. */
+const COPY_TARGET: Record<Framework, ReactNode> = {
+  react: (
+    <>
+      Copy each file to the same path under <code>components/nxds/</code>
+    </>
+  ),
+  vue: (
+    <>
+      Keep the same folders under your <code>@/</code> root
+    </>
+  ),
+};
+
+/**
+ * The Installation section of a component page: Command and Manual tabs, or
+ * only the manual steps for a framework the CLI doesn't install.
+ */
+export function ComponentInstallation({
   slug,
   framework = 'react',
 }: {
   slug: string;
   framework?: Framework;
 }) {
-  const { components, packages, files, styles } = await loadInstallPlan(
-    slug,
-    framework
-  );
-  const sources = await Promise.all(
-    files.map(async (path) => ({
-      path,
-      source: await loadSource(path, framework),
-    }))
-  );
+  const {
+    components,
+    packages,
+    files: sources,
+    styles,
+  } = loadInstallPlan(slug, framework);
 
   const steps: Step[] = [];
   if (components.length > 0) {
@@ -67,45 +76,46 @@ export async function ComponentInstallation({
     title: 'Keep each file at the path shown above it.',
     body: (
       <p className="nx:typography-body-default nx:text-muted-foreground">
-        Paths are relative to <code>{frameworkSourceRoot(framework)}</code>.
-        Keep the same folders under your <code>@/</code> root, and the imports
-        between files work without edits.
+        Paths are relative to <code>packages/{framework}/src/</code>.{' '}
+        {COPY_TARGET[framework]}, and the imports between files work without
+        edits.
       </p>
     ),
   });
 
+  const manual = (
+    <ol className="nx:mt-4 nx:flex nx:flex-col nx:gap-6">
+      {steps.map((step, index) => (
+        <li key={step.title} className="nx:flex nx:gap-4">
+          <span
+            aria-hidden
+            className="nx:flex nx:size-7 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-full nx:bg-control-background nx:typography-label-default nx:font-semibold nx:text-foreground"
+          >
+            {index + 1}
+          </span>
+          <div className="nx:min-w-0 nx:flex-1 nx:pt-0.5">
+            <p className="nx:mb-3 nx:typography-body-default nx:font-medium nx:text-foreground">
+              {step.title}
+            </p>
+            {step.body}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+
+  if (!cliInstalls(framework)) return <div className="nx:mb-4">{manual}</div>;
+
   return (
-    <Tabs defaultValue="manual" className="nx:mb-4">
+    <Tabs defaultValue="command" className="nx:mb-4">
       <TabsList variant="underline">
         <TabsTrigger value="command">Command</TabsTrigger>
         <TabsTrigger value="manual">Manual</TabsTrigger>
       </TabsList>
-      {/* TODO(#798): replace with the registry install command. */}
-      <TabsContent value="command">
-        <p className="nx:py-4 nx:typography-body-default nx:text-muted-foreground">
-          Coming soon.
-        </p>
+      <TabsContent value="command" className="nx:pt-4">
+        <AddCommand name={slug} />
       </TabsContent>
-      <TabsContent value="manual">
-        <ol className="nx:mt-4 nx:flex nx:flex-col nx:gap-6">
-          {steps.map((step, index) => (
-            <li key={step.title} className="nx:flex nx:gap-4">
-              <span
-                aria-hidden
-                className="nx:flex nx:size-7 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-full nx:bg-control-background nx:typography-label-default nx:font-semibold nx:text-foreground"
-              >
-                {index + 1}
-              </span>
-              <div className="nx:min-w-0 nx:flex-1 nx:pt-0.5">
-                <p className="nx:mb-3 nx:typography-body-default nx:font-medium nx:text-foreground">
-                  {step.title}
-                </p>
-                {step.body}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </TabsContent>
+      <TabsContent value="manual">{manual}</TabsContent>
     </Tabs>
   );
 }
@@ -131,6 +141,29 @@ export function SourceFile({ path, source }: { path: string; source: string }) {
   );
 }
 
+/**
+ * The CLI command that adds `name` with everything it needs, and the setup
+ * it assumes.
+ */
+export function AddCommand({ name }: { name: string }) {
+  return (
+    <>
+      <CodeSample lang="bash">{`npx nxds-cli@latest add ${name}`}</CodeSample>
+      <p className="nx:mt-3 nx:typography-body-default nx:text-muted-foreground">
+        Run <code>npx nxds-cli@latest init</code> first if nxds isn&rsquo;t set
+        up in your app yet. See{' '}
+        <Link
+          href={requirePage('getting-started', 'install').route}
+          className={LINK_CLASS}
+        >
+          Install
+        </Link>
+        .
+      </p>
+    </>
+  );
+}
+
 /** The `npm install` command for `name@range` packages. */
 export function PackagesSample({ packages }: { packages: readonly string[] }) {
   return (
@@ -144,7 +177,7 @@ export function StylesSample({ styles }: { styles: readonly string[] }) {
     <CodeSample lang="css">
       {[
         '/* app/globals.css */',
-        ...styles.map((file) => `@import '../${file}';`),
+        ...styles.map((file) => `@import '../components/nxds/${file}';`),
       ].join('\n')}
     </CodeSample>
   );

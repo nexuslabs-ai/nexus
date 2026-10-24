@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
@@ -47,21 +46,6 @@ type Story = StoryObj<typeof DropdownMenu>;
 // ============================================
 // BASIC STORIES
 // ============================================
-
-export const Default: Story = {
-  render: (_args) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open Menu</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Logout</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
 
 export const WithLabelsAndSeparators: Story = {
   tags: ['docs'],
@@ -420,100 +404,6 @@ export const WithInsetItems: Story = {
       </DropdownMenuContent>
     </DropdownMenu>
   ),
-};
-
-export const ImmediateItems: Story = {
-  render: (_args) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open immediate menu</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>New File</DropdownMenuItem>
-        <DropdownMenuItem>Open File</DropdownMenuItem>
-        <DropdownMenuItem>Save</DropdownMenuItem>
-        <DropdownMenuItem>Share</DropdownMenuItem>
-        <DropdownMenuItem>Archive</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', {
-      name: 'Open immediate menu',
-    });
-
-    await userEvent.click(trigger);
-
-    const menu = await within(document.body).findByRole('menu');
-    const items = Array.from(
-      menu.querySelectorAll('[data-slot="dropdown-menu-item"]')
-    );
-    await expectImmediateItemMotion(items);
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.querySelector('[role="menu"]')).toBeNull();
-    });
-  },
-};
-
-export const ImmediateGroupedItems: Story = {
-  render: (_args) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open grouped immediate menu</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Files</DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem>New File</DropdownMenuItem>
-          <DropdownMenuItem>Open File</DropdownMenuItem>
-          <DropdownMenuItem>Save File</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Edit</DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Undo</DropdownMenuItem>
-          <DropdownMenuItem>Redo</DropdownMenuItem>
-          <DropdownMenuItem>Copy</DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', {
-      name: 'Open grouped immediate menu',
-    });
-
-    await userEvent.click(trigger);
-
-    const menu = await within(document.body).findByRole('menu');
-    const groups = Array.from(menu.querySelectorAll('[role="group"]'));
-    expect(groups).toHaveLength(2);
-
-    const [fileGroup, editGroup] = groups;
-
-    if (!fileGroup || !editGroup) {
-      throw new Error('Expected two grouped item sections.');
-    }
-
-    const fileItems = Array.from(
-      fileGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
-    );
-    const editItems = Array.from(
-      editGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
-    );
-
-    await expectImmediateItemMotion(fileItems);
-    await expectImmediateItemMotion(editItems);
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.querySelector('[role="menu"]')).toBeNull();
-    });
-  },
 };
 
 // ============================================

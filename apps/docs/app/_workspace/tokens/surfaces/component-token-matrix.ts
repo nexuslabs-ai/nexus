@@ -31,7 +31,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'primary-disabled',
     ],
     sourceFile: 'packages/react/src/components/button/button.tsx',
-    stories: ['Primary', 'Disabled', 'VariantClassesMatchTokens'],
+    stories: ['Default', 'Disabled', 'AllVariants'],
   },
   {
     component: 'Button',
@@ -69,7 +69,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'disabled-foreground',
     ],
     sourceFile: 'packages/react/src/components/input/input.tsx',
-    stories: ['VisualStateTokens', 'Invalid', 'Disabled'],
+    stories: ['AllVariants', 'Invalid', 'Disabled'],
   },
   {
     component: 'Input',
@@ -77,7 +77,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
     states: 'Rest, hover',
     tokens: ['control-background', 'control-background-hover', 'foreground'],
     sourceFile: 'packages/react/src/components/input/input.tsx',
-    stories: ['BorderlessStates', 'BorderlessSurfaceComparison'],
+    stories: ['BorderlessStates'],
   },
   {
     component: 'InputGroup',
@@ -97,7 +97,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'disabled-foreground',
     ],
     sourceFile: 'packages/react/src/components/input-group/input-group.tsx',
-    stories: ['VisualStateTokens', 'BorderlessHoverSurface', 'Invalid'],
+    stories: ['StateMatrix', 'BorderlessStates', 'Disabled'],
   },
   {
     component: 'Table',
@@ -160,7 +160,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'AllVariants',
       'KeyboardInteraction',
       'InvalidTrigger',
-      'Disabled',
+      'DisabledInteraction',
     ],
   },
   {
@@ -222,7 +222,7 @@ export const COMPONENT_TOKEN_MATRIX: readonly ComponentTokenEntry[] = [
       'focus-default',
     ],
     sourceFile: 'packages/react/src/components/sidebar/sidebar.tsx',
-    stories: ['Default', 'InteractiveControls', 'StylingContracts'],
+    stories: ['Default', 'InteractiveControls', 'AllVariants'],
   },
   {
     component: 'Command',

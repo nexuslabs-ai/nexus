@@ -31,12 +31,6 @@ type Story = StoryObj<typeof Switch>;
 // BASIC STORIES
 // ============================================
 
-export const Default: Story = {
-  args: {
-    'aria-label': 'Toggle switch',
-  },
-};
-
 export const WithLabel: Story = {
   tags: ['docs'],
   render: function WithLabelStory() {
@@ -186,23 +180,6 @@ export const Small: Story = {
   },
 };
 
-export const WithLabelAndDescription: Story = {
-  render: (_args) => (
-    <div className="nx:grid nx:grid-cols-[auto_1fr] nx:items-center nx:gap-x-3 nx:gap-y-1.5">
-      <Switch id="notifications" />
-      <label
-        htmlFor="notifications"
-        className="nx:typography-label-default nx:leading-none"
-      >
-        Enable Notifications
-      </label>
-      <p className="nx:col-start-2 nx:typography-body-default nx:text-muted-foreground">
-        Receive notifications when someone mentions you.
-      </p>
-    </div>
-  ),
-};
-
 export const LabelOnLeft: Story = {
   tags: ['docs'],
   parameters: {
@@ -228,34 +205,6 @@ export const LabelOnLeft: Story = {
           </p>
         </div>
         <Switch id={switchId} aria-describedby={descriptionId} />
-      </div>
-    );
-  },
-};
-
-// ============================================
-// CONTROLLED EXAMPLE
-// ============================================
-
-export const Controlled: Story = {
-  render: function ControlledSwitch() {
-    const [checked, setChecked] = React.useState(false);
-
-    return (
-      <div className="nx:flex nx:flex-col nx:items-center nx:gap-4">
-        <div className="nx:flex nx:items-center nx:gap-2">
-          <Switch
-            id="controlled"
-            checked={checked}
-            onCheckedChange={setChecked}
-          />
-          <label htmlFor="controlled" className="nx:typography-label-default">
-            Controlled Switch
-          </label>
-        </div>
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Switch is {checked ? 'on' : 'off'}
-        </p>
       </div>
     );
   },
@@ -327,6 +276,28 @@ export const DisabledInteraction: Story = {
     await userEvent.click(switchEl);
     await expect(switchEl).toHaveAttribute('data-state', 'unchecked');
     await expect(args.onCheckedChange).not.toHaveBeenCalled();
+  },
+};
+
+export const LabelClick: Story = {
+  render: function LabelClickStory(args) {
+    const switchId = React.useId();
+
+    return (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Switch {...args} id={switchId} />
+        <Label htmlFor={switchId}>Airplane mode</Label>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByText('Airplane mode'));
+    await expect(canvas.getByRole('switch')).toHaveAttribute(
+      'data-state',
+      'checked'
+    );
   },
 };
 

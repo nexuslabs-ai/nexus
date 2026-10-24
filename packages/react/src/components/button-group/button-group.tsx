@@ -138,9 +138,7 @@ function ButtonGroupText({
  *
  * Props for the ButtonGroupSeparator component.
  */
-interface ButtonGroupSeparatorProps extends React.ComponentProps<
-  typeof Separator
-> {}
+type ButtonGroupSeparatorProps = React.ComponentProps<typeof Separator>;
 
 /**
  * Divider between sub-groups that spans the whole group. Vertical by default.

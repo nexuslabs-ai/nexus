@@ -53,10 +53,8 @@ const switchThumbVariants = cva(
 /**
  * Props for Switch.
  */
-interface SwitchProps
-  extends
-    React.ComponentProps<typeof SwitchPrimitive.Root>,
-    VariantProps<typeof switchVariants> {}
+type SwitchProps = React.ComponentProps<typeof SwitchPrimitive.Root> &
+  VariantProps<typeof switchVariants>;
 
 /**
  * On/off control for settings that apply at once, with no save step. Pair it
