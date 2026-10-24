@@ -64,8 +64,17 @@ function docsStories<TStory extends { tags?: string[] }>(
   );
 }
 
+/** The shared component a part belongs to: the longest slug its `data-slot` starts with. */
+function ownerOf(slot: string) {
+  return shared
+    .filter((slug) => slot === slug || slot.startsWith(`${slug}-`))
+    .reduce<
+      string | undefined
+    >((longest, slug) => (!longest || slug.length > longest.length ? slug : longest), undefined);
+}
+
 function isOwnSlot(slot: string, slug: string) {
-  return slot === slug || slot.startsWith(`${slug}-`);
+  return ownerOf(slot) === slug;
 }
 
 /** One element as a line, so a mismatch prints as a readable line diff. */

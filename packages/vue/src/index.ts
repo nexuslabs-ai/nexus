@@ -15,6 +15,7 @@ export * from './components/field';
 export * from './components/hide';
 export * from './components/input';
 export * from './components/input-group';
+export * from './components/input-otp';
 export * from './components/kbd';
 export * from './components/label';
 export * from './components/native-select';

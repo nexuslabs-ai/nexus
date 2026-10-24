@@ -130,14 +130,16 @@ const rangeEndsAtMax = computed(() =>
 // thumb-owned ARIA (naming and invalid state) goes there.
 const THUMB_ATTRS = ['aria-label', 'aria-labelledby', 'aria-invalid'];
 const attrs = useAttrs();
-const thumbAttrs = computed(() =>
-  Object.fromEntries(THUMB_ATTRS.map((name) => [name, attrs[name]]))
-);
-const rootAttrs = computed(() =>
-  Object.fromEntries(
+
+function thumbAttrs() {
+  return Object.fromEntries(THUMB_ATTRS.map((name) => [name, attrs[name]]));
+}
+
+function rootAttrs() {
+  return Object.fromEntries(
     Object.entries(attrs).filter(([name]) => !THUMB_ATTRS.includes(name))
-  )
-);
+  );
+}
 
 const delegated = reactiveOmit(
   props,
@@ -152,7 +154,7 @@ const forwarded = useForwardProps(delegated);
 
 <template>
   <SliderRoot
-    v-bind="{ ...forwarded, ...rootAttrs }"
+    v-bind="{ ...forwarded, ...rootAttrs() }"
     :model-value="values"
     data-slot="slider"
     :data-size="size"
@@ -204,7 +206,7 @@ const forwarded = useForwardProps(delegated);
     <SliderThumb
       v-for="(_, index) in values"
       :key="index"
-      v-bind="thumbAttrs"
+      v-bind="thumbAttrs()"
       data-slot="slider-thumb"
       :data-orientation="orientation"
       :data-size="size"

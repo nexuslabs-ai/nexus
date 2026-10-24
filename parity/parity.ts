@@ -29,7 +29,6 @@ export const planned = [
   'filter-chip',
   'filter-condition',
   'hover-card',
-  'input-otp',
   'item',
   'marker',
   'menubar',
@@ -69,6 +68,7 @@ export const shared = [
   'hide',
   'input',
   'input-group',
+  'input-otp',
   'kbd',
   'label',
   'native-select',
@@ -137,6 +137,7 @@ export const behaviourOnlyIn: Record<
   vue: {
     'checkbox/VModel': V_MODEL,
     'input/VModel': V_MODEL,
+    'input-otp/VModel': V_MODEL,
     'native-select/VModel': V_MODEL,
     'radio-group/VModel': V_MODEL,
     'slider/VModel': V_MODEL,
@@ -149,11 +150,16 @@ export const behaviourOnlyIn: Record<
   },
 };
 
+const PIN_INPUT =
+  'React types into one hidden input and reports the code as a string; Reka gives each slot its own input and emits one character per slot';
+
 const TABS_INDICATOR =
   "React waits for its measured indicator's opacity and transform; Reka's indicator has neither, so Vue checks only the geometry";
 
 /** Paired play stories whose steps differ by design, as `{slug}/{Story}`. */
 export const behaviourDifferences: Record<string, string> = {
+  'input-otp/KeyboardInteraction': PIN_INPUT,
+  'input-otp/Paste': PIN_INPUT,
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
@@ -163,6 +169,10 @@ export const behaviourDifferences: Record<string, string> = {
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
 export const renderedDifferences: Record<string, string> = {
+  'input-otp':
+    "input-otp puts data-slot on its hidden <input>; Vue's root is Reka's PinInputRoot <div>",
+  'input-otp-slot':
+    "React's slot is a <div> that shows the character; Vue's slot is Reka's PinInputInput <input>",
   'tabs-indicator':
     "Radix has no indicator, so React measures the active tab and moves a span; Vue renders Reka's TabsIndicator, which reads Reka's CSS variables",
 };
@@ -171,6 +181,8 @@ export const renderedDifferences: Record<string, string> = {
 export const vueOnlyDeclarations: Record<string, string> = {
   'button/index.ts#ButtonGroupKey':
     'Vue injection key ButtonGroup provides to its Buttons and ButtonGroupText; React passes the same size through context',
+  'input-otp/index.ts#InputOTPKey':
+    "Vue injection key the root provides so each slot's <input> takes the field's name; React's single <input> carries it",
   'tabs/index.ts#TabsListKey':
     'Vue injection key the list provides to its triggers; React passes the same state through context',
   'toggle-group/index.ts#ToggleGroupKey':
