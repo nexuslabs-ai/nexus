@@ -144,6 +144,23 @@ The index DB ships **inside** the image, never in git — the live index is the 
 
 The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claude/rules/docs-mcp.md).
 
+## Browser MCP (chrome-devtools)
+
+`.mcp.json` and `.codex/config.toml` start `chrome-devtools-mcp`, which launches Google Chrome stable. If you don't have Chrome, or want another Chromium browser, point the server at it in its own config file:
+
+```json
+{
+  "executablePath": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+}
+```
+
+| OS            | Config file                                                            |
+| ------------- | ---------------------------------------------------------------------- |
+| macOS / Linux | `$XDG_CONFIG_HOME/cd4a/config.json`, else `~/.config/cd4a/config.json` |
+| Windows       | `%LOCALAPPDATA%\Google\cd4a\config.json`                               |
+
+The file applies in every MCP client, so you don't edit the repo config. A user-level `chrome-devtools` entry in Claude Code or Codex doesn't work, because the project config wins. Keep the file and its folder outside anything an agent can write to, so an agent can't change which browser the server launches.
+
 ---
 
 ## Releasing
