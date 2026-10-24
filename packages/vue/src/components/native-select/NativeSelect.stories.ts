@@ -380,7 +380,7 @@ export const WithDataAttributes: Story = {
 export const VModel: Story = {
   render: () => ({
     components: { NativeSelect, NativeSelectOption },
-    setup: () => ({ plan: ref('free') }),
+    setup: () => ({ plan: ref<string | undefined>('free') }),
     template: `
       <div class="nx:grid nx:gap-2">
         <NativeSelect v-model="plan" aria-label="Plan">
@@ -388,15 +388,21 @@ export const VModel: Story = {
           <NativeSelectOption value="pro">Pro</NativeSelectOption>
         </NativeSelect>
         <p>Selected: {{ plan }}</p>
+        <button type="button" @click="plan = undefined">Reset</button>
       </div>
     `,
   }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const select = canvas.getByRole('combobox');
 
-    await expect(canvas.getByRole('combobox')).toHaveValue('free');
-    await userEvent.selectOptions(canvas.getByRole('combobox'), 'pro');
+    await expect(select).toHaveValue('free');
+    await userEvent.selectOptions(select, 'pro');
     await expect(canvas.getByText('Selected: pro')).toBeVisible();
+
+    // Resetting the model to undefined falls back to the first option, not a blank select
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset' }));
+    await expect(select).toHaveValue('free');
   },
 };
 

@@ -309,6 +309,24 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+export const DisabledInteraction: Story = {
+  args: {
+    'aria-label': 'Disabled checkbox',
+    disabled: true,
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const checkbox = canvas.getByRole('checkbox');
+
+    await expect(checkbox).toBeDisabled();
+
+    // Click should not toggle
+    await userEvent.click(checkbox);
+    await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
+    await expect(args.onCheckedChange).not.toHaveBeenCalled();
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     'aria-label': 'Checkbox',

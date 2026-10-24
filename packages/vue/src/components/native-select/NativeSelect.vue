@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IconChevronDown } from '@tabler/icons-vue';
 import { useVModel } from '@vueuse/core';
-import { computed, type HTMLAttributes } from 'vue';
+import { computed, type HTMLAttributes, useTemplateRef, watch } from 'vue';
 
 import { cn } from '../../lib/utils';
 
@@ -36,6 +36,18 @@ const model = useVModel(props, 'modelValue', emits, {
 const valueAttrs = computed(() =>
   model.value === undefined ? {} : { value: model.value }
 );
+
+const select = useTemplateRef('select');
+// A model reset to undefined blanks the select, so pick the first enabled option as React does.
+watch(
+  model,
+  (value) => {
+    if (value !== undefined || !select.value) return;
+    const first = [...select.value.options].find((option) => !option.disabled);
+    if (first) first.selected = true;
+  },
+  { flush: 'post' }
+);
 </script>
 
 <template>
@@ -44,6 +56,7 @@ const valueAttrs = computed(() =>
     class="nx:group/native-select nx:relative nx:w-full"
   >
     <select
+      ref="select"
       v-bind="{ ...$attrs, ...valueAttrs }"
       data-slot="native-select"
       :data-size="size"

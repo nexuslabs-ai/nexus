@@ -290,6 +290,31 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+export const DisabledInteraction: Story = {
+  args: { disabled: true },
+  render: (args) => ({
+    components: { RadioGroup, RadioGroupItem },
+    setup: () => ({ args }),
+    template: `
+      <RadioGroup v-bind="args" aria-label="Pick one">
+        <RadioGroupItem value="one" aria-label="Option one" />
+        <RadioGroupItem value="two" aria-label="Option two" />
+      </RadioGroup>
+    `,
+  }),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const two = canvas.getByRole('radio', { name: 'Option two' });
+
+    await expect(two).toBeDisabled();
+
+    // Clicking a disabled option does not select it
+    await userEvent.click(two);
+    await expect(two).toHaveAttribute('data-state', 'unchecked');
+    await expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
+  },
+};
+
 export const WithDataAttributes: Story = {
   render: () => ({
     components: { RadioGroup, RadioGroupItem },

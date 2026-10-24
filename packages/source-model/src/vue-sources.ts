@@ -12,6 +12,7 @@ import {
 } from 'vue-component-meta';
 
 import { importSpecifiers } from './files.mjs';
+import { publicExports } from './props-contract.mjs';
 import {
   type ComponentEntry,
   literalDefaultValue,
@@ -87,19 +88,41 @@ export function createVueChecker(): VueChecker {
   });
 }
 
+/** Type alias names declared in @nxds/vue that its public entry does not export. */
+function localAliasNames(checker: VueChecker) {
+  const program =
+    checker.getProgram() ?? fail('the Vue checker has no program.');
+  const exported = publicExports(program.getTypeChecker(), program, [
+    path.join(vueSrc, 'index.ts'),
+  ]);
+  return new Set(
+    program
+      .getSourceFiles()
+      .filter((sourceFile) => isUnder(sourceFile.fileName, vueSrc))
+      .flatMap((sourceFile) => sourceFile.statements)
+      .filter(ts.isTypeAliasDeclaration)
+      .map((statement) => statement.name.text)
+      .filter((name) => !exported.has(name))
+  );
+}
+
 /** A union schema's members as printed types, or null when one is not a plain type. */
 function unionMembers(schema: PropertyMetaSchema): string[] | null {
   if (typeof schema === 'string') return [schema];
   if (schema.kind !== 'enum' || !schema.schema) return null;
-  const members = schema.schema.map(unionMembers);
-  if (members.some((member) => member === null)) return null;
-  return members.flat() as string[];
+  const members: string[] = [];
+  for (const memberSchema of schema.schema) {
+    const member = unionMembers(memberSchema);
+    if (!member) return null;
+    members.push(...member);
+  }
+  return members;
 }
 
-/** A prop's type, with a union alias such as `Breakpoint` written out as its members. */
-function propType(prop: PropertyMeta) {
+/** A prop's type, with an unexported local union alias such as `Breakpoint` written out as its members. */
+function propType(prop: PropertyMeta, localAliases: Set<string>) {
   const type = prop.type.replace(/\s*\|\s*undefined$/, '');
-  if (!/^[A-Z]\w*$/.test(type)) return type;
+  if (!localAliases.has(type)) return type;
   const members = unionMembers(prop.schema)?.filter(
     (member) => member !== 'undefined'
   );
@@ -120,16 +143,23 @@ export function isOwnDeclaration(declarations: { file: string }[]) {
 
 /** Each part a component folder exports, with its `vue-component-meta` read once. */
 export function componentParts(checker: VueChecker, slug: string) {
+  const localAliases = localAliasNames(checker);
   return exportedParts(slug).map(({ name, file }) => ({
     name,
     file,
     meta: checker.getComponentMeta(file),
+    localAliases,
   }));
 }
 
 export type VuePart = ReturnType<typeof componentParts>[number];
 
-export function partEntry({ name, file, meta }: VuePart): ComponentEntry {
+export function partEntry({
+  name,
+  file,
+  meta,
+  localAliases,
+}: VuePart): ComponentEntry {
   return {
     name,
     description: '',
@@ -140,7 +170,7 @@ export function partEntry({ name, file, meta }: VuePart): ComponentEntry {
       )
       .map((prop) => ({
         name: prop.name,
-        type: propType(prop),
+        type: propType(prop, localAliases),
         required: prop.required,
         defaultValue: propDefault(prop, `${name}.${prop.name}`),
         description: prop.description,

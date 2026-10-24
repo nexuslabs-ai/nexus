@@ -206,7 +206,7 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-// A disabled toggle does not respond to clicks.
+// A disabled toggle shows muted colors.
 export const Disabled: Story = {
   tags: ['docs'],
   parameters: {
@@ -232,6 +232,29 @@ export const Disabled: Story = {
     // Disabled state uses a semantic text token at full opacity (not a fade).
     await expect(toggle).toHaveClass('nx:disabled:text-disabled-foreground');
     await expect(getComputedStyle(toggle).opacity).toBe('1');
+  },
+};
+
+// A disabled toggle ignores clicks.
+export const DisabledInteraction: Story = {
+  args: { 'onUpdate:modelValue': fn() },
+  render: (args) => ({
+    components: { IconBold, Toggle },
+    setup: () => ({ args }),
+    template: `
+      <Toggle v-bind="args" aria-label="Bold" disabled>
+        <IconBold />
+      </Toggle>
+    `,
+  }),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: 'Bold' });
+    await expect(toggle).toBeDisabled();
+    // pointerEventsCheck: 0 clicks through the disabled toggle's pointer-events: none.
+    await userEvent.click(toggle, { pointerEventsCheck: 0 });
+    await expect(toggle).toHaveAttribute('data-state', 'off');
+    await expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
   },
 };
 
