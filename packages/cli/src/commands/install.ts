@@ -3,16 +3,18 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
+  assertSupportsReact,
   type Catalog,
   fetchRelease,
-  type Framework,
   loadRelease,
+  type ReactMajor,
   releaseFiles,
   resolveItems,
   SETUP,
   setupVariant,
   splitInstalled,
-  variantOf,
+  type Target,
+  variantFor,
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig, writeConfig } from '../config';
@@ -25,7 +27,12 @@ import {
   type InstallResult,
 } from '../install';
 import { installPackages, packagesToInstall } from '../packages';
-import { majorVersion, type Project, readProject } from '../project';
+import {
+  majorVersion,
+  type Project,
+  reactMajor,
+  readProject,
+} from '../project';
 import {
   cssEntryPath,
   defaultDir,
@@ -84,6 +91,14 @@ function settled(result: InstallResult) {
   );
 }
 
+/** Fails when the app's React changed since its files were installed. */
+function assertFilesMatchReact(config: Config, react: ReactMajor) {
+  if (config.react === react) return;
+  throw new CliError(
+    `nxds.json has React ${config.react} files, and this app uses React ${react}. Run \`${CLI_COMMAND} update\` to switch them, then run this command again.`
+  );
+}
+
 function nxdsDir(dir: string) {
   const normalized = relativePath(dir);
   if (normalized) return normalized;
@@ -122,6 +137,7 @@ export async function init(
       'nxds components are TypeScript. Add a tsconfig.json to your app, then run init again.'
     );
   }
+  const react = reactMajor(project);
   const addTailwind = !('tailwindcss' in project.dependencies);
   if (!addTailwind) assertTailwind4(project);
 
@@ -129,6 +145,8 @@ export async function init(
   const existing = readConfig(cwd);
   // Running init again stays on the app's release.
   const catalog = await loadRelease(registry, existing?.version ?? 'latest');
+  assertSupportsReact(catalog, react);
+  if (existing) assertFilesMatchReact(existing, react);
   if (existing && dir && dir !== existing.dir) {
     throw new CliError(
       `nxds is already set up in ${existing.dir}. Run init without --dir, or move the folder and change "dir" in nxds.json.`
@@ -136,13 +154,14 @@ export async function init(
   }
   const config: Config = existing ?? {
     framework: 'react',
+    react,
     version: catalog.version,
     dir: dir ?? defaultDir(project),
     css: cssEntryPath(project),
     items: [],
   };
 
-  const setup = setupVariant(catalog, config.framework);
+  const setup = setupVariant(catalog, config);
   const wiring = planWiring(project, config, addTailwind, setup.steps);
 
   const tailwind = packagesToInstall(
@@ -178,6 +197,7 @@ export async function init(
   return {
     data: {
       setup: project.setup,
+      react: config.react,
       version: config.version,
       dir: config.dir,
       css: config.css,
@@ -193,7 +213,7 @@ export async function init(
       manual: wiring.manual,
     },
     lines: [
-      `nxds ${config.version} in ${config.dir}`,
+      `nxds ${config.version} in ${config.dir}, for React ${config.react}`,
       ...installLines(config, { ...installed, packages }, options),
       ...wiring.changes.map(
         (change) => `${change.created ? createVerb : editVerb} ${change.path}`
@@ -225,10 +245,12 @@ export async function add(
   options: InstallOptions
 ): Promise<CommandResult> {
   const config = requireConfig(cwd);
+  const project = readProject(cwd);
+  assertFilesMatchReact(config, reactMajor(project));
   const catalog = await loadRelease(registry, config.version);
   const installed = installItems(
     catalog,
-    readProject(cwd),
+    project,
     config,
     names,
     null,
@@ -251,10 +273,10 @@ export async function add(
 }
 
 /** The files `names` and everything they need install. */
-function filesOf(catalog: Catalog, framework: Framework, names: string[]) {
+function filesOf(catalog: Catalog, target: Target, names: string[]) {
   return new Set(
-    resolveItems(catalog, framework, names).flatMap((item) =>
-      variantOf(item, framework).files.map((file) => file.path)
+    resolveItems(catalog, target.framework, names).flatMap((item) =>
+      variantFor(item, target).files.map((file) => file.path)
     )
   );
 }
@@ -263,6 +285,9 @@ type UpdateData = InstallResult & {
   dryRun: boolean;
   from: string;
   version: string;
+  /** The React major the files were for before, and after. */
+  fromReact: ReactMajor;
+  react: ReactMajor;
   removed: string[];
   orphaned: string[];
 };
@@ -283,6 +308,9 @@ type UpdateData = InstallResult & {
  * nothing until it is resolved, then merges from the app's release. The app
  * also stays behind when its release is gone from the registry and an edited
  * file is kept.
+ *
+ * When the app's React major changed, the files switch to the new major's: the
+ * app's release in the old major is the base nxds's changes merge from.
  */
 export async function update(
   cwd: string,
@@ -290,21 +318,22 @@ export async function update(
   options: InstallOptions
 ): Promise<CommandResult> {
   const config = requireConfig(cwd);
+  const project = readProject(cwd);
   const from = config.version;
+  const fromReact = config.react;
+  const react = reactMajor(project);
   const latest = await loadRelease(registry, 'latest');
+  assertSupportsReact(latest, react);
   const { known, removed } = splitInstalled(latest, config.items);
-  const current = filesOf(latest, config.framework, known);
+  const current = filesOf(latest, { ...config, react }, known);
   const previous = await fetchRelease(registry, from);
   const installedBefore = previous
-    ? filesOf(
-        previous,
-        config.framework,
-        splitInstalled(previous, config.items).known
-      )
+    ? filesOf(previous, config, splitInstalled(previous, config.items).known)
     : new Set<string>();
+  const unchanged = from === latest.version && fromReact === react;
 
   const unresolved =
-    from === latest.version || options.overwrite
+    unchanged || options.overwrite
       ? []
       : conflictedFiles(cwd, config, new Set([...current, ...installedBefore]));
   if (unresolved.length > 0) {
@@ -313,6 +342,8 @@ export async function update(
       dryRun: options.dryRun,
       from,
       version: from,
+      fromReact,
+      react: fromReact,
       unresolved,
       removed: [],
       orphaned: [],
@@ -330,24 +361,29 @@ export async function update(
   const orphaned = [...installedBefore].filter(
     (file) => !current.has(file) && existsSync(path.join(cwd, config.dir, file))
   );
+  const previousFiles = previous && releaseFiles(previous, config);
   config.items = known;
+  config.react = react;
   const installed = installItems(
     latest,
-    readProject(cwd),
+    project,
     config,
     known,
-    previous && releaseFiles(previous, config.framework),
+    previousFiles,
     options
   );
 
-  const stays = from !== latest.version && installed.skipped.length > 0;
-  if (!stays) config.version = latest.version;
+  const stays = !unchanged && installed.skipped.length > 0;
+  if (stays) config.react = fromReact;
+  else config.version = latest.version;
   if (!options.dryRun) writeConfig(cwd, config);
 
   const data: UpdateData = {
     dryRun: options.dryRun,
     from,
     version: config.version,
+    fromReact,
+    react: config.react,
     ...installed,
     removed,
     orphaned,
@@ -370,6 +406,11 @@ export async function update(
         (file) =>
           `No installed item uses ${config.dir}/${file} any more. Delete it once nothing in your app imports it.`
       ),
+      ...(fromReact !== react && !stays
+        ? [
+            `${options.dryRun ? 'Would switch' : 'Switched'} the files from React ${fromReact} to React ${react}.`,
+          ]
+        : []),
       stays
         ? `nxds.json stays on ${from} until every file above is resolved or replaced.`
         : `nxds ${from === latest.version ? 'is on' : `${options.dryRun ? 'would move' : 'moved'} from ${from} to`} ${latest.version}.`,

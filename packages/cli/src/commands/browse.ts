@@ -5,7 +5,7 @@ import {
   type Framework,
   loadRelease,
   SETUP,
-  variantOf,
+  variantFor,
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
 import { readConfig } from '../config';
@@ -97,7 +97,10 @@ export async function view(
 ): Promise<CommandResult> {
   const catalog = await appRelease(cwd, registry);
   const item = findItem(catalog, name);
-  const variant = variantOf(item, projectFramework(cwd, catalog));
+  const variant = variantFor(item, {
+    framework: projectFramework(cwd, catalog),
+    react: readConfig(cwd)?.react ?? 19,
+  });
   const packages = Object.entries(variant.packages.npm).map(
     ([pkg, range]) => `${pkg}@${range}`
   );

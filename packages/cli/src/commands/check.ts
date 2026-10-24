@@ -11,10 +11,11 @@ import {
   releaseFiles,
   resolveItems,
   splitInstalled,
-  variantOf,
+  variantFor,
 } from '../catalog';
 import { CLI_COMMAND } from '../cli-command';
 import { type Config, readConfig, requireConfig } from '../config';
+import { CliError } from '../errors';
 import {
   baseOf,
   conflictedFiles,
@@ -27,6 +28,7 @@ import {
   findFile,
   majorVersion,
   type Project,
+  reactMajor,
   readProject,
   VITE_CONFIGS,
   VITE_ENTRIES,
@@ -44,7 +46,7 @@ export async function diff(
   const config = requireConfig(cwd);
   const latest = await loadRelease(registry, 'latest');
   const previous = await fetchRelease(registry, config.version);
-  const previousFiles = previous && releaseFiles(previous, config.framework);
+  const previousFiles = previous && releaseFiles(previous, config);
   const { known, removed } = splitInstalled(latest, config.items);
   const items = resolveItems(
     latest,
@@ -72,7 +74,7 @@ export async function diff(
   }
 
   const files = items.flatMap((item) =>
-    variantOf(item, config.framework).files.map((file) => {
+    variantFor(item, config).files.map((file) => {
       const state = fileState(cwd, config, file, previousFiles);
       return {
         item: item.name,
@@ -154,6 +156,50 @@ function unscannedReason(cwd: string, config: Config, css: string) {
   return null;
 }
 
+/** The major `name` is installed at, or null when it isn't installed. */
+function installedMajor(project: Project, name: string) {
+  const version = installedVersion(project, name);
+  return version === null ? null : Number(version.split('.')[0]);
+}
+
+/** Whether React is one nxds supports, and the files and React packages match it. */
+function reactChecks(project: Project, config: Config): Check[] {
+  let react: ReturnType<typeof reactMajor>;
+  try {
+    react = reactMajor(project);
+  } catch (error) {
+    if (!(error instanceof CliError)) throw error;
+    return [{ name: 'react', ok: false, message: error.message }];
+  }
+  const checks: Check[] = [
+    {
+      name: 'react',
+      ok: config.react === react,
+      message:
+        config.react === react
+          ? `The files are for React ${react}, which this app uses`
+          : `The files are for React ${config.react}, and this app uses React ${react}. Run \`${CLI_COMMAND} update\` to switch them.`,
+    },
+  ];
+  for (const name of ['react-dom', '@types/react', '@types/react-dom']) {
+    if (name.startsWith('@types/') && !(name in project.dependencies)) continue;
+    const major = installedMajor(project, name);
+    const reactInstalled = installedMajor(project, 'react');
+    if (reactInstalled === null) continue;
+    checks.push({
+      name,
+      ok: major === reactInstalled,
+      message:
+        major === null
+          ? `${name} is not installed`
+          : major === reactInstalled
+            ? `${name} ${major} matches react ${reactInstalled}`
+            : `${name} ${major} is installed with react ${reactInstalled}. Install the same major as react.`,
+    });
+  }
+  return checks;
+}
+
 /** Each package the installed items need that is missing or below range. */
 function packageProblems(
   project: Project,
@@ -162,7 +208,7 @@ function packageProblems(
 ) {
   const needed: Record<string, string> = Object.assign(
     {},
-    ...items.map((item) => variantOf(item, config.framework).packages.npm)
+    ...items.map((item) => variantFor(item, config).packages.npm)
   );
   return Object.entries(needed).flatMap(([name, range]) => {
     if (!(name in project.dependencies))
@@ -212,6 +258,7 @@ export async function doctor(
     majorVersion(project, 'tailwindcss') === 4,
     tailwindMessage(project)
   );
+  checks.push(...reactChecks(project, config));
 
   const css = read(cwd, config.css);
   const importsTokens = css.includes('tailwind/nxds.css');
@@ -278,7 +325,7 @@ export async function doctor(
 
   const items = resolveItems(catalog, config.framework, known);
   const missingFiles = items.flatMap((item) =>
-    variantOf(item, config.framework)
+    variantFor(item, config)
       .files.filter(
         (file) => !existsSync(path.join(cwd, config.dir, file.path))
       )
@@ -296,7 +343,7 @@ export async function doctor(
     cwd,
     config,
     items.flatMap((item) =>
-      variantOf(item, config.framework).files.map((file) => file.path)
+      variantFor(item, config).files.map((file) => file.path)
     )
   ).map((file) => `${config.dir}/${file}`);
   check(

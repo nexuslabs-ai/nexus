@@ -1,7 +1,8 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { major, minVersion, validRange } from 'semver';
+import { major, minVersion, parse, validRange } from 'semver';
 
+import type { ReactMajor } from './catalog';
 import { CLI_COMMAND } from './cli-command';
 import { CliError, readJson } from './errors';
 import { installedVersion } from './packages';
@@ -93,6 +94,34 @@ export function readProject(root: string): Project {
 /** The first of `candidates` that exists under the project root. */
 export function findFile(project: Project, candidates: string[]) {
   return firstExisting(project.root, candidates);
+}
+
+/**
+ * The React major the app's nxds files are for: 18 on React 18.3, 19 on React
+ * 19 or newer. Reads the installed React, else the lowest version the declared
+ * range allows. React 18's files also run on 19, so a range that spans both
+ * gets 18's.
+ */
+export function reactMajor(project: Project): ReactMajor {
+  const declared = project.dependencies.react;
+  if (declared === undefined) {
+    throw new CliError(
+      'This app has no react dependency. nxds needs React 18.3 or 19.'
+    );
+  }
+  const installed = installedVersion(project, 'react');
+  const range = validRange(declared) === null ? null : minVersion(declared);
+  const version = installed === null ? range : parse(installed);
+  if (version === null) {
+    throw new CliError(
+      `This app declares react ${declared}, which names no version, and none is installed. Install your dependencies, then run the command again.`
+    );
+  }
+  if (version.major >= 19) return 19;
+  if (version.major === 18 && version.minor >= 3) return 18;
+  throw new CliError(
+    `nxds needs React 18.3 or 19, and this app uses react ${version.version}. Upgrade React, then run the command again.`
+  );
 }
 
 /**

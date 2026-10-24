@@ -360,6 +360,151 @@ describe('update', () => {
   });
 });
 
+const REACT_BUTTON = readFileSync(
+  path.resolve(import.meta.dirname, '../../react/src', BUTTON),
+  'utf8'
+);
+const REACT_18_BUTTON = readFileSync(
+  path.resolve(import.meta.dirname, '../../react-18/src', BUTTON),
+  'utf8'
+);
+
+/** `version` with today's Button, and its packages/react-18 copy for React 18. */
+function react18Release(version: string): Catalog {
+  const release = structuredClone(RELEASE);
+  release.version = version;
+  buttonSource(release).content = REACT_BUTTON;
+  const button = release.items.find((item) => item.name === 'button');
+  if (!button?.variants.react) throw new Error(`${version} has no button`);
+  button.variants.react.react18 = {
+    files: [{ path: BUTTON, content: REACT_18_BUTTON }],
+    packages: { npm: {} },
+  };
+  return release;
+}
+
+function setReact(app: string, range: string) {
+  const manifest = JSON.parse(readApp(app, 'package.json'));
+  manifest.dependencies.react = range;
+  writeApp(app, 'package.json', JSON.stringify(manifest));
+}
+
+function nxdsReact(app: string) {
+  return (JSON.parse(readApp(app, 'nxds.json')) as { react: number }).react;
+}
+
+describe('React 18', () => {
+  it('installs the React 18 files in an app on React 18', async () => {
+    const context = setup([react18Release('0.4.7')]);
+    setReact(context.app, '^18.3.1');
+
+    await installButton(context);
+
+    expect(readApp(context.app, NXDS_BUTTON)).toBe(REACT_18_BUTTON);
+    expect(readApp(context.app, NXDS_BUTTON)).toContain('React.forwardRef');
+    expect(nxdsReact(context.app)).toBe(18);
+  });
+
+  it('installs the React 19 files from the same release on React 19', async () => {
+    const context = setup([react18Release('0.4.7')]);
+
+    await installButton(context);
+
+    expect(readApp(context.app, NXDS_BUTTON)).toBe(REACT_BUTTON);
+    expect(nxdsReact(context.app)).toBe(19);
+  });
+
+  it.each([['^17.0.2'], ['^18.2.0']])(
+    'refuses react %s, below React 18.3',
+    async (range) => {
+      const context = setup([react18Release('0.4.7')]);
+      setReact(context.app, range);
+
+      const run = await cli(['init'], context);
+
+      expect(run.exitCode).toBe(EXIT_CODES.error);
+      expect(run.stderr).toMatch(/nxds needs React 18\.3 or 19/);
+    }
+  );
+
+  it('refuses a release without React 18 files on React 18', async () => {
+    const context = setup();
+    setReact(context.app, '^18.3.1');
+
+    const run = await cli(['init'], context);
+
+    expect(run.exitCode).toBe(EXIT_CODES.error);
+    expect(run.stderr).toMatch(/nxds 0\.4\.6 has no React 18 files/);
+  });
+
+  it('refuses to add files for the wrong React after React changes', async () => {
+    const context = setup([react18Release('0.4.7')]);
+    setReact(context.app, '^18.3.1');
+    expect((await cli(['init'], context)).exitCode).toBe(EXIT_CODES.ok);
+    setReact(context.app, '^19.2.0');
+
+    const run = await cli(['add', 'button'], context);
+
+    expect(run.exitCode).toBe(EXIT_CODES.error);
+    expect(run.stderr).toMatch(
+      /nxds\.json has React 18 files, and this app uses React 19/
+    );
+  });
+
+  it('switches the files to React 19, keeping your edits, when the app upgrades', async () => {
+    const context = setup([react18Release('0.4.7')]);
+    setReact(context.app, '^18.3.1');
+    await installButton(context);
+    const edited = readApp(context.app, NXDS_BUTTON).replace(
+      "'use client';",
+      "'use client';\n// Acme: buttons follow the brand guide."
+    );
+    writeApp(context.app, NXDS_BUTTON, edited);
+    setReact(context.app, '^19.2.0');
+
+    const doctor = await cliJson(['doctor'], context);
+    expect(doctor.body.data.checks).toContainEqual(
+      expect.objectContaining({ name: 'react', ok: false })
+    );
+
+    const { exitCode, body } = await cliJson(['update'], context);
+
+    expect(exitCode).toBe(EXIT_CODES.ok);
+    expect(body.data).toMatchObject({
+      fromReact: 18,
+      react: 19,
+      merged: [BUTTON],
+    });
+    const merged = readApp(context.app, NXDS_BUTTON);
+    expect(merged).toContain('// Acme: buttons follow the brand guide.');
+    expect(merged).not.toContain('React.forwardRef');
+    expect(merged).not.toContain('<<<<<<<');
+    expect(nxdsReact(context.app)).toBe(19);
+  });
+
+  it('writes conflict markers when you edited the lines the switch changes', async () => {
+    const context = setup([react18Release('0.4.7')]);
+    setReact(context.app, '^18.3.1');
+    await installButton(context);
+    writeApp(
+      context.app,
+      NXDS_BUTTON,
+      readApp(context.app, NXDS_BUTTON).replace(
+        'function Button(propsWithoutRef, forwardedRef)',
+        'function AcmeButton(propsWithoutRef, forwardedRef)'
+      )
+    );
+    setReact(context.app, '^19.2.0');
+
+    const { exitCode, body } = await cliJson(['update'], context);
+
+    expect(exitCode).toBe(EXIT_CODES.attention);
+    expect(body.data.conflicted).toEqual([BUTTON]);
+    expect(readApp(context.app, NXDS_BUTTON)).toContain('<<<<<<< your file');
+    expect(nxdsReact(context.app)).toBe(19);
+  });
+});
+
 describe('help', () => {
   it.each([[['help', 'add']], [['add', '--help']]])(
     'prints help for %j and exits 0',

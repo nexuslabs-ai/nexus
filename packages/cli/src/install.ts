@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { type Catalog, resolveItems, variantOf } from './catalog';
+import { type Catalog, resolveItems, variantFor } from './catalog';
 import type { Config } from './config';
 import { type PreviousFiles, writeFiles, type WriteResult } from './files';
 import { installPackages, packagesToInstall } from './packages';
@@ -70,7 +70,7 @@ export function installItems(
   options: InstallOptions
 ): InstallResult {
   const items = resolveItems(catalog, config.framework, names);
-  const variants = items.map((item) => variantOf(item, config.framework));
+  const variants = items.map((item) => variantFor(item, config));
 
   // Items share files, such as `lib/icons.ts`; write each one once.
   const files = new Map(

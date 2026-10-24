@@ -19,6 +19,8 @@ import {
   exportedComponentSlugs,
 } from '@nxds/source-model/react-sources.mjs';
 import {
+  react18Root,
+  react18Src,
   reactRoot,
   reactSrc,
   repoRoot,
@@ -26,7 +28,7 @@ import {
   vueSrc,
 } from '@nxds/source-model/roots.mjs';
 import { exportedSlugs } from '@nxds/source-model/vue-sources.ts';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -96,11 +98,53 @@ function packageRecord(packages) {
   return Object.fromEntries(packages.map(({ name, range }) => [name, range]));
 }
 
-/** @type {{ version: string; devDependencies: Record<string, string> }} */
+/** @type {{ version: string; devDependencies: Record<string, string>; peerDependencies: Record<string, string> }} */
 const reactPackage = JSON.parse(
   readFileSync(path.join(reactRoot, 'package.json'), 'utf8')
 );
 const devRanges = reactPackage.devDependencies;
+/** @type {{ peerDependencies: Record<string, string> }} */
+const react18Package = JSON.parse(
+  readFileSync(path.join(react18Root, 'package.json'), 'utf8')
+);
+
+/**
+ * `variant` with what an app on React 18 installs instead: packages/react-18's
+ * copy of each file that differs. Recharts reads elements with react-is, which
+ * must match the app's React, so a variant with recharts pins it per major.
+ * @template {Variant} V
+ * @param {V} variant
+ * @returns {V}
+ */
+function withReact18(variant) {
+  const files = variant.files.flatMap((file) => {
+    if (!existsSync(path.join(reactSrc, file.path))) return [];
+    const copy = path.join(react18Src, file.path);
+    if (!existsSync(copy)) {
+      throw new Error(
+        `catalog: ${toRepoPath(copy)} is missing. Run \`pnpm --filter @nxds/react-18 generate\`.`
+      );
+    }
+    const content = readCanonical(copy);
+    return content === file.content ? [] : [{ path: file.path, content }];
+  });
+  const usesRecharts = 'recharts' in variant.packages.npm;
+  const npm = usesRecharts
+    ? {
+        ...variant.packages.npm,
+        'react-is': reactPackage.peerDependencies.react,
+      }
+    : variant.packages.npm;
+  const react18Npm = usesRecharts
+    ? { 'react-is': react18Package.peerDependencies.react }
+    : {};
+  if (files.length === 0 && !usesRecharts) return variant;
+  return {
+    ...variant,
+    packages: { ...variant.packages, npm },
+    react18: { files, packages: { npm: react18Npm } },
+  };
+}
 
 /** Tailwind 4 at the version packages/react builds with, or a newer 4.x. */
 function tailwindRange() {
@@ -165,7 +209,10 @@ function setupItem() {
     description:
       'The token CSS, the appearance provider and the cn helper. Every other item needs it.',
     docs: `${DOCS_URL}/getting-started/install`,
-    variants: { react: setupVariant('react'), vue: setupVariant('vue') },
+    variants: {
+      react: withReact18(setupVariant('react')),
+      vue: setupVariant('vue'),
+    },
   };
 }
 
@@ -246,7 +293,7 @@ export function buildCatalog() {
         ).trim(),
         docs: `${DOCS_URL}/components/${slug}`,
         variants: {
-          react: planVariant(reactSrc, plan, setup.variants.react),
+          react: withReact18(planVariant(reactSrc, plan, setup.variants.react)),
           ...(vueVariant && { vue: vueVariant }),
         },
       };
@@ -263,10 +310,8 @@ export function buildCatalog() {
     description: componentDescription(block.slug, [block.stories]).trim(),
     docs: `${DOCS_URL}/blocks/${block.slug}`,
     variants: {
-      react: planVariant(
-        reactSrc,
-        blockPlans.get(block.slug),
-        setup.variants.react
+      react: withReact18(
+        planVariant(reactSrc, blockPlans.get(block.slug), setup.variants.react)
       ),
     },
   }));
