@@ -73,7 +73,7 @@ function packageReExports(slug: string) {
 function vueContract(vueProgram: VueProgram, slug: string) {
   const parts = componentParts(vueProgram, slug).map(
     (part): VuePartApi => ({
-      entry: partEntry(part, vueProgram.localAliases),
+      entry: partEntry(vueProgram, part),
       slots: part.meta.slots
         .map((slot) => slot.name)
         .filter((name) => name !== 'default'),

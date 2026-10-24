@@ -12,7 +12,6 @@ export const planned = [
   'brand-color-field',
   'breadcrumb',
   'bubble',
-  'button-group',
   'carousel',
   'chart',
   'choice-card',
@@ -66,6 +65,7 @@ export const shared = [
   'aspect-ratio',
   'badge',
   'button',
+  'button-group',
   'card',
   'checkbox',
   'dialog',
@@ -119,6 +119,10 @@ export const behaviourOnlyIn: Record<
   Record<string, string>
 > = {
   react: {
+    'button-group/SplitButton':
+      'joins a DropdownMenu trigger to the group, and DropdownMenu is planned for Vue',
+    'button-group/WithSelectTrigger':
+      'joins a Select trigger to the group, and Select is planned for Vue',
     'dialog/NestedOverlayStacking':
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
   },
@@ -153,6 +157,8 @@ export const renderedDifferences: Record<string, string> = {
 
 /** Top-level values a Vue recipe file declares that React has no twin for, as `{file}#{name}`. */
 export const vueOnlyDeclarations: Record<string, string> = {
+  'button/index.ts#ButtonGroupKey':
+    'Vue injection key ButtonGroup provides to its Buttons and ButtonGroupText; React passes the same size through context',
   'tabs/index.ts#TabsListKey':
     'Vue injection key the list provides to its triggers; React passes the same state through context',
 };
