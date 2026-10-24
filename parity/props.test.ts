@@ -12,7 +12,6 @@ import {
   componentParts,
   createVueChecker,
   isOwnDeclaration,
-  localAliasNames,
   parseFile,
   partEntry,
   type VueChecker,
@@ -71,14 +70,10 @@ function packageReExports(slug: string) {
   });
 }
 
-function vueContract(
-  checker: VueChecker,
-  localAliases: Set<string>,
-  slug: string
-) {
+function vueContract(checker: VueChecker, slug: string) {
   const parts = componentParts(checker, slug).map(
     (part): VuePartApi => ({
-      entry: partEntry(part, localAliases),
+      entry: partEntry(part, checker.localAliases),
       slots: part.meta.slots
         .map((slot) => slot.name)
         .filter((name) => name !== 'default'),
@@ -195,7 +190,6 @@ const contracts = new Map<string, Contract>();
 
 beforeAll(() => {
   const checker = createVueChecker();
-  const localAliases = localAliasNames(checker);
   const reactFiles = new Map(
     (reactPropsFiles() as PropsFile[]).map((file) => [file.slug, file])
   );
@@ -204,7 +198,7 @@ beforeAll(() => {
     if (!react) throw new Error(`@nxds/react has no props file for ${slug}.`);
     contracts.set(slug, {
       react: new Map(react.components.map((entry) => [entry.name, entry])),
-      vue: vueContract(checker, localAliases, slug),
+      vue: vueContract(checker, slug),
       vueReExports: new Set(packageReExports(slug)),
     });
   }

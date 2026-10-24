@@ -29,7 +29,7 @@ import {
 
 const COMPONENT_SPECIFIER = './components/';
 
-export type VueChecker = ReturnType<typeof createChecker>;
+export type VueChecker = ReturnType<typeof createVueChecker>;
 
 function fail(message: string): never {
   throw new Error(`vue-sources: ${message}`);
@@ -80,16 +80,18 @@ export function exportedParts(slug: string) {
   });
 }
 
-export function createVueChecker(): VueChecker {
-  return createChecker(path.join(vueRoot, 'tsconfig.json'), {
+/** The `vue-component-meta` checker, with the local alias names read from its program. */
+export function createVueChecker() {
+  const checker = createChecker(path.join(vueRoot, 'tsconfig.json'), {
     forceUseTs: true,
     schema: true,
     printer: { newLine: ts.NewLineKind.LineFeed },
   });
+  return { checker, localAliases: localAliasNames(checker) };
 }
 
 /** Type alias names declared in @nxds/vue that its public entry does not export. */
-export function localAliasNames(checker: VueChecker) {
+function localAliasNames(checker: ReturnType<typeof createChecker>) {
   const program =
     checker.getProgram() ?? fail('the Vue checker has no program.');
   const exported = publicExports(program.getTypeChecker(), program, [
@@ -142,7 +144,7 @@ export function isOwnDeclaration(declarations: { file: string }[]) {
 }
 
 /** Each part a component folder exports, with its `vue-component-meta` read once. */
-export function componentParts(checker: VueChecker, slug: string) {
+export function componentParts({ checker }: VueChecker, slug: string) {
   return exportedParts(slug).map(({ name, file }) => ({
     name,
     file,
@@ -175,14 +177,12 @@ export function partEntry(
   };
 }
 
-export function componentProps(
-  checker: VueChecker,
-  localAliases: Set<string>,
-  slug: string
-): PropsFile {
+export function componentProps(checker: VueChecker, slug: string): PropsFile {
   return toPropsFile(
     slug,
-    componentParts(checker, slug).map((part) => partEntry(part, localAliases))
+    componentParts(checker, slug).map((part) =>
+      partEntry(part, checker.localAliases)
+    )
   );
 }
 
