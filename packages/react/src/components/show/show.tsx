@@ -1,8 +1,24 @@
+import type { HTMLAttributes, ReactNode } from 'react';
+
 import {
-  type ResponsiveVisibilityProps,
+  type VisibilityAxis,
   visibilityClassName,
 } from '../../lib/responsive-visibility';
 import { cn } from '../../lib/utils';
+
+/**
+ * Props for Show.
+ */
+type ShowProps = HTMLAttributes<HTMLElement> & {
+  /**
+   * Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.
+   * Tag-only and non-semantic: `display: contents` can
+   * drop a semantic element's box from the accessibility tree, so put semantics
+   * on a child *inside* `<Show>` / `<Hide>` instead.
+   */
+  as?: 'span' | 'div';
+  children: ReactNode;
+} & VisibilityAxis;
 
 /**
  * Shows its children only while a width condition matches. Children stay
@@ -28,7 +44,7 @@ function Show({
   containerAbove,
   containerBelow,
   ...props
-}: ResponsiveVisibilityProps) {
+}: ShowProps) {
   return (
     <Comp
       data-slot="show"
@@ -46,4 +62,4 @@ function Show({
   );
 }
 
-export { Show, type ResponsiveVisibilityProps as ShowProps };
+export { Show, type ShowProps };

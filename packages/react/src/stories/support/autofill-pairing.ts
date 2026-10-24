@@ -1,10 +1,12 @@
+import { expect } from 'storybook/test';
+
 /**
- * The `bg-*` / `text-*` classes on a field that have no `autofill-*` class of
- * the same token in the same state, so browser autofill paint would win there.
+ * Asserts every `bg-*` / `text-*` class on a field has an `autofill-*` class of
+ * the same token in the same state, so browser autofill paint never wins.
  */
-export function unpairedAutofillClasses(field: HTMLElement) {
+export async function expectAutofillPaired(field: HTMLElement) {
   const classes = [...field.classList];
-  return classes.filter((className) => {
+  const unpaired = classes.filter((className) => {
     const match = className.match(/^(nx:(?:[^:]+:)*)(bg|text)-(.+)$/);
     if (!match) return false;
     const [, scope = '', kind, token] = match;
@@ -12,4 +14,5 @@ export function unpairedAutofillClasses(field: HTMLElement) {
     if (/(file|placeholder):/.test(scope)) return false;
     return !classes.includes(`${scope}autofill-${kind}-${token}`);
   });
+  await expect(unpaired).toEqual([]);
 }

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 import { Spinner } from '../spinner/spinner';
 
 import {
@@ -185,7 +185,7 @@ export const WithTextarea: Story = {
     const textarea = within(canvasElement).getByRole('textbox', {
       name: 'Message',
     });
-    await expect(unpairedAutofillClasses(textarea)).toEqual([]);
+    await expectAutofillPaired(textarea);
   },
 };
 
@@ -299,7 +299,7 @@ export const Disabled: Story = {
     await expect(window.getComputedStyle(input).backgroundColor).toBe(
       'rgba(0, 0, 0, 0)'
     );
-    await expect(unpairedAutofillClasses(input)).toEqual([]);
+    await expectAutofillPaired(input);
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();

@@ -144,6 +144,19 @@ export const vueOnlyDeclarations: Record<string, string> = {
 /** Files Vue copies from React byte for byte, as `[react, vue]` repo paths. */
 export const copies: [react: string, vue: string][] = [
   ['packages/react/src/lib/utils.ts', 'packages/vue/src/lib/utils.ts'],
+  ['packages/react/src/lib/motion.ts', 'packages/vue/src/lib/motion.ts'],
+  [
+    'packages/react/src/lib/field-size.ts',
+    'packages/vue/src/lib/field-size.ts',
+  ],
+  [
+    'packages/react/src/lib/responsive-visibility.ts',
+    'packages/vue/src/lib/responsive-visibility.ts',
+  ],
+  [
+    'packages/react/src/stories/support/autofill-pairing.ts',
+    'packages/vue/src/stories/support/autofill-pairing.ts',
+  ],
   [
     'packages/react/src/stories/support/story-height-test-utils.ts',
     'packages/vue/src/stories/support/story-height-test-utils.ts',

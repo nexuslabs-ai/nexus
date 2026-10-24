@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 
 import {
   NativeSelect,
@@ -320,7 +320,7 @@ export const WithDataAttributes: Story = {
     await expect(select).toHaveAttribute('data-variant', 'bordered');
     await expect(select).toHaveClass('nx:bg-container');
     await expect(select).toHaveClass('nx:enabled:hover:bg-container-hover');
-    await expect(unpairedAutofillClasses(select)).toEqual([]);
+    await expectAutofillPaired(select);
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();

@@ -19,7 +19,7 @@ import {
 import { useArgs } from 'storybook/preview-api';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 
 import {
   Sidebar,
@@ -388,7 +388,7 @@ export const LoadingSkeleton: Story = {
     });
     await expect(input).toHaveAttribute('data-slot', 'sidebar-input');
     await expect(input).toHaveClass('nx:bg-background');
-    await expect(unpairedAutofillClasses(input)).toEqual([]);
+    await expectAutofillPaired(input);
   },
 };
 
