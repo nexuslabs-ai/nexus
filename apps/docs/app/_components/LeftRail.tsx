@@ -24,42 +24,53 @@ function railGroups(pages: readonly ManifestPage[]): RailGroup[] {
 }
 
 export function LeftRail({ section }: { section: ManifestSection }) {
-  const pathname = usePathname();
   return (
-    <aside className="nx:sticky nx:top-(--docs-header-h) nx:self-start nx:max-h-[calc(100svh-var(--docs-header-h))] nx:overflow-y-auto nx:pr-2">
+    <aside className="nx:hidden nx:lg:block nx:sticky nx:top-(--docs-header-h) nx:self-start nx:max-h-[calc(100svh-var(--docs-header-h))] nx:overflow-y-auto nx:pr-2">
       <h3 className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mb-2">
         {section.title}
       </h3>
-      {railGroups(section.pages).map((group) => (
-        <div key={group.label ?? group.pages[0]?.slug}>
-          {group.label && (
-            <h4 className="nx:px-2 nx:mt-3 nx:mb-1 nx:typography-label-small nx:font-semibold nx:text-foreground">
-              {group.label}
-            </h4>
-          )}
-          <ul className="nx:list-none nx:p-0 nx:m-0">
-            {group.pages.map((page) => {
-              const active = pathname === page.route;
-              return (
-                <li key={page.slug}>
-                  <Link
-                    href={page.route}
-                    aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      RAIL_LINK_BASE,
-                      active
-                        ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default'
-                        : 'nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover'
-                    )}
-                  >
-                    {page.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+      <SectionPageList section={section} />
     </aside>
   );
+}
+
+export function SectionPageList({
+  section,
+  onNavigate,
+}: {
+  section: ManifestSection;
+  onNavigate?: () => void;
+}) {
+  const pathname = usePathname();
+  return railGroups(section.pages).map((group) => (
+    <div key={group.label ?? group.pages[0]?.slug}>
+      {group.label && (
+        <h4 className="nx:px-2 nx:mt-3 nx:mb-1 nx:typography-label-small nx:font-semibold nx:text-foreground">
+          {group.label}
+        </h4>
+      )}
+      <ul className="nx:list-none nx:p-0 nx:m-0">
+        {group.pages.map((page) => {
+          const active = pathname === page.route;
+          return (
+            <li key={page.slug}>
+              <Link
+                href={page.route}
+                onClick={onNavigate}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  RAIL_LINK_BASE,
+                  active
+                    ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-focus-default'
+                    : 'nx:text-muted-foreground nx:border-transparent nx:hover:text-foreground nx:hover:bg-container-hover'
+                )}
+              >
+                {page.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  ));
 }
