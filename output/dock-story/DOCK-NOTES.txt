@@ -1,0 +1,319 @@
+Contextual dock exploration
+
+This standalone page uses Roomy · bare icons by default across all
+six chapters. Every comparison remains in DialKit's Dock studio > Iteration
+selector: Straight expansion · roomy, Straight expansion, Continuous surface,
+Pill morph · connected, Markup · Portrait, Tactile tools, Active label · Examlly,
+Contextual dock, and Colored tiles · previous. Saved comparison choices still persist.
+
+Roomy · bare icons — October 23
+- Now the default across all six chapters, retaining roomy sizing, active pill,
+  panel motion and fixed bottom-center placement. All previous comparisons remain.
+- Inactive icons have no resting surface, rim or shadow. Hover and focus show
+  a soft rounded rectangle with no vertical lift; keyboard focus outlines and
+  existing accessible labels remain. Previous comparisons are untouched.
+- Guidance: searched "show subtle button hover feedback and visible keyboard
+  focus" and retrieved forms. Retain semantic buttons, non-color selection
+  cues, aria-expanded and visible focus. No environment queries added.
+- Verified bare resting styles, hover opacity and removal of hover translation,
+  keyboard selection/focus, light and dark themes, and the expanding controls.
+  Scoped ESLint and Prettier passed; browser warnings/errors empty. Local only.
+
+Roomy dock spacing correction — October 23
+- The visible bar now sizes to its tool count. Six tools retain 640px; three
+  tools use 436px. Inactive slots stay near 65px instead of stretching to 167px.
+  The active pill/panel retains 280px and the dock's center and bottom stay fixed.
+- The existing outer query container remains unchanged, so shorter desktop
+  toolbars do not accidentally inherit mobile icon/control styling. The bar
+  still clamps to 100% of available width on narrow screens.
+- Guidance: searched "size a toolbar to its contents with consistent gaps
+  between buttons" and retrieved css-layout. Retain one-dimensional flexbox,
+  explicit gaps, intrinsic item limits and existing container queries; no new
+  browser-specific features. Measured six- and three-tool bars in the preview.
+- Scoped ESLint and Prettier passed. Other comparison iterations are unchanged.
+
+References inspected
+- User screenshots: persistent tool dock with a contextual panel above the
+  selected tool, related surfaces and an attached directional pointer.
+- /Users/temp/code/dotgrid/playground.html: toolbar, popovers and dismissal
+  handlers. Used compact grouped tools, shared surfaces and bottom-origin entry.
+- Installed dialkit 2.0.2 README and dist/index.js: useDialKit, select controls,
+  panel roots, spring selection and panel transitions.
+
+Modern Web Guidance
+- Query: position contextual popover above toolbar button animate
+- Retrieved: viewport-aware-dropdowns, via modern-web-guidance CLI.
+- Decision: apply named disclosure controls, visible focus and edge containment.
+  Repository no-environment-branching policy overrides the guide's optional
+  detection/polyfill advice. A positioned child of the stable dock provides
+  bounded panels without CSS anchor positioning, feature detection or polyfills.
+  Motion follows the explicit Nexus reduceMotion preference.
+
+Verification
+- Live Vite preview compiled; scoped ESLint and Prettier checks passed.
+- Both dock variants selected through DialKit.
+- Desktop dark and light rendering inspected; mobile 390 x 844 inspected.
+- Mobile document width 390px, dock/panel bounds x16..374; no horizontal overflow.
+- Native radius slider changed the computed canvas border radius; keyboard
+  ArrowRight changed 14px to 15px; Escape returned focus to the dock trigger.
+- Surface selection changed the canvas treatment to Soft.
+- Scroll transitions inspected through the separate final footer chapter.
+
+Canvas remains empty boxes, as requested. This is a local prototype; nothing
+was committed, pushed or merged for this exploration.
+
+Tactile and active-label iterations — 2026-10-23
+
+References inspected
+- User reference screenshots: larger physical tool silhouettes, raised active
+  tool, and a contextual panel growing from that selected tool.
+- /Users/temp/code/examlly/apps/web/src/components/shell/mobile-bottom-nav.tsx
+- /Users/temp/code/examlly/apps/web/src/components/shell/use-nav-reveal.ts
+  Examlly's PrimaryNavItem keeps inactive icons visible while expanding the
+  selected icon into a foreground pill with its label. Applied that pattern
+  here with a persistent active label, sized to fit all six controls at 390px.
+
+Implementation
+- Tactile tools uses a swatch fan, ruler, type key, corner tile, pencil and
+  dimensional app tools. Existing contextual and colored versions remain.
+- Both new variants measure the selected control. A ResizeObserver follows
+  its changing width so the panel pointer and transform origin follow the
+  active pill as it expands. Panels grow from the tool center and stay within
+  the dock bounds. The bottom dock position stays fixed across chapters.
+- Escape closes the panel and returns focus to its selected trigger. Outside
+  clicks dismiss it; arrow keys navigate the controls.
+
+Modern Web Guidance
+- Query: animate expanding panel from selected toolbar button
+- Retrieved: animate-to-intrinsic-sizes, via modern-web-guidance CLI.
+- Decision: interpolate-size/calc-size lack required cross-browser support.
+  Use the existing Motion transform animation and measured layout instead.
+  Motion follows the explicit Nexus reduceMotion preference with no OS query.
+
+Verification
+- Scoped ESLint, Prettier and whitespace checks passed.
+- Both new variants selected through DialKit; all four options are present.
+- Tactile panels inspected in dark and light, including edge tools.
+- Active label and tactile inspected at 390 x 844; document width and scroll
+  width are both 390px. Long Typography label fits with five inactive icons.
+- Verified tool-relative transform origin and panel bounds in the live DOM.
+- Escape restored focus to Typography; no browser warning/error logs.
+- Saved tactile-tools-preview.png, active-label-preview.png and
+  active-label-mobile-preview.png as review evidence.
+
+DialKit controls in Active label · Examlly — 2026-10-23
+
+- User direction: retain the Examlly dock and use the exact DialKit control
+  appearance and interaction in its tool panels.
+- Reused the installed dialkit 2.0.2 Slider, Toggle, SelectControl, ColorControl
+  and ButtonGroup exports. Actual package styles provide the row height,
+  spacing, typography, fill sliders, dropdowns and color picker. Panel shell
+  uses the same 280px width, 14px radius, padding and DialKit theme tokens.
+- Applied to every tool in the active-label iteration. Other dock variants
+  retain their previous controls.
+- Library docs MCP was unavailable; checked installed declarations and source,
+  including portal ownership, keyboard dismissal and explicit theme handling.
+- Modern Web Guidance query: accessible input controls slider select popover.
+  Retrieved slider. Used the requested library controls rather than a custom
+  slider; verified their labeled min/max/current-value semantics and keyboard
+  handling. No new typed attr(), progress() or environment branches were added.
+- Verified palette selection changes the accent, keyboard slider changes tint,
+  theme toggle updates the page and controls, nested color picker closes on
+  Escape while keeping the dock panel open, and all controls render in chapter
+  three. Browser warning/error log was empty.
+- Inspected dark/light desktop and 390px mobile. Panel and nested picker stay
+  inside the viewport; document and scroll widths both equal 390px.
+- Scoped ESLint and Prettier passed. Prototype changes remain local.
+
+Grid behind the dock — 2026-10-23
+
+- User correction: widening the screen must not add widgets. Retained the
+  existing fixed widget set per layout and removed narrow-screen hiding rules.
+- Canvas now spans the stage's canvas and dock rows. The dock overlays it with
+  its existing bottom inset; a 200px alpha gradient fades only the canvas.
+  Panels remain outside the mask and keep their existing interactions.
+- Heading bottom padding is 40px at all widths. Existing 700px page-shell
+  breakpoint reflows the same boxes to two columns and three rows.
+- Guidance source: modern-web-guidance search "responsive auto filling grid
+  columns available width", retrieved css-layout. After the user correction,
+  chose explicit flexible tracks for known column counts, not auto-fill.
+- Verified live at 390x844, 1280x1194 and 1920x1194: five Sidebar boxes at every
+  width, no horizontal overflow, 40px heading padding. Canvas reaches viewport
+  bottom behind the dock; dock top remains 1102px across desktop chapter changes.
+- Dark/light fade inspected, mobile More panel stays visible above the canvas,
+  final footer appears on scroll. Browser warnings/errors empty. Prettier passed.
+- Saved grid-behind-dock-preview.png. Changes remain local.
+
+
+Remaining chapters — 2026-10-23
+
+- The established standalone experience now has all six chapters, followed by
+  the final footer. Each chapter receives one viewport of scroll travel.
+- Order: Explore, Customize, Build on what you use, Make each component yours,
+  One foundation / Many frameworks, Stories are the tests, Footer.
+- The first four chapters retain the same empty box canvas. Comparison adds a
+  native range-controlled split and MUI / Ant Design / shadcn selection. It is
+  explicitly a layout preview, not a claim of live third-party integrations.
+- Framework dock selection highlights the route from token sources through
+  Nexus core to React, Vue or Svelte. Support copy follows the current
+  getting-started introduction: React, growing Vue library, Svelte planned.
+- Story dock selects Click, Keyboard and Disabled. The specimen imports the
+  actual Nexus Button, counts real activations and shows play-function excerpts
+  from packages/react/src/components/button/Button.stories.tsx. It does not
+  pretend to run the Storybook suite or present fabricated passing results.
+- Dock controls are now an explicit per-chapter choice, so selection-only
+  chapters do not open empty panels. All four comparison variants remain.
+- Existing 700px page-shell breakpoint handles mobile. Below 900px height the
+  framework cards use an inline icon and name to keep the diagram above the
+  dock; selected-framework availability remains in the note. Heading bottom
+  padding remains 40px. Widget count does not increase with viewport width.
+
+Guidance and verification
+- Modern Web Guidance query: interactive comparison slider keyboard accessible
+  range input. Retrieved slider. Used native range semantics, explicit labeling,
+  value text and a visible focus ring. Existing css-layout guidance informed
+  the shared grid overlay. No typed attr(), progress(), environment branches,
+  custom pointer handling or new dependencies were introduced.
+- Docs MCP discovery returned no tools. Reused installed package APIs and read
+  the actual Nexus Button implementation and stories for behavior and excerpts.
+- Scoped ESLint and Prettier pass. Vite compiled every new chapter; browser
+  warnings/errors empty. No production app or design-system source changed.
+- Verified desktop 1280x1000, laptop 1280x800, mobile 390x844 and light/dark.
+  Comparison drag changed 51 to 74; ArrowRight changed 50 to 51 and clip-path
+  followed. Framework dock changed both highlight and description.
+- Verified click -> one activation, Enter + Space -> two activations, disabled
+  Button has disabled=true and zero activations. Scenario switching resets the
+  live counter. Final footer appears only after chapter six.
+- Tactile and Contextual source controls still open in chapter four; Escape
+  dismisses and restores focus. Active label restored after inspection.
+- Saved comparison-chapter-preview.png, framework-chapter-preview.png and
+  stories-chapter-preview.png. Changes remain local and uncommitted.
+
+Heading spacing refinement (October 23):
+- Apply the annotated 96px top / 72px bottom padding at min-height: 1200px.
+- Retain 12px / 40px on shorter viewports to preserve the canvas and anchored dock.
+- Reuse the existing css-layout guidance; no new browser-platform feature.
+- Verified computed padding at 2369x1794 and 1280x800, no horizontal overflow, dock 20px from bottom at both sizes.
+- Scoped Prettier check passed. Preview screenshot: heading-spacing-preview.png.
+
+Open Source badge restoration (October 23):
+- Restore the Nexus Badge above shared chapter headings, using the scroll-headlines reference sizing and variant.
+- Active label dock is a custom GrowingDock toolbar of native buttons with Motion selection animation, not the shared Segmented Tabs component.
+- Verified badge placement and dock fit at 1280x900 and 390x844, with no mobile horizontal overflow. Scoped ESLint and Prettier passed.
+
+Markup · Portrait dock comparison — October 23
+- Added a separate DialKit iteration. Active label · Examlly remains the default
+  for new sessions; all four previous options and their styles are preserved.
+- Apple Markup reference: https://mobbin.com/screens/23b4ee8f-32d4-4ad1-8bb4-e5c1484fdcdf
+  Portrait reference: https://mobbin.com/screens/5fe4f6ad-6a59-47c9-908f-82862f940ccc
+- The new wrapper reuses GrowingDock's measured selected-tool origin, panel
+  scaling, arrow/Escape navigation and real DialKit controls. New scoped CSS
+  adds soft circular tool surfaces, a raised active icon-and-label pill and a
+  rounded matching panel. Reference screenshots inform visual relationships;
+  animation timing is our adaptation, not a verified reproduction.
+- Shared 640px maximum width, 72px height and bottom position are retained.
+  The existing 480px container breakpoint reduces circular faces to 34px and
+  icons to 22px so the six-tool dock and Typography label fit mobile widths.
+- Modern Web Guidance query: animate contextual panel growing from selected
+  toolbar button. Retrieved motion. Reuse transform/opacity for panel entry,
+  existing ResizeObserver anchor tracking and explicit appearance.reduceMotion.
+  Repository policy overrides the guide's preference-query/feature-detection
+  suggestions; no environment queries or new dependencies added.
+- Verified 1280x900 light/dark and 390x844 mobile: no horizontal overflow,
+  longest active label fits, rightmost panel clamps within dock edges. End key
+  switches tool and panel, Escape returns focus, outside click dismisses. Grid
+  gap slider changed the actual computed gap from 16px to 17px; reset to 16px.
+- Scoped ESLint and Prettier passed. Preview keeps the new iteration selected.
+  Changes are local; no production website, shared component, commit or push.
+
+Pill morph · connected — October 23
+- Separate comparison after Markup · Portrait; previous versions and defaults
+  remain intact. MorphingDock owns this interaction without changing the old
+  GrowingDock implementations or the page's dock placement.
+- One persistent surface uses Motion layout projection between the measured
+  active pill and panel. Closing reverses to the pill; changing tools retargets
+  position and content height without unmounting the surface. Controls crossfade
+  separately so text does not stretch. A concave bridge joins panel and pill.
+- Portrait surfaces, active icon/label and actual DialKit controls remain. The
+  bar has no entrance slide. Keyboard actions and explicit reduced motion are
+  immediate; no OS or input-device queries.
+- Modern Web Guidance search: morph button into contextual panel shared layout
+  animation. Retrieved motion; use transform projection and opacity. Repository
+  policy overrides generic media-query advice. Emil guidance informs short,
+  interruptible motion, trigger origin and a restrained spring without bounce.
+- Docs MCP tools unavailable. Verified official Motion layout docs:
+  https://motion.dev/docs/react-layout-animations . Installed Motion: 14.3.1.
+  ResizeObserver measures tool and content layout, excluding animated transforms.
+- Native-click frame samples show opening from about 206x54 toward 280x205,
+  reverse collapse, and continuous movement/resize from Colors to Typography.
+  Dock stayed at y=808, height=72 and scrollY=1216 throughout sampled frames.
+- An early Playwright click auto-scrolled the page. Native clicks isolated that
+  harness behavior and confirmed the actual UI stays stationary.
+- Verified rapid tool changes, nested Palette selection, Escape returning focus
+  to More, and 390x844 Typography/edge fit without horizontal overflow. Light
+  and dark checked. Scoped ESLint/Prettier pass; browser warnings/errors empty.
+- Local prototype only. No production component changes, commit or push.
+
+Continuous surface — October 23
+- New independent dock comparison; Pill morph · connected and earlier versions
+  remain available. Default and dock placement are unchanged.
+- One SVG outline includes the panel and the full active pill. No connector,
+  separate selected-pill background, internal border or separate shadow. Broad
+  curved shoulders reach the pill before neighboring tool hit areas.
+- The same path commands interpolate between the closed capsule and open
+  surface; interrupted transitions retarget. Controls retain their existing
+  DialKit appearance and fade independently, without stretched text.
+- Reference lock: existing Markup behavior and Portrait neutral raised surfaces.
+  Refero Portrait style 0a8a4374-b165-4ec0-99b7-ab0b20c37ba4 reviewed; retain
+  24px card corners, soft shadows and existing neutral color roles only.
+- Guidance search: animate a continuous expanding toolbar panel from selected
+  tab. Retrieved anchor-positioning-tab-underline. Reuse its single selected
+  indicator and accessible state principles; repo policy excludes limited
+  anchor-positioning and environment-query fallbacks. Existing ResizeObserver
+  geometry plus SVG is used instead. Path morphing verified against:
+  https://motion.dev/docs/react-svg-animation
+- Native-click frame sampling verified height grows from the 54px pill and
+  collapses back into it, while dock y=808, height=72, bottom=880 and scroll
+  remain fixed. Tool switches smoothly retarget the single surface.
+- Checked light/dark, 390x844 edge-aligned panel fit, nested Palette menu and
+  changed value, and Escape focus return. No horizontal overflow or browser
+  warnings/errors. Scoped ESLint and Prettier pass.
+- Local prototype only; no commit or push. Concurrent chapter work preserved.
+
+Straight expansion — October 23
+- New independent comparison after Continuous surface. Earlier variants,
+  defaults and the dock's position remain unchanged.
+- Panel and active pill share the selected tool's measured width. One rounded
+  vertical outline grows upward and collapses back to the capsule, with no
+  shoulders or connector. Controls fade independently of the surface geometry.
+- At the existing 480px container breakpoint, labels and values stack inside
+  the narrow panel. The panel width remains equal to its active pill on mobile.
+- Modern Web Guidance query: expand a panel vertically from a fixed width
+  button. Retrieved animate-to-intrinsic-sizes. Retain measured natural height,
+  aria-expanded and inaccessible closed controls. Repository support policy
+  excludes the guide's limited-availability intrinsic-size APIs; reuse existing
+  ResizeObserver and Motion SVG path interpolation instead.
+- Frame sampling verified constant 206px surface width during open/close,
+  while dock y=808 and height=72 remained fixed. Button measurement rounding
+  differs by less than one pixel from the fractional flex layout.
+- Verified light/dark, 390x844 controls and rightmost tool, Escape dismissal,
+  no horizontal overflow, and empty browser warning/error logs. Scoped ESLint
+  and Prettier passed. Local prototype only; no commit or push.
+
+Straight expansion · roomy — October 23
+- New comparison uses the same StraightDock motion with an isolated width and
+  spacing class. Original Straight expansion and all previous variants remain.
+- Active pill has a 280px flex basis and the panel follows its measured width.
+  Both shrink together only when the remaining tools need space. Outer dock
+  width, height, bottom offset and centering are unchanged.
+- Desktop controls have 20px padding and 8px gaps. The existing 480px container
+  breakpoint keeps stacked labels on mobile with 12px horizontal padding.
+- Modern Web Guidance search for resizing a toolbar button and expanding panel
+  returned no matches. Retrieved the prior animate-to-intrinsic-sizes guide;
+  retain measured height, aria-expanded and inert closed content. Existing
+  Motion/ResizeObserver implementation satisfies repository browser policy;
+  no limited-availability APIs or preference queries added.
+- Measured desktop panel/pill at 280px (previously about 206px), dock 640x72
+  at y=808 before and after opening. Mobile panel/pill both 154px, dock 343x72,
+  no horizontal overflow. Checked dark desktop and light mobile controls.
+- Scoped ESLint and Prettier passed. Local only; no commit or push.

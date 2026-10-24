@@ -1,0 +1,396 @@
+.coexistence-story-subtitle {
+  margin: -8px 0 24px;
+  color: var(--nx-color-muted-foreground);
+  font-size: clamp(14px, 1.5cqi, 18px);
+  line-height: 1.5;
+}
+.coexistence-diagram {
+  --coexistence-surface: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 4%,
+    var(--nx-color-background)
+  );
+  --coexistence-line: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 16%,
+    transparent
+  );
+  container: coexistence-diagram / inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  inline-size: min(100%, 1368px);
+  block-size: 100%;
+  margin: 0 auto;
+  padding-block: 0 calc(var(--story-dock-clearance) + 16px);
+  color: var(--nx-color-foreground);
+}
+.coexistence-application {
+  border: 1px solid var(--coexistence-line);
+  border-radius: var(--canvas-radius, 14px);
+  padding: clamp(20px, 3cqi, 48px);
+}
+.coexistence-application-label {
+  text-align: center;
+  color: var(--nx-color-muted-foreground);
+  font-size: 14px;
+  margin-block-end: clamp(24px, 4cqb, 48px);
+}
+.coexistence-peers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+  align-items: stretch;
+}
+.coexistence-peer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: clamp(20px, 3cqi, 40px);
+  border-radius: var(--canvas-radius, 14px);
+  background: var(--coexistence-surface);
+  min-inline-size: 0;
+}
+.coexistence-eyebrow,
+.coexistence-peer > p {
+  color: var(--nx-color-muted-foreground);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.coexistence-peer > p {
+  margin: 0;
+}
+.coexistence-library {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-block-size: 36px;
+}
+.coexistence-library > strong {
+  font-size: 24px;
+  font-weight: 500;
+}
+.coexistence-added-label {
+  font-size: 12px;
+  color: var(--nx-color-muted-foreground);
+}
+.coexistence-nodes {
+  display: grid;
+  gap: 8px;
+}
+.coexistence-node {
+  display: flex;
+  align-items: center;
+  min-block-size: 48px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--nx-color-foreground) 5%, transparent);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.coexistence-plus {
+  place-self: center;
+  color: var(--nx-color-muted-foreground);
+  font-size: 24px;
+  font-weight: 400;
+}
+.coexistence-added {
+  animation: coexistence-arrive 650ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
+}
+.coexistence-module {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  min-block-size: 160px;
+  padding: 24px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--nx-color-foreground) 5%, transparent);
+}
+.coexistence-module::before,
+.coexistence-module::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border: 1px solid var(--nx-color-information-border);
+  border-radius: inherit;
+  background: color-mix(
+    in srgb,
+    var(--nx-color-information-background) 20%,
+    transparent
+  );
+  animation: coexistence-tint 600ms ease 1050ms both;
+}
+.coexistence-module::after {
+  border-color: var(--nx-color-success-border);
+  border-radius: 24px;
+  background: color-mix(
+    in srgb,
+    var(--nx-color-success-background) 20%,
+    var(--coexistence-surface)
+  );
+  animation: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+[data-alternate='true'] > .coexistence-module::after {
+  opacity: 1;
+}
+[data-alternate='true'] > .coexistence-module {
+  --coexistence-blue-opacity: 0;
+  border-radius: 24px;
+}
+.coexistence-module > strong {
+  font-weight: 500;
+  font-size: 18px;
+}
+.coexistence-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.coexistence-capabilities span {
+  font-size: 12px;
+  color: var(--nx-color-muted-foreground);
+  padding: 4px 8px;
+  border: 1px solid var(--coexistence-line);
+  border-radius: 4px;
+}
+.coexistence-appearance-paths {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+}
+.coexistence-appearance-path {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+.coexistence-appearance-path + .coexistence-appearance-path {
+  grid-column: 3;
+}
+.coexistence-wire {
+  block-size: 32px;
+  inline-size: 1px;
+  background: var(--coexistence-line);
+}
+.coexistence-appearance-path > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.coexistence-swatch {
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 4px;
+}
+.coexistence-existing-swatch {
+  background: var(--nx-color-muted-foreground);
+}
+.coexistence-nexus-swatch {
+  background: var(--nx-color-information-border);
+}
+[data-alternate='true'] .coexistence-nexus-swatch {
+  background: var(--nx-color-success-border);
+  border-radius: 50%;
+}
+.coexistence-path-note {
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+}
+.coexistence-diagram-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--nx-color-muted-foreground);
+  font-size: 14px;
+}
+.coexistence-diagram-caption > div {
+  display: flex;
+  gap: 8px;
+}
+@keyframes coexistence-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes coexistence-tint {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: var(--coexistence-blue-opacity, 1);
+  }
+}
+[data-reduce-motion='true'] .coexistence-added,
+[data-reduce-motion='true'] .coexistence-module::before {
+  animation: none;
+}
+[data-reduce-motion='true'] .coexistence-module::after {
+  transition: none;
+}
+[data-reduce-motion='true']
+  [data-alternate='true']
+  > .coexistence-module::before {
+  opacity: 0;
+}
+@container story-canvas (max-height: 640px) {
+  .coexistence-diagram {
+    gap: 12px;
+  }
+  .coexistence-application {
+    padding-block: 16px;
+  }
+  .coexistence-application-label {
+    margin-block-end: 16px;
+  }
+  .coexistence-peer {
+    gap: 12px;
+    padding-block: 16px;
+  }
+  .coexistence-node {
+    min-block-size: 36px;
+    padding-block: 8px;
+  }
+  .coexistence-module {
+    min-block-size: 124px;
+    gap: 12px;
+    padding: 16px;
+  }
+  .coexistence-wire {
+    block-size: 20px;
+  }
+}
+@container coexistence-diagram (max-width: 680px) {
+  .coexistence-application {
+    padding: 16px;
+  }
+  .coexistence-peers,
+  .coexistence-appearance-paths {
+    grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  }
+  .coexistence-peer {
+    padding: 12px;
+    gap: 16px;
+  }
+  .coexistence-library {
+    gap: 8px;
+  }
+  .coexistence-library > strong {
+    font-size: 18px;
+  }
+  .coexistence-library svg {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+  .coexistence-added-label,
+  .coexistence-peer > p {
+    display: none;
+  }
+  .coexistence-node {
+    padding: 8px;
+    font-size: 12px;
+  }
+  .coexistence-module {
+    padding: 12px;
+  }
+  .coexistence-module > strong {
+    font-size: 16px;
+  }
+  .coexistence-capabilities span {
+    padding: 0;
+    border: 0;
+  }
+  .coexistence-eyebrow,
+  .coexistence-appearance-path {
+    font-size: 12px;
+  }
+  .coexistence-appearance-path > div {
+    flex-direction: column;
+  }
+  .coexistence-diagram-caption {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@container story-canvas (max-height: 580px) {
+  .coexistence-diagram {
+    gap: 12px;
+    padding-block-end: var(--story-dock-clearance);
+  }
+  .coexistence-application {
+    padding: 12px;
+  }
+  .coexistence-application-label {
+    margin-block-end: 12px;
+    font-size: 12px;
+  }
+  .coexistence-peer {
+    gap: 8px;
+    padding: 12px;
+  }
+  .coexistence-eyebrow {
+    font-size: 11px;
+  }
+  .coexistence-library {
+    min-block-size: 28px;
+  }
+  .coexistence-library > strong {
+    font-size: 18px;
+  }
+  .coexistence-library svg {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+  .coexistence-node {
+    min-block-size: 28px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .coexistence-module {
+    min-block-size: 104px;
+    padding: 12px;
+    gap: 8px;
+  }
+  .coexistence-module > strong {
+    font-size: 16px;
+  }
+  .coexistence-capabilities {
+    gap: 4px 8px;
+  }
+  .coexistence-peer > p,
+  .coexistence-added-label,
+  .coexistence-path-note,
+  .coexistence-diagram-caption > span {
+    display: none;
+  }
+  .coexistence-wire {
+    block-size: 16px;
+  }
+  .coexistence-appearance-path > div {
+    flex-direction: row;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .coexistence-swatch {
+    inline-size: 8px;
+    block-size: 8px;
+    flex-shrink: 0;
+  }
+  .coexistence-diagram-caption {
+    justify-content: center;
+  }
+}

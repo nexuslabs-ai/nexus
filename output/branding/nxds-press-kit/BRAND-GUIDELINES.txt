@@ -1,36 +1,29 @@
 NEXUS DESIGN SYSTEM — BRAND FOUNDATION
-21 October 2026 | nxds block wordmark approved
+22 October 2026 | monospace nx: code-block identity
 
 CONFIRMED IDENTITY
 Product: Nexus Design System. Handle: nxds. Company: Nexus Labs.
-Primary logo and website header: approved borderless nxds block wordmark, with no colon. Use the rounded-slot x and dense rounded s as supplied in source/mark.svg. Original vector artwork, no font dependency.
-The compact nx icon uses the approved n and rounded-slot x shapes, without a colon. Use it for favicons and app icons; use the full nxds wordmark in the website header and footer. The 328 × 132 letter pair is centered in a 368 × 368 square with 20 units of horizontal clear space. source/icon.svg is the compact master.
+Primary lockup: JetBrains Mono Regular nx: inside a softly rounded code-block tile, followed by Nexus Design System in DM Sans600.
+The mark is now derived from the code typeface, replacing the geometric letter construction. Supplied SVGs contain outlined glyphs so no installed font is required.
+Use the full lockup in the header and footer. Narrow headers show the compact tile with an accessible name.
 
-APPROVED WORDMARK GEOMETRY
-Master viewBox: 664 × 132. Each letter is 160 units wide; gaps are 8 units.
-n: R32 outer shoulders, 14-unit opening with R7 end.
-x: rounded side waists; 14-unit top and bottom slots with R7 closed ends. Slot entrance corners and external terminal corners use R4. Preserve the supplied side curves and path.
-d: R32 shoulders, 12-unit counter with R6 ends.
-s: R32 outer bends and R4 cut entrance corners; dense rounded body, 14-unit openings with R7 ends; top cut end center x72/y45, bottom x88/y87 in letter coordinates. Its inner and outer arcs are not concentric: optical density was prioritized.
-Do not stretch, retype, add a border, or insert a colon.
-Website size: 96 × 19.084337 CSS px. Preserve aspect ratio; do not force the former header height.
-Both themes use identical geometry. Website inherits currentColor; supplied light-background ink #171717, dark-background ink #FAFAFA.
+GEOMETRY
+Full lockup viewBox:660 x88. Code tile: x1,y12,138 x64,R10. nx: uses JetBrains Mono400 at60 units, start x16, baseline60 in the full lockup. Keep natural monospace advances. Product name begins at x160.
+Square app icon:400 x400; tile inset8,R56. The code mark is centered in the square. Same geometry in both themes.
+Do not stretch or substitute another monospace face.
 
 USAGE AND ASSETS
-Header accessible link name: Nexus Design System home. SVG itself is decorative inside that link.
-source/mark.svg is the full-wordmark master. svg/nx-logo.svg and svg/nxds-website-wordmark.svg use currentColor. Light/dark SVGs and transparent PNGs are provided.
-svg/nx-icon-*.svg and favicon/ contain the compact nx icon with the new letter shapes. The PNG/ICO icons have opaque backgrounds for contrast.
-Website component: apps/docs/app/_components/NexusWordmark.tsx.
-Maintain clear space of at least one counter width (14 master units) around the full wordmark. Review the supplied 96px sample before using smaller sizes.
+source/mark.svg: full lockup master, including outlined DM Sans name.
+source/icon.svg: square app-icon master. source/monogram.svg: outlined JetBrains Mono nx: artwork.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: identical full lockups retained under existing public filenames.
+svg/nx-icon-*.svg: compact square icons. PNG/ICO versions have opaque theme backgrounds.
+Light ink: #171717. Dark ink: #FAFAFA. Tile fill6% and border14% of ink. SVG masters inherit currentColor.
+Website component: apps/docs/app/_components/NexusCodeLockup.tsx. Header mark64 x30 CSS px, with product name alongside when space permits.
+Keep at least one colon-dot width of clear space around the bare monogram. Check16px and32px icon exports before using at small sizes.
 
-APPROVED TYPOGRAPHY — OPTION B
-Headings, body text and standalone product name: DM Sans.
-Code, code blocks and technical monospace content: JetBrains Mono.
-Starting hierarchy: headings 600; body 400; labels/navigation 500; code 400.
-Use the existing responsive type scale rather than forcing a single size across all screens. Body text should generally be 16–18px; code should generally be at least 14px. These are starting recommendations, not a new global component-size override.
-Keep code letter spacing neutral and programming ligatures disabled for literal syntax clarity.
-Use the supplied nxds vector artwork; do not retype it in DM Sans.
-DM Sans and JetBrains Mono are self-hosted on the website. Their font files and SIL Open Font License notices are included in this kit. The approved original wordmark is vector artwork and requires no font software. The website sets the families through its appearance defaults; consumer apps retain their own typography choices.
+TYPOGRAPHY
+Product name: DM Sans600. Website headings/body: DM Sans. Code text: JetBrains Mono.
+Fonts and SIL Open Font License notices are included. Exported logo SVGs use paths and require no installed fonts; live website product name uses the existing appearance font.
 
 APPROVED POSITIONING
 Audience: people building products who need a consistent design system they can make their own. Speak most directly to frontend developers, design engineers, and product teams maintaining a growing interface; remain welcoming to individual builders.
@@ -61,6 +54,3 @@ Claim boundaries:
 Distinguish the framework-independent foundation from currently available component bindings. Do not promise support for all frameworks based on planned bindings.
 Describe tested stories and behaviors according to actual coverage. Do not imply that executable stories guarantee every state or behavior is tested.
 This approval establishes positioning, not an independent audit of current feature or test coverage.
-
-FURTHER BRAND WORK
-Positioning and the nxds wordmark are approved. Refine voice examples, accent strategy and reusable communication templates. The product name remains Nexus Design System; nxds remains the handle. Package, repository and domain migrations are separate work.

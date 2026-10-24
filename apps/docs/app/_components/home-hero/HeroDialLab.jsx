@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react';
 import { DialRoot, DialStore, useDialKitController } from 'dialkit';
 
 import { CtaJourney } from './CtaJourney';
+import { EvidenceHeadlineJourney } from './EvidenceHeadlineJourney';
 import { FeatureStripJourney } from './FeatureStripJourney';
 import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
 import { useJourneyColors } from './journey-colors';
+import { MiniatureHeadlineJourney } from './MiniatureHeadlineJourney';
 import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
 import { ScrollHeadlineJourney } from './ScrollHeadlineJourney';
 import { StackedHeadlineJourney } from './StackedHeadlineJourney';
@@ -23,6 +25,18 @@ import 'dialkit/styles.css';
 import './hero-dial-lab.css';
 
 const iterations = [
+  {
+    value: 'miniature-tiles',
+    name: 'Scroll · component tiles',
+    preset: null,
+    description: 'Consistent tiles with component miniatures.',
+  },
+  {
+    value: 'live-examples',
+    name: 'Scroll · live examples',
+    preset: null,
+    description: 'Customization tiles, app coexistence, and component source.',
+  },
   {
     value: 'tile-shuffle',
     name: 'Tile shuffle',
@@ -126,6 +140,8 @@ const config = {
       { value: 'rotating', label: 'Rotating headline' },
       { value: 'stacked-headlines', label: 'Stacked headlines' },
       { value: 'scroll-headlines', label: 'Scroll headlines' },
+      { value: 'miniature-tiles', label: 'Scroll · component tiles' },
+      { value: 'live-examples', label: 'Scroll · live examples' },
       { value: 'tile-shuffle', label: 'Tile shuffle' },
       { value: 'compact', label: 'Compact row' },
       { value: 'workbench', label: 'Workbench grid' },
@@ -565,6 +581,8 @@ export function HeroDialLab({ mode, children, ctaLinks, featureStripContent }) {
       rotating: RotatingHeadlineJourney,
       'stacked-headlines': StackedHeadlineJourney,
       'scroll-headlines': ScrollHeadlineJourney,
+      'miniature-tiles': MiniatureHeadlineJourney,
+      'live-examples': EvidenceHeadlineJourney,
       'tile-shuffle': TileShuffleJourney,
       'tilted-cta': TiltedCtaJourney,
       tilted: TiltedJourney,

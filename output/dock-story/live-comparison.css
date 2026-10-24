@@ -1,0 +1,187 @@
+.live-comparison {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding-bottom: var(--story-dock-clearance);
+}
+.live-comparison-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1368px;
+  width: 100%;
+  margin-inline: auto;
+}
+.live-comparison:has(.coexistence-appearance-controls) {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+.coexistence-appearance-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 1368px;
+  margin-inline: auto;
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-lg, 12px);
+  background: var(--nx-color-container);
+}
+.coexistence-appearance-caption {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.coexistence-appearance-caption span {
+  color: var(--nx-color-muted-foreground);
+}
+.coexistence-appearance-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+@container story-canvas (max-width: 900px) {
+  .coexistence-appearance-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .coexistence-appearance-caption {
+    flex: 1;
+  }
+  .coexistence-appearance-fields {
+    order: 3;
+    flex-basis: 100%;
+    gap: 8px;
+  }
+}
+@container story-canvas (max-width: 520px) {
+  .coexistence-appearance-fields {
+    gap: 4px;
+  }
+  .coexistence-appearance-controls {
+    padding: 8px;
+  }
+}
+.live-comparison-slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+  width: min(240px, 35%);
+}
+.live-comparison-slider input {
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  background: transparent;
+  cursor: ew-resize;
+  margin: 0;
+}
+.live-comparison-slider input::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--nx-color-border-default);
+}
+.live-comparison-slider input::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--nx-color-foreground);
+  margin-top: -7px;
+}
+.live-comparison-slider input::-moz-range-track {
+  height: 2px;
+  background: var(--nx-color-border-default);
+}
+.live-comparison-slider input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nx-color-foreground);
+}
+.live-comparison-slider input:focus-visible {
+  outline: 2px solid var(--nx-color-border-focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.live-comparison-stage {
+  position: relative;
+  min-height: 0;
+  width: 100%;
+  max-width: 1368px;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: var(--nx-radius-lg, 12px);
+}
+.live-comparison-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--nx-color-background);
+}
+.live-comparison-after {
+  clip-path: inset(0 0 0 var(--comparison-split));
+}
+.library-comparison-frame {
+  border: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.live-comparison-stage[data-comparing='true'] iframe {
+  pointer-events: none;
+}
+.live-comparison-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--comparison-split);
+  width: 1px;
+  background: var(--nx-color-foreground);
+  pointer-events: none;
+}
+.live-comparison-line span {
+  position: absolute;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: 50%;
+  background: var(--nx-color-container);
+  color: var(--nx-color-foreground);
+}
+.live-comparison-note {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--nx-color-muted-foreground);
+}
+@container story-canvas (max-width: 520px) {
+  .live-comparison-tools {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 12px;
+  }
+  .live-comparison-slider {
+    order: 3;
+    width: 100%;
+  }
+  .live-comparison-note {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,27 @@
+@import '/Users/temp/.codex/worktrees/nexus-homepage/nexus/packages/tailwind/nexus.css';
+@source './main.jsx';
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+}
+.story-page {
+  background: var(--nx-color-background);
+  color: var(--nx-color-foreground);
+  --story-header-height: 64px;
+}
+.story-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--nx-color-background);
+}
+
+.dialkit-panel[data-position='top-right'] {
+  top: calc(var(--story-header-height, 64px) + 12px);
+}

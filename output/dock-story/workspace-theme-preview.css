@@ -1,0 +1,47 @@
+html,
+body,
+#root {
+  margin: 0;
+  min-block-size: 100%;
+}
+body {
+  background: transparent;
+}
+/* Keep MUI's standard rem basis independent of Nexus's global reset. */
+html:root {
+  font-size: 16px;
+  background: #171717;
+}
+.workspace-theme-frame {
+  container: theme-frame / inline-size;
+  padding: 4px;
+}
+.workspace-theme-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+.workspace-theme-specimen {
+  min-inline-size: 0;
+}
+.workspace-theme-specimen > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-block-end: 14px;
+  font:
+    13px / 1.5 Arial,
+    sans-serif;
+  color: #aeafb4;
+}
+.workspace-theme-specimen > header strong {
+  color: #e4e4e7;
+  font-size: 15px;
+}
+@container theme-frame (max-width: 650px) {
+  .workspace-theme-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

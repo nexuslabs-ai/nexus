@@ -1,10 +1,13 @@
 NEXUS DESIGN SYSTEM — PRESS KIT
-21 October 2026
+22 October 2026
 
-Primary logo: approved borderless nxds block wordmark, rounded-slot x and dense rounded s. No colon. Same geometry in light and dark.
-source/mark.svg: editable full-wordmark master.
-svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full wordmark for the website header and footer.
-png/nx-logo-*: transparent full-wordmark exports.
-svg/nx-icon-*, png/nx-icon-*, favicon/: compact nx icon using the approved n and x shapes, without a colon.
-fonts/: website DM Sans and JetBrains Mono, with licenses. Logo requires no font.
+Primary logo: JetBrains Mono nx: code-block tile followed by Nexus Design System.
+source/mark.svg: full lockup, entirely vector paths.
+source/monogram.svg: outlined JetBrains Mono nx: artwork.
+source/icon.svg: compact square icon master.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full lockup.
+png/nx-logo-*: transparent full-lockup exports.
+svg/nx-icon-*, png/nx-icon-*, favicon/: compact nx: icons.
+fonts/: DM Sans and JetBrains Mono with licenses.
 BRAND-GUIDELINES.txt: geometry, usage, typography and positioning.
+Run node source/export.cjs from the repository checkout to regenerate raster exports from supplied SVGs. Requires the repository sharp dependency.

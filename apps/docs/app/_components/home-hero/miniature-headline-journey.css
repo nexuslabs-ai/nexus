@@ -1,0 +1,129 @@
+.component-composition {
+  position: relative;
+  display: block;
+  inline-size: var(--nx-spacing-7);
+  block-size: var(--nx-spacing-7);
+  flex-shrink: 0;
+  scale: 1.45;
+  font-size: 8px;
+  line-height: 1;
+}
+.composition-pill {
+  position: absolute;
+  inset: 6px 1px 7px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: currentColor;
+  box-shadow: 0 2px 0 color-mix(in srgb, currentColor 25%, transparent);
+}
+.composition-pill > span {
+  color: white;
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.composition-cursor {
+  position: absolute;
+  inline-size: 10px;
+  block-size: 13px;
+  right: -1px;
+  bottom: 0;
+  stroke: white;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+.composition-panel {
+  position: absolute;
+  inset: 2px 0;
+  padding: 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 40%);
+  box-shadow: 2px 2px 0 color-mix(in srgb, currentColor 15%, transparent);
+}
+.composition-line {
+  display: block;
+  block-size: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.composition-title {
+  display: block;
+  font-size: 5px;
+  line-height: 1;
+  font-weight: 600;
+  margin-block-end: 3px;
+}
+.composition-line {
+  opacity: 0.35;
+  margin-block-end: 2px;
+}
+.composition-short {
+  inline-size: 65%;
+}
+.composition-close {
+  position: absolute;
+  right: 3px;
+  top: 2px;
+}
+.composition-action {
+  position: absolute;
+  inline-size: 8px;
+  block-size: 4px;
+  right: 3px;
+  bottom: 3px;
+  background: currentColor;
+  border-radius: 2px;
+}
+.composition-field,
+.composition-menu {
+  position: absolute;
+  inset-inline: 0;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 40%);
+}
+.composition-field {
+  top: 0;
+  block-size: 9px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 3px;
+}
+.composition-field > span,
+.composition-option > span {
+  inline-size: 11px;
+  block-size: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.composition-menu {
+  top: 11px;
+  bottom: 0;
+  padding: 2px;
+}
+.composition-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  block-size: 6px;
+  padding-inline: 2px;
+  font-size: 6px;
+}
+.composition-option:first-child {
+  background: rgb(255 255 255 / 45%);
+  border-radius: 1px;
+}
+.composition-option:last-child {
+  opacity: 0.45;
+}
+.source-ownership-line {
+  margin: var(--nx-spacing-3) 0 0;
+  color: var(--nx-color-muted-foreground);
+  font-size: var(--nx-typography-size-sm);
+  font-weight: 400;
+  line-height: 1.5;
+}

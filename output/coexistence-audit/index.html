@@ -1,0 +1,247 @@
+<!doctype html><meta charset="utf-8" /><title>Nexus coexistence audit</title
+><style>
+  body {
+    font: 16px/1.6 system-ui;
+    max-width: 1100px;
+    margin: 48px auto;
+    padding: 24px;
+    color: #ddd;
+    background: #171717;
+  }
+  h1,
+  h2 {
+    color: white;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  td,
+  th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #444;
+  }
+  a {
+    color: #9dcaff;
+  }
+  code {
+    color: #b5d8ff;
+  }
+  small {
+    color: #bbb;
+  }
+</style>
+<h1>Coexistence audit — verified findings</h1>
+<p>
+  19 October 2026 · Local Nexus source · MUI 9.5.0 · Ant 6.6.6 · installed
+  shadcn radix-nova styling with published 4.22.1 variant helpers.
+</p>
+<p>
+  <b>No evidence of broad MUI or Ant component destruction.</b> The strongest
+  differences are global stylesheet integration effects. These are conditional
+  on importing the tested unscoped Tailwind/shadcn globals after existing
+  styles, not unavoidable defects in individual shadcn components.
+</p>
+<h2>Where Nexus preserved the existing UI</h2>
+<table>
+  <tr>
+    <th>Existing UI</th>
+    <th>shadcn integration result</th>
+    <th>Nexus integration result</th>
+    <th>Condition / mechanism</th>
+  </tr>
+  <tr>
+    <td>Custom branded button and card</td>
+    <td>Teal changes to neutral; radius changes from 16px to 10px.</td>
+    <td>Existing brand variables and radius preserved.</td>
+    <td>
+      Existing app deliberately uses generic --primary, --primary-foreground,
+      --radius. Later shadcn :root/.dark declarations reuse these names. This is
+      a representative token-name collision, not a default MUI/Ant token
+      collision.
+    </td>
+  </tr>
+  <tr>
+    <td>Native form inside MUI host</td>
+    <td>
+      Input/button/select backgrounds become transparent; borders disappear;
+      font and dimensions change.
+    </td>
+    <td>
+      Light-mode baseline preserved. Dark provider changes browser-native colors
+      but preserves structure.
+    </td>
+    <td>
+      Tailwind Preflight global form reset. Not reproduced as breakage of styled
+      MUI TextField or Ant Input.
+    </td>
+  </tr>
+  <tr>
+    <td>Native navigation links</td>
+    <td>Underlines removed; color inherits.</td>
+    <td>Underline preserved. Dark color-scheme changes native link color.</td>
+    <td>Global anchor reset.</td>
+  </tr>
+  <tr>
+    <td>Native headings and lists</td>
+    <td>Heading 24px → 16px; ordered-list numbering removed.</td>
+    <td>Structure preserved.</td>
+    <td>Global heading/list reset, already known.</td>
+  </tr>
+  <tr>
+    <td>Native HTML table</td>
+    <td>Spacing and height change.</td>
+    <td>Preserved.</td>
+    <td>
+      Preflight border-collapse/padding reset. This is not an Ant or MUI
+      DataGrid failure.
+    </td>
+  </tr>
+</table>
+<h2>Excluded from a Nexus superiority demo</h2>
+<ul>
+  <li>
+    Body-portaled searchable selector under MUI Dialog or Ant Modal: both kits
+    fall below the host modal with default stacking levels.
+  </li>
+  <li>
+    Ant reset overriding text-color utilities on added primary
+    buttons/checkboxes: both kits affected in the neutral-theme test.
+  </li>
+  <li>
+    Computed border changes with zero border width, and hidden-input font/color
+    changes: not counted as visible failures.
+  </li>
+  <li>
+    Transient border-width measurements were removed by waiting for CSS
+    transitions before both samples.
+  </li>
+</ul>
+<h2>Runtime coverage</h2>
+<p>
+  162 host fixture cases (61 MUI, 101 Ant) × two kits × light/dark = 648
+  before/after case runs. Tested button sizes/types/disabled/danger states,
+  input variants/sizes/error/disabled states, typography, checked/disabled
+  choices, alerts and selected card/link/progress primitives. Separate overlay
+  and added-control results are linked below.
+</p>
+<table>
+  <tr>
+    <th>Host</th>
+    <th>Added kit</th>
+    <th>Mode</th>
+    <th>Cases</th>
+    <th>DOM nodes</th>
+    <th>Raw property deltas</th>
+  </tr>
+  <tr>
+    <td>mui</td>
+    <td>nexus</td>
+    <td>light</td>
+    <td>61</td>
+    <td>238</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>mui</td>
+    <td>nexus</td>
+    <td>dark</td>
+    <td>61</td>
+    <td>238</td>
+    <td>40</td>
+  </tr>
+  <tr>
+    <td>mui</td>
+    <td>shadcn</td>
+    <td>light</td>
+    <td>61</td>
+    <td>238</td>
+    <td>456</td>
+  </tr>
+  <tr>
+    <td>mui</td>
+    <td>shadcn</td>
+    <td>dark</td>
+    <td>61</td>
+    <td>238</td>
+    <td>456</td>
+  </tr>
+  <tr>
+    <td>ant</td>
+    <td>nexus</td>
+    <td>light</td>
+    <td>101</td>
+    <td>233</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>ant</td>
+    <td>nexus</td>
+    <td>dark</td>
+    <td>101</td>
+    <td>233</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td>ant</td>
+    <td>shadcn</td>
+    <td>light</td>
+    <td>101</td>
+    <td>233</td>
+    <td>338</td>
+  </tr>
+  <tr>
+    <td>ant</td>
+    <td>shadcn</td>
+    <td>dark</td>
+    <td>101</td>
+    <td>233</td>
+    <td>312</td>
+  </tr>
+</table>
+<p>Raw deltas are diagnostic data, not failure counts.</p>
+<h2>Coverage limits</h2>
+<p>
+  This is not a completed runtime certification of every component and exported
+  subpart. Source inventory covers 79 Nexus source modules and 24 installed
+  shadcn modules, plus 64 of 65 upstream registry UI entries retrieved (toast
+  unavailable in this preset). Unexercised components are explicitly marked in
+  the coverage file. Hover, focus, responsive sizes, portal nesting and all
+  permutations are not exhaustively runtime-tested. Upstream current Combobox
+  uses Base UI; the exercised installed shadcn searchable selector uses Popover
+  + input + cmdk.
+</p>
+<p>
+  The theme-token fixture intentionally models an app with overlapping variable
+  names. It does not establish that an unmodified MUI or Ant theme has those
+  names. Existing Tailwind apps that already use Preflight will not experience a
+  newly introduced Preflight reset in the same way.
+</p>
+<h2>Evidence files</h2>
+<ul>
+  <li>
+    <a href="nexus-host-preservation-results.json"
+      >648 host preservation runs (raw property changes)</a
+    >
+  </li>
+  <li>
+    <a href="nexus-conflict-runtime-results.json"
+      >Overlay and added-control evidence</a
+    >
+  </li>
+  <li>
+    <a href="nexus-component-conflict-inventory.json"
+      >Local component and export inventory</a
+    >
+  </li>
+  <li>
+    <a href="nexus-component-conflict-coverage.csv"
+      >Coverage status per module / registry entry</a
+    >
+  </li>
+</ul>
+<p>
+  No homepage comparison, library fix, commit or push was made as part of this
+  audit.
+</p>

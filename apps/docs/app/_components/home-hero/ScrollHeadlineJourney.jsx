@@ -20,6 +20,8 @@ export function smoothStep(value) {
 
 export function ScrollHeadlineJourney({
   children,
+  contentGroups = groups,
+  staticContent,
   Panel = ScrollHeadlinePanel,
   ...props
 }) {
@@ -62,7 +64,10 @@ export function ScrollHeadlineJourney({
 
   if (reduceMotion)
     return (
-      <StackedHeadlineJourney {...props}>{children}</StackedHeadlineJourney>
+      <>
+        {staticContent ?? <StackedHeadlineJourney {...props} />}
+        {children}
+      </>
     );
 
   return (
@@ -79,7 +84,7 @@ export function ScrollHeadlineJourney({
               details={[]}
               customizationHeading={
                 <div className="scroll-headline-panels">
-                  {groups.map((group, index) => (
+                  {contentGroups.map((group, index) => (
                     <Panel
                       key={group.title}
                       group={group}
@@ -103,7 +108,7 @@ export function ScrollHeadlineJourney({
         </div>
       </div>
       <div className="scroll-headline-mobile">
-        <StackedHeadlineJourney {...props} />
+        {staticContent ?? <StackedHeadlineJourney {...props} />}
       </div>
       {children}
     </div>
@@ -125,7 +130,7 @@ function ScrollHeadlinePanel({ group, index, progress, slide, tuning }) {
         transform: `translateY(${(1 - enter - leave) * 18}px)`,
       }}
     >
-      <StackedTileGroup {...group} tuning={tuning} />
+      {group.content ?? <StackedTileGroup {...group} tuning={tuning} />}
     </div>
   );
 }

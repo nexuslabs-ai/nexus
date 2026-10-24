@@ -16,7 +16,7 @@ export function HeadlineJourney({
   showTools = true,
   customizationHeading = (
     <p className="journey-heading journey-enter" aria-hidden="true">
-      Customizable in every detail.
+      Customize every detail.
     </p>
   ),
 }) {
@@ -33,7 +33,8 @@ export function HeadlineJourney({
         intro={
           <>
             <h1 className="nx:sr-only">
-              Nexus design system. Open source. Customizable in every detail.
+              Your design system starts here. Open source. Customize every
+              detail.
               {showTools && ' Built to work with your favorite tools.'}
             </h1>
             <Badge
@@ -45,7 +46,7 @@ export function HeadlineJourney({
               Open Source
             </Badge>
             <p className="journey-title journey-enter" aria-hidden="true">
-              Nexus design system.
+              Your design system starts here.
             </p>
           </>
         }

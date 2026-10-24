@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>NX: — Diagonal block study</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #eae9e5;
+      color: #171717;
+      font:
+        14px/1.6 system-ui,
+        sans-serif;
+    }
+    main {
+      max-width: 1120px;
+      margin: auto;
+      padding: 40px 24px;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: -0.7px;
+      margin: 0;
+    }
+    header p {
+      color: #666;
+      margin: 8px 0 28px;
+    }
+    section {
+      background: #fafaf8;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .dark {
+      background: #171717;
+      color: #fafafa;
+    }
+    .label {
+      font: 11px monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      opacity: 0.55;
+      padding: 24px;
+    }
+    .large {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 36px 24px 68px;
+    }
+    .large img {
+      width: 810px;
+      max-width: 100%;
+      height: auto;
+    }
+    .bar {
+      padding: 24px;
+      border-top: 1px solid #8883;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .bar img {
+      width: 270px;
+      height: 32px;
+    }
+    .bar span {
+      font: 11px monospace;
+      opacity: 0.55;
+    }
+    footer {
+      color: #666;
+      font-size: 12px;
+    }
+    .construction {
+      padding: 40px 24px;
+      display: flex;
+      justify-content: center;
+      background-color: #fafaf8;
+      background-image:
+        linear-gradient(#17171708 1px, transparent 1px),
+        linear-gradient(90deg, #17171708 1px, transparent 1px);
+      background-size: 12px 12px;
+    }
+    .construction img {
+      width: 360px;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+  <main>
+    <header>
+      <h1>NX: / Matched diagonals</h1>
+      <p>
+        Matched diagonals: 3 units across for every 5 down (59°). The wider X
+        uses 36-unit terminals to balance the N’s solid stems.
+      </p>
+    </header>
+    <section>
+      <div class="label">Mark construction / enlarged</div>
+      <div class="construction">
+        <img src="mark.svg" alt="Custom uppercase NX colon mark" />
+      </div>
+    </section>
+    <section class="light">
+      <div class="label">light / enlarged 3×</div>
+      <div class="large">
+        <img src="lockup-light.svg" alt="NX: Nexus Design System" />
+      </div>
+      <div class="bar">
+        <img
+          src="lockup-light.svg"
+          alt="NX: Nexus Design System at header size"
+        /><span>Actual header size · 270 × 32px</span>
+      </div>
+    </section>
+    <section class="dark">
+      <div class="label">dark / enlarged 3×</div>
+      <div class="large">
+        <img src="lockup-dark.svg" alt="NX: Nexus Design System" />
+      </div>
+      <div class="bar">
+        <img
+          src="lockup-dark.svg"
+          alt="NX: Nexus Design System at header size"
+        /><span>Actual header size · 270 × 32px</span>
+      </div>
+    </section>
+    <footer>
+      Preview only. Website and press kit unchanged. Custom SVG geometry.
+    </footer>
+  </main>
+</html>

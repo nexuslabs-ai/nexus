@@ -1,0 +1,43 @@
+.component-board {
+  container: component-board / inline-size;
+  block-size: 100%;
+  overflow: auto;
+  scroll-padding-block: 24px 120px;
+}
+
+.component-board-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  max-inline-size: 78rem;
+  margin-inline: auto;
+  padding: 24px 24px 144px;
+  gap: 32px;
+}
+
+.component-board-column {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  gap: 24px;
+}
+
+.component-board-section {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  gap: 16px;
+}
+
+@container component-board (min-width: 44rem) {
+  .component-board-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container component-board (min-width: 64rem) {
+  .component-board-layout {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px;
+  }
+}

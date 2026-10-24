@@ -35,7 +35,7 @@ import './stacked-headline-journey.css';
 
 export const groups = [
   {
-    title: 'Customizable in every detail.',
+    title: 'Customize every detail.',
     tiles: [
       ['Theme', IconPaint],
       ['Colors', IconColorSwatch],
@@ -52,7 +52,7 @@ export const groups = [
     ],
   },
   {
-    title: 'Works with your existing app.',
+    title: 'Keep the app. Add Nexus.',
     tiles: [
       ['MUI', MuiLogo],
       ['Ant Design', AntDesignLogo],
@@ -62,11 +62,11 @@ export const groups = [
     ],
   },
   {
-    title: 'Yours to copy. Yours to change.',
+    title: 'Own the source.',
     tiles: [
-      ['Copy source', IconCopy],
-      ['Make it yours', IconPencilCode],
-      ['Own the changes', IconBrandGit],
+      ['Edit components', IconCopy],
+      ['Extend variants', IconPencilCode],
+      ['Commit changes', IconBrandGit],
     ],
   },
 ];

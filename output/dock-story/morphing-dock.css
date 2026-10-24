@@ -1,0 +1,50 @@
+.morph-dock .context-dock-bar {
+  animation: none;
+}
+.morph-dock .context-dock-bar > button {
+  z-index: 3;
+  transition: color 120ms;
+}
+.morph-dock .context-tool-label {
+  transition: none;
+}
+.morph-surface {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--markup-face);
+  box-shadow:
+    inset 0 0 0 1px var(--markup-rim),
+    inset 0 1px 0 var(--markup-shine),
+    0 3px 6px var(--markup-shadow),
+    0 12px 32px var(--markup-shadow);
+}
+.morph-bridge {
+  position: absolute;
+  top: -9px;
+  z-index: 3;
+  width: 64px;
+  height: 20px;
+  pointer-events: none;
+  transform-origin: bottom;
+}
+.morph-bridge svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--markup-face);
+}
+.morph-dock .morph-content {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+.morph-content > div {
+  width: 100%;
+}
+.morph-dock .context-panel-heading button {
+  background: var(--markup-shell);
+}

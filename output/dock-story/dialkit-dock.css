@@ -1,0 +1,53 @@
+/* Keep the dock shell; use DialKit's own control components and theme tokens. */
+.active-label-dock .context-panel {
+  padding: 10px 12px;
+  border: 1px solid var(--dial-border);
+  border-radius: 14px;
+  background: var(--dial-glass-bg);
+  backdrop-filter: blur(var(--dial-backdrop-blur));
+  box-shadow: var(--dial-shadow);
+}
+.active-label-dock .context-panel-pointer {
+  background: var(--dial-glass-bg);
+  border-color: var(--dial-border);
+}
+.active-label-dock .context-panel-heading {
+  padding-bottom: 14px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--dial-surface-subtle);
+}
+.active-label-dock .context-panel-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--dial-text-root);
+}
+.active-label-dock .context-panel-heading button {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--dial-text-label);
+  opacity: 0.6;
+}
+.active-label-dock .context-panel-heading button:hover {
+  background: var(--dial-surface-hover);
+  opacity: 1;
+}
+.active-label-dock .context-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dial-row-gap);
+  padding-bottom: 10px;
+}
+.dial-dock-source {
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--dial-radius);
+  background: var(--dial-surface);
+  color: var(--dial-text-label);
+  font:
+    11px / 1.6 'Geist Mono',
+    monospace;
+  white-space: pre-wrap;
+}

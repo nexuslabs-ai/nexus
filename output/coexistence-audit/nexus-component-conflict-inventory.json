@@ -1,0 +1,2186 @@
+[
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/accordion/accordion.tsx",
+    "exports": [
+      "Accordion",
+      "AccordionContent",
+      "AccordionContentProps",
+      "AccordionItem",
+      "AccordionItemProps",
+      "AccordionProps",
+      "AccordionTrigger",
+      "AccordionTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-accordion",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/alert/alert.tsx",
+    "exports": [
+      "Alert",
+      "AlertActions",
+      "AlertActionsProps",
+      "AlertClose",
+      "AlertCloseProps",
+      "AlertContent",
+      "AlertContentProps",
+      "AlertDescription",
+      "AlertDescriptionProps",
+      "AlertIcon",
+      "AlertIconProps",
+      "AlertProps",
+      "AlertTitle",
+      "AlertTitleProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/alert-dialog/alert-dialog.tsx",
+    "exports": [
+      "AlertDialog",
+      "AlertDialogAction",
+      "AlertDialogActionProps",
+      "AlertDialogBody",
+      "AlertDialogBodyProps",
+      "AlertDialogCancel",
+      "AlertDialogCancelProps",
+      "AlertDialogContent",
+      "AlertDialogContentProps",
+      "AlertDialogDescription",
+      "AlertDialogDescriptionProps",
+      "AlertDialogFooter",
+      "AlertDialogFooterProps",
+      "AlertDialogHeader",
+      "AlertDialogHeaderProps",
+      "AlertDialogOverlay",
+      "AlertDialogOverlayProps",
+      "AlertDialogPortal",
+      "AlertDialogTitle",
+      "AlertDialogTitleProps",
+      "AlertDialogTrigger",
+      "AlertDialogVariant"
+    ],
+    "portal_and_stacking_evidence": [
+      "63:const AlertDialogPortal = AlertDialogPrimitive.Portal;",
+      "129:<AlertDialogPortal>",
+      "148:</AlertDialogPortal>",
+      "409:AlertDialogPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-alert-dialog",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../button/button",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/appearance-settings/appearance-settings.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@nexus_ds/core",
+      "../../card/card",
+      "../../input/input",
+      "../../select/select",
+      "../../slider/slider",
+      "../../switch/switch",
+      "../../toggle-group/toggle-group",
+      "../brand-color-field/brand-color-field",
+      "../config-preview/config-preview",
+      "../provider",
+      "../setting-row/setting-row"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/brand-color-field/brand-color-field.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@nexus_ds/core",
+      "../../../lib/utils",
+      "../../select/select",
+      "../color-field/color-field"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/color-field/color-field.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../input/input"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/config-preview/config-preview.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["@nexus_ds/core", "../provider"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/factory.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["@nexus_ds/core", "./provider"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/provider.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@nexus_ds/core"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/script.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["@nexus_ds/core"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/setting-row/setting-row.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/theme-quick-control/theme-quick-control.tsx",
+    "exports": [],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@nexus_ds/core",
+      "@tabler/icons-react",
+      "../../../lib/utils",
+      "../../button/button",
+      "../../popover/popover",
+      "../../separator/separator",
+      "../../toggle-group/toggle-group",
+      "../color-field/color-field",
+      "../provider"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/aspect-ratio/aspect-ratio.tsx",
+    "exports": ["AspectRatio", "AspectRatioProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-aspect-ratio"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/attachment/attachment.tsx",
+    "exports": [
+      "Attachment",
+      "AttachmentActions",
+      "AttachmentActionsProps",
+      "AttachmentContent",
+      "AttachmentContentProps",
+      "AttachmentDescription",
+      "AttachmentDescriptionProps",
+      "AttachmentGroup",
+      "AttachmentGroupProps",
+      "AttachmentMedia",
+      "AttachmentMediaProps",
+      "AttachmentProgress",
+      "AttachmentProgressProps",
+      "AttachmentProps",
+      "AttachmentState",
+      "AttachmentTitle",
+      "AttachmentTitleProps",
+      "AttachmentTrigger",
+      "AttachmentTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "270:className={cn('nx:relative nx:z-20', className)}",
+      "387:'nx:absolute nx:inset-0 nx:z-10 nx:cursor-pointer nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:p-0 nx:no-underline',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../item/item",
+      "../progress/progress"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/avatar/avatar.tsx",
+    "exports": [
+      "Avatar",
+      "AvatarFallback",
+      "AvatarFallbackProps",
+      "AvatarGroup",
+      "AvatarGroupProps",
+      "AvatarImage",
+      "AvatarImageProps",
+      "AvatarProps",
+      "AvatarStatus",
+      "AvatarStatusProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-avatar",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/badge/badge.tsx",
+    "exports": ["Badge", "BadgeProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+    "exports": [
+      "Breadcrumb",
+      "BreadcrumbEllipsis",
+      "BreadcrumbEllipsisProps",
+      "BreadcrumbItem",
+      "BreadcrumbItemProps",
+      "BreadcrumbLink",
+      "BreadcrumbLinkProps",
+      "BreadcrumbList",
+      "BreadcrumbListProps",
+      "BreadcrumbMenuTrigger",
+      "BreadcrumbMenuTriggerProps",
+      "BreadcrumbPage",
+      "BreadcrumbPageProps",
+      "BreadcrumbProps",
+      "BreadcrumbSeparator",
+      "BreadcrumbSeparatorProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/bubble/bubble.tsx",
+    "exports": [
+      "Bubble",
+      "BubbleContent",
+      "BubbleContentProps",
+      "BubbleGroup",
+      "BubbleGroupProps",
+      "BubbleProps",
+      "BubbleReactions",
+      "BubbleReactionsProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/button/button.tsx",
+    "exports": ["Button", "ButtonProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../button-group/button-group-context",
+      "../spinner/spinner"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/button-group/button-group.tsx",
+    "exports": [
+      "ButtonGroup",
+      "ButtonGroupProps",
+      "ButtonGroupSeparator",
+      "ButtonGroupSeparatorProps",
+      "ButtonGroupSize",
+      "ButtonGroupText",
+      "ButtonGroupTextProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../separator/separator",
+      "./button-group-context"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/card/card.tsx",
+    "exports": [
+      "Card",
+      "CardAction",
+      "CardActionProps",
+      "CardContent",
+      "CardContentProps",
+      "CardDescription",
+      "CardDescriptionProps",
+      "CardFooter",
+      "CardFooterProps",
+      "CardHeader",
+      "CardHeaderProps",
+      "CardProps",
+      "CardTitle",
+      "CardTitleProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-slot", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/carousel/carousel.tsx",
+    "exports": [
+      "Carousel",
+      "CarouselApi",
+      "CarouselContent",
+      "CarouselItem",
+      "CarouselNext",
+      "CarouselPrevious",
+      "CarouselProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "embla-carousel-react",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/chart/chart.tsx",
+    "exports": [
+      "ChartContainer",
+      "ChartLegend",
+      "ChartLegendContent",
+      "ChartTooltip",
+      "ChartTooltipContent"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "recharts", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/checkbox/checkbox.tsx",
+    "exports": ["Checkbox", "CheckboxProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-checkbox",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/choice-card/choice-card.tsx",
+    "exports": [
+      "ChoiceCard",
+      "ChoiceCardContent",
+      "ChoiceCardContentProps",
+      "ChoiceCardDescription",
+      "ChoiceCardDescriptionProps",
+      "ChoiceCardProps",
+      "ChoiceCardTitle",
+      "ChoiceCardTitleProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../label/label"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/choice-row/choice-row.tsx",
+    "exports": [
+      "ChoiceRow",
+      "ChoiceRowContent",
+      "ChoiceRowDescription",
+      "ChoiceRowProps",
+      "ChoiceRowTitle"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/utils", "../label/label"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/collapsible/collapsible.tsx",
+    "exports": [
+      "Collapsible",
+      "CollapsibleContent",
+      "CollapsibleContentProps",
+      "CollapsibleProps",
+      "CollapsibleTrigger",
+      "CollapsibleTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-collapsible", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/combobox/combobox.tsx",
+    "exports": [
+      "Combobox",
+      "ComboboxContent",
+      "ComboboxContentProps",
+      "ComboboxEmpty",
+      "ComboboxEmptyProps",
+      "ComboboxGroup",
+      "ComboboxGroupProps",
+      "ComboboxInput",
+      "ComboboxInputProps",
+      "ComboboxItem",
+      "ComboboxItemProps",
+      "ComboboxList",
+      "ComboboxListProps",
+      "ComboboxProps",
+      "ComboboxSeparator",
+      "ComboboxSeparatorProps",
+      "ComboboxTrigger",
+      "ComboboxTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button",
+      "../command/command",
+      "../popover/popover"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/command/command.tsx",
+    "exports": [
+      "Command",
+      "CommandDialog",
+      "CommandDialogProps",
+      "CommandEmpty",
+      "CommandEmptyProps",
+      "CommandGroup",
+      "CommandGroupProps",
+      "CommandInput",
+      "CommandInputProps",
+      "CommandItem",
+      "CommandItemProps",
+      "CommandList",
+      "CommandListProps",
+      "CommandLoading",
+      "CommandLoadingProps",
+      "CommandProps",
+      "CommandSeparator",
+      "CommandSeparatorProps",
+      "CommandShortcut",
+      "CommandShortcutProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "cmdk",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../dialog/dialog"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/context-menu/context-menu.tsx",
+    "exports": [
+      "ContextMenu",
+      "ContextMenuCheckboxItem",
+      "ContextMenuCheckboxItemProps",
+      "ContextMenuContent",
+      "ContextMenuContentProps",
+      "ContextMenuGroup",
+      "ContextMenuItem",
+      "ContextMenuItemProps",
+      "ContextMenuLabel",
+      "ContextMenuLabelProps",
+      "ContextMenuPortal",
+      "ContextMenuRadioGroup",
+      "ContextMenuRadioItem",
+      "ContextMenuRadioItemProps",
+      "ContextMenuSeparator",
+      "ContextMenuSeparatorProps",
+      "ContextMenuShortcut",
+      "ContextMenuShortcutProps",
+      "ContextMenuSub",
+      "ContextMenuSubContent",
+      "ContextMenuSubContentProps",
+      "ContextMenuSubTrigger",
+      "ContextMenuSubTriggerProps",
+      "ContextMenuTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "43:const ContextMenuPortal = ContextMenuPrimitive.Portal;",
+      "120:'nx:z-popover nx:min-w-32 nx:overflow-hidden',",
+      "153:<ContextMenuPrimitive.Portal>",
+      "157:'nx:z-popover nx:max-h-(--radix-context-menu-content-available-height)',",
+      "166:</ContextMenuPrimitive.Portal>",
+      "467:ContextMenuPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-context-menu",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/date-picker/date-picker.tsx",
+    "exports": [
+      "DatePicker",
+      "DatePickerCellSize",
+      "DatePickerDayButton",
+      "DatePickerDayContent",
+      "DatePickerDayContentProps",
+      "DatePickerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "354:className=\"nx:relative nx:z-10 nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-1\""
+    ],
+    "dependencies": [
+      "react",
+      "react-day-picker",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/description-list/description-list.tsx",
+    "exports": [
+      "DescriptionList",
+      "DescriptionListDescription",
+      "DescriptionListItem",
+      "DescriptionListTerm"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/dialog/dialog.tsx",
+    "exports": [
+      "Dialog",
+      "DialogBody",
+      "DialogBodyProps",
+      "DialogClose",
+      "DialogContent",
+      "DialogContentProps",
+      "DialogDescription",
+      "DialogDescriptionProps",
+      "DialogFooter",
+      "DialogFooterProps",
+      "DialogHeader",
+      "DialogHeaderProps",
+      "DialogOverlay",
+      "DialogOverlayProps",
+      "DialogPortal",
+      "DialogTitle",
+      "DialogTitleProps",
+      "DialogTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "62:const DialogPortal = DialogPrimitive.Portal;",
+      "156:<DialogPortal>",
+      "187:</DialogPortal>",
+      "365:DialogPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-dialog",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/drawer/drawer.tsx",
+    "exports": [
+      "Drawer",
+      "DrawerBody",
+      "DrawerBodyProps",
+      "DrawerClose",
+      "DrawerContent",
+      "DrawerContentProps",
+      "DrawerDescription",
+      "DrawerDescriptionProps",
+      "DrawerFooter",
+      "DrawerFooterProps",
+      "DrawerHeader",
+      "DrawerHeaderProps",
+      "DrawerOverlay",
+      "DrawerOverlayProps",
+      "DrawerPortal",
+      "DrawerTitle",
+      "DrawerTitleProps",
+      "DrawerTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "45:const DrawerPortal = DrawerPrimitive.Portal;",
+      "69:'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',",
+      "107:<DrawerPortal>",
+      "112:'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-hidden nx:bg-container nx:shadow-lg',",
+      "129:</DrawerPortal>",
+      "266:DrawerPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "vaul",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+    "exports": [
+      "DropdownMenu",
+      "DropdownMenuCheckboxItem",
+      "DropdownMenuCheckboxItemProps",
+      "DropdownMenuContent",
+      "DropdownMenuContentProps",
+      "DropdownMenuGroup",
+      "DropdownMenuItem",
+      "DropdownMenuItemProps",
+      "DropdownMenuLabel",
+      "DropdownMenuLabelProps",
+      "DropdownMenuPortal",
+      "DropdownMenuRadioGroup",
+      "DropdownMenuRadioItem",
+      "DropdownMenuRadioItemProps",
+      "DropdownMenuSeparator",
+      "DropdownMenuSeparatorProps",
+      "DropdownMenuShortcut",
+      "DropdownMenuShortcutProps",
+      "DropdownMenuSub",
+      "DropdownMenuSubContent",
+      "DropdownMenuSubContentProps",
+      "DropdownMenuSubTrigger",
+      "DropdownMenuSubTriggerProps",
+      "DropdownMenuTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "43:const DropdownMenuPortal = DropdownMenuPrimitive.Portal;",
+      "120:'nx:z-popover nx:min-w-32 nx:overflow-hidden',",
+      "157:<DropdownMenuPrimitive.Portal>",
+      "162:'nx:z-popover nx:max-h-(--radix-dropdown-menu-content-available-height)',",
+      "171:</DropdownMenuPrimitive.Portal>",
+      "472:DropdownMenuPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-dropdown-menu",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/empty-state/empty-state.tsx",
+    "exports": [
+      "EmptyState",
+      "EmptyStateContent",
+      "EmptyStateContentProps",
+      "EmptyStateDescription",
+      "EmptyStateDescriptionProps",
+      "EmptyStateHeader",
+      "EmptyStateHeaderProps",
+      "EmptyStateMedia",
+      "EmptyStateMediaProps",
+      "EmptyStateProps",
+      "EmptyStateTitle",
+      "EmptyStateTitleProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/field/field.tsx",
+    "exports": [
+      "Field",
+      "FieldContent",
+      "FieldDescription",
+      "FieldError",
+      "FieldErrorProps",
+      "FieldGroup",
+      "FieldLabel",
+      "FieldLegend",
+      "FieldLegendProps",
+      "FieldProps",
+      "FieldRequiredIndicator",
+      "FieldRequiredIndicatorProps",
+      "FieldSeparator",
+      "FieldSet",
+      "FieldTitle"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../label/label",
+      "../separator/separator"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-builder/filter-builder.tsx",
+    "exports": ["FilterBuilder", "FilterBuilderProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/filter-model",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button",
+      "../checkbox/checkbox",
+      "../choice-row/choice-row",
+      "../input/input",
+      "../popover/popover",
+      "../select/select"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-chip/filter-chip.tsx",
+    "exports": ["FilterChip", "FilterChipProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-condition/filter-condition.tsx",
+    "exports": [
+      "FilterCondition",
+      "FilterConditionField",
+      "FilterConditionRemove",
+      "FilterConditionRemoveProps",
+      "FilterConditionSegment"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/hide/hide.tsx",
+    "exports": ["Hide", "ResponsiveVisibilityProps", "HideProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/responsive-visibility",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/hover-card/hover-card.tsx",
+    "exports": [
+      "HoverCard",
+      "HoverCardContent",
+      "HoverCardContentProps",
+      "HoverCardProps",
+      "HoverCardTrigger",
+      "HoverCardTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "84:<HoverCardPrimitive.Portal>",
+      "90:'nx:z-popover nx:w-64 nx:p-container nx:outline-none',",
+      "97:</HoverCardPrimitive.Portal>"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-hover-card",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input/input.tsx",
+    "exports": ["Input", "InputProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "../../lib/field-size",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input-group/input-group.tsx",
+    "exports": [
+      "InputGroup",
+      "InputGroupAddon",
+      "InputGroupAddonProps",
+      "InputGroupButton",
+      "InputGroupButtonProps",
+      "InputGroupInput",
+      "InputGroupInputProps",
+      "InputGroupProps",
+      "InputGroupText",
+      "InputGroupTextarea",
+      "InputGroupTextareaProps",
+      "InputGroupTextProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../button/button",
+      "../input/input",
+      "../textarea/textarea"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input-otp/input-otp.tsx",
+    "exports": [
+      "InputOTP",
+      "InputOTPGroup",
+      "InputOTPGroupProps",
+      "InputOTPProps",
+      "InputOTPSeparator",
+      "InputOTPSeparatorProps",
+      "InputOTPSlot",
+      "InputOTPSlotProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "input-otp",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/item/item.tsx",
+    "exports": [
+      "Item",
+      "ItemActions",
+      "ItemActionsProps",
+      "ItemContent",
+      "ItemContentProps",
+      "ItemDescription",
+      "ItemDescriptionProps",
+      "ItemFooter",
+      "ItemGroup",
+      "ItemHeader",
+      "ItemMedia",
+      "ItemMediaProps",
+      "ItemProps",
+      "ItemSeparator",
+      "ItemTitle",
+      "ItemTitleProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../separator/separator"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/kbd/kbd.tsx",
+    "exports": ["Kbd", "KbdGroup", "KbdGroupProps", "KbdProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/label/label.tsx",
+    "exports": ["Label", "LabelProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-label", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/marker/marker.tsx",
+    "exports": [
+      "Marker",
+      "MarkerContent",
+      "MarkerContentProps",
+      "MarkerIcon",
+      "MarkerIconProps",
+      "MarkerProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/menubar/menubar.tsx",
+    "exports": [
+      "Menubar",
+      "MenubarCheckboxItem",
+      "MenubarCheckboxItemProps",
+      "MenubarContent",
+      "MenubarContentProps",
+      "MenubarGroup",
+      "MenubarItem",
+      "MenubarItemProps",
+      "MenubarLabel",
+      "MenubarLabelProps",
+      "MenubarMenu",
+      "MenubarPortal",
+      "MenubarProps",
+      "MenubarRadioGroup",
+      "MenubarRadioItem",
+      "MenubarRadioItemProps",
+      "MenubarSeparator",
+      "MenubarSeparatorProps",
+      "MenubarShortcut",
+      "MenubarShortcutProps",
+      "MenubarSub",
+      "MenubarSubContent",
+      "MenubarSubContentProps",
+      "MenubarSubTrigger",
+      "MenubarSubTriggerProps",
+      "MenubarTrigger",
+      "MenubarTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "62:const MenubarPortal = MenubarPrimitive.Portal;",
+      "158:'nx:z-popover nx:min-w-32 nx:overflow-hidden',",
+      "195:<MenubarPrimitive.Portal>",
+      "202:'nx:z-popover nx:min-w-48 nx:overflow-hidden',",
+      "210:</MenubarPrimitive.Portal>",
+      "490:MenubarPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-menubar",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/message/message.tsx",
+    "exports": [
+      "Message",
+      "MessageAvatar",
+      "MessageAvatarProps",
+      "MessageContent",
+      "MessageContentProps",
+      "MessageFooter",
+      "MessageFooterProps",
+      "MessageGroup",
+      "MessageGroupProps",
+      "MessageHeader",
+      "MessageHeaderProps",
+      "MessageProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/utils", "../avatar/avatar"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/message-scroller/message-scroller.tsx",
+    "exports": [
+      "MessageScroller",
+      "MessageScrollerButton",
+      "MessageScrollerButtonProps",
+      "MessageScrollerContent",
+      "MessageScrollerContentProps",
+      "MessageScrollerItem",
+      "MessageScrollerItemProps",
+      "MessageScrollerProps",
+      "MessageScrollerProvider",
+      "MessageScrollerProviderProps",
+      "MessageScrollerViewport",
+      "MessageScrollerViewportProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "333:'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:[&_svg]:size-4 nx:data-[active=false]:invisible',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-compose-refs",
+      "@radix-ui/react-scroll-area",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button",
+      "../scroll-area/scroll-area"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/multi-select/multi-select.tsx",
+    "exports": [
+      "MultiSelect",
+      "MultiSelectContent",
+      "MultiSelectContentProps",
+      "MultiSelectGroup",
+      "MultiSelectGroupProps",
+      "MultiSelectItem",
+      "MultiSelectItemProps",
+      "MultiSelectProps",
+      "MultiSelectSeparator",
+      "MultiSelectSeparatorProps",
+      "MultiSelectTrigger",
+      "MultiSelectTriggerProps",
+      "MultiSelectValue",
+      "MultiSelectValueProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../badge/badge",
+      "../command/command",
+      "../popover/popover"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/native-select/native-select.tsx",
+    "exports": [
+      "NativeSelect",
+      "NativeSelectOptGroup",
+      "NativeSelectOption",
+      "NativeSelectProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/navigation-menu/navigation-menu.tsx",
+    "exports": [
+      "NavigationMenu",
+      "NavigationMenuContent",
+      "NavigationMenuContentProps",
+      "NavigationMenuIndicator",
+      "NavigationMenuIndicatorProps",
+      "NavigationMenuItem",
+      "NavigationMenuItemProps",
+      "NavigationMenuLink",
+      "NavigationMenuLinkProps",
+      "NavigationMenuList",
+      "NavigationMenuListProps",
+      "NavigationMenuProps",
+      "NavigationMenuTrigger",
+      "NavigationMenuTriggerProps",
+      "NavigationMenuViewport",
+      "NavigationMenuViewportProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "198:<div className=\"nx:absolute nx:top-full nx:left-0 nx:isolate nx:z-popover nx:flex nx:justify-center\">",
+      "259:'nx:top-full nx:z-1 nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-navigation-menu",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/page-header/page-header.tsx",
+    "exports": [
+      "PageHeader",
+      "PageHeaderActions",
+      "PageHeaderContent",
+      "PageHeaderDescription",
+      "PageHeaderMeta",
+      "PageHeaderTitle",
+      "PageHeaderTitleRow"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-slot", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/pagination/pagination.tsx",
+    "exports": [
+      "Pagination",
+      "PaginationContent",
+      "PaginationContentProps",
+      "PaginationEllipsis",
+      "PaginationEllipsisProps",
+      "PaginationItem",
+      "PaginationItemProps",
+      "PaginationLink",
+      "PaginationLinkProps",
+      "PaginationNext",
+      "PaginationNextProps",
+      "PaginationPrevious",
+      "PaginationPreviousProps",
+      "PaginationProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/popover/popover.tsx",
+    "exports": [
+      "Popover",
+      "PopoverAnchor",
+      "PopoverContent",
+      "PopoverContentProps",
+      "PopoverTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "61:<PopoverPrimitive.Portal>",
+      "67:'nx:z-popover nx:w-72 nx:p-container nx:outline-none',",
+      "74:</PopoverPrimitive.Portal>"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-popover",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/progress/progress.tsx",
+    "exports": ["Progress", "ProgressProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-progress", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/radio-group/radio-group.tsx",
+    "exports": [
+      "RadioGroup",
+      "RadioGroupItem",
+      "RadioGroupItemProps",
+      "RadioGroupProps"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-radio-group",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/resizable/resizable.tsx",
+    "exports": ["ResizableHandle", "ResizablePanel", "ResizablePanelGroup"],
+    "portal_and_stacking_evidence": [
+      "68:<div className=\"nx:z-10 nx:flex nx:h-4 nx:w-3 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default nx:bg-border-default\">"
+    ],
+    "dependencies": [
+      "react-resizable-panels",
+      "../../lib/icons",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/scroll-area/scroll-area.tsx",
+    "exports": ["ScrollArea", "ScrollAreaProps", "ScrollBar", "ScrollBarProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-scroll-area",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/select/select.tsx",
+    "exports": [
+      "Select",
+      "SelectContent",
+      "SelectContentProps",
+      "SelectGroup",
+      "SelectItem",
+      "SelectItemProps",
+      "SelectLabel",
+      "SelectLabelProps",
+      "SelectScrollDownButton",
+      "SelectScrollUpButton",
+      "SelectSeparator",
+      "SelectSeparatorProps",
+      "SelectTrigger",
+      "SelectTriggerProps",
+      "SelectValue"
+    ],
+    "portal_and_stacking_evidence": [
+      "180:<SelectPrimitive.Portal>",
+      "184:'nx:relative nx:z-popover nx:max-h-96 nx:min-w-32 nx:overflow-hidden',",
+      "209:</SelectPrimitive.Portal>"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-select",
+      "class-variance-authority",
+      "../../lib/field-size",
+      "../../lib/icons",
+      "../../lib/motion",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/separator/separator.tsx",
+    "exports": ["Separator", "SeparatorProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "@radix-ui/react-separator", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sheet/sheet.tsx",
+    "exports": [
+      "Sheet",
+      "SheetBody",
+      "SheetBodyProps",
+      "SheetClose",
+      "SheetContent",
+      "SheetContentProps",
+      "SheetDescription",
+      "SheetDescriptionProps",
+      "SheetFooter",
+      "SheetFooterProps",
+      "SheetHeader",
+      "SheetHeaderProps",
+      "SheetOverlay",
+      "SheetOverlayProps",
+      "SheetPortal",
+      "SheetTitle",
+      "SheetTitleProps",
+      "SheetTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "47:const SheetPortal = DialogPrimitive.Portal;",
+      "69:'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',",
+      "86:'nx:fixed nx:z-modal nx:flex nx:flex-col nx:overflow-hidden',",
+      "152:<SheetPortal>",
+      "171:</SheetPortal>",
+      "333:SheetPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-dialog",
+      "class-variance-authority",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/show/show.tsx",
+    "exports": ["Show", "ResponsiveVisibilityProps", "ShowProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "../../lib/responsive-visibility",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sidebar/sidebar.tsx",
+    "exports": [
+      "Sidebar",
+      "SidebarContent",
+      "SidebarContentProps",
+      "SidebarFooter",
+      "SidebarFooterProps",
+      "SidebarGroup",
+      "SidebarGroupAction",
+      "SidebarGroupActionProps",
+      "SidebarGroupContent",
+      "SidebarGroupContentProps",
+      "SidebarGroupLabel",
+      "SidebarGroupLabelProps",
+      "SidebarGroupProps",
+      "SidebarHeader",
+      "SidebarHeaderProps",
+      "SidebarInput",
+      "SidebarInputProps",
+      "SidebarInset",
+      "SidebarInsetProps",
+      "SidebarMenu",
+      "SidebarMenuAction",
+      "SidebarMenuActionProps",
+      "SidebarMenuBadge",
+      "SidebarMenuBadgeProps",
+      "SidebarMenuButton",
+      "SidebarMenuButtonProps",
+      "SidebarMenuItem",
+      "SidebarMenuItemProps",
+      "SidebarMenuProps",
+      "SidebarMenuSkeleton",
+      "SidebarMenuSkeletonProps",
+      "SidebarMenuSub",
+      "SidebarMenuSubButton",
+      "SidebarMenuSubButtonProps",
+      "SidebarMenuSubItem",
+      "SidebarMenuSubItemProps",
+      "SidebarMenuSubProps",
+      "SidebarProps",
+      "SidebarProvider",
+      "SidebarProviderProps",
+      "SidebarRail",
+      "SidebarRailProps",
+      "SidebarSeparator",
+      "SidebarSeparatorProps",
+      "SidebarTrigger",
+      "SidebarTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "331:'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:md:flex',",
+      "408:'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:border-0 nx:bg-transparent nx:p-0 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:md:flex',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slot",
+      "class-variance-authority",
+      "../../hooks/use-narrow",
+      "../../lib/icons",
+      "../../lib/utils",
+      "../button/button",
+      "../input/input",
+      "../separator/separator",
+      "../sheet/sheet",
+      "../skeleton/skeleton",
+      "../tooltip/tooltip"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/skeleton/skeleton.tsx",
+    "exports": ["Skeleton", "SkeletonProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/slider/slider.tsx",
+    "exports": ["Slider", "SliderProps"],
+    "portal_and_stacking_evidence": [
+      "49:'nx:pointer-events-none nx:absolute nx:z-10 nx:size-1.5 nx:rounded-full nx:bg-muted-foreground-subtle nx:opacity-50 nx:transition-colors nx:duration-fast nx:data-disabled:bg-disabled-foreground nx:data-[orientation=horizontal]:top-1/2 nx:data-[orientation=horizontal]:-translate-x-1/2 nx:data-[orientation=horizontal]:-translate-y-1/2 nx:data-[orientation=vertical]:left-1/2 nx:data-[orientation=vertical]:-translate-x-1/2 nx:data-[orientation=vertical]:translate-y-1/2';"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-slider",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sonner/sonner.tsx",
+    "exports": ["Toaster"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "sonner", "../../lib/icons", "@nexus_ds/react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/spinner/spinner.tsx",
+    "exports": ["Spinner", "SpinnerProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "../../lib/icons", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/switch/switch.tsx",
+    "exports": ["Switch", "SwitchProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-switch",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/table/table.tsx",
+    "exports": [
+      "Table",
+      "TableBody",
+      "TableBodyProps",
+      "TableCaption",
+      "TableCaptionProps",
+      "TableCell",
+      "TableCellProps",
+      "TableFooter",
+      "TableFooterProps",
+      "TableHead",
+      "TableHeader",
+      "TableHeaderProps",
+      "TableHeadProps",
+      "TableProps",
+      "TableRow",
+      "TableRowHeader",
+      "TableRowHeaderProps",
+      "TableRowProps",
+      "TableSelectionCell",
+      "TableSelectionCellProps",
+      "TableSelectionHead",
+      "TableSelectionHeadProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "273:stickyHeader && 'nx:sticky nx:top-0 nx:z-sticky nx:bg-container',"
+    ],
+    "dependencies": ["react", "class-variance-authority", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/tabs/tabs.tsx",
+    "exports": [
+      "Tabs",
+      "TabsContent",
+      "TabsContentProps",
+      "TabsList",
+      "TabsListProps",
+      "TabsTrigger",
+      "TabsTriggerProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "175:'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',",
+      "195:'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-tabs",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/textarea/textarea.tsx",
+    "exports": ["Textarea", "TextareaProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "../../lib/utils"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toggle/toggle.tsx",
+    "exports": ["Toggle", "ToggleProps"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-toggle",
+      "class-variance-authority",
+      "../../lib/utils"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toggle-group/toggle-group.tsx",
+    "exports": [
+      "ToggleGroup",
+      "ToggleGroupItem",
+      "ToggleGroupItemProps",
+      "ToggleGroupProps"
+    ],
+    "portal_and_stacking_evidence": [
+      "100:base: 'nx:relative nx:rounded-none nx:not-disabled:hover:z-10 nx:not-disabled:data-[state=on]:z-20 nx:not-disabled:aria-invalid:z-30 nx:not-disabled:aria-invalid:data-[state=on]:z-40 nx:[&&&&:focus-visible]:z-50',"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-toggle-group",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../toggle/toggle"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toolbar/toolbar.tsx",
+    "exports": [
+      "Toolbar",
+      "ToolbarButton",
+      "ToolbarGroup",
+      "ToolbarLink",
+      "ToolbarSeparator",
+      "ToolbarToggleGroup",
+      "ToolbarToggleItem"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-toolbar",
+      "class-variance-authority",
+      "../../lib/utils",
+      "../button/button",
+      "../tooltip/tooltip",
+      "../tooltip/tooltip-group"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/tooltip/tooltip.tsx",
+    "exports": [
+      "Tooltip",
+      "TooltipContent",
+      "TooltipContentProps",
+      "TooltipProvider",
+      "TooltipTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "84:<TooltipPrimitive.Portal>",
+      "89:'nx:z-popover nx:overflow-hidden',",
+      "98:</TooltipPrimitive.Portal>"
+    ],
+    "dependencies": [
+      "react",
+      "@radix-ui/react-tooltip",
+      "../../lib/utils",
+      "../overlay-layout/overlay-layout",
+      "./tooltip-group"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/alert.tsx",
+    "exports": ["Alert", "AlertTitle", "AlertDescription", "AlertAction"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/avatar.tsx",
+    "exports": [
+      "Avatar",
+      "AvatarImage",
+      "AvatarFallback",
+      "AvatarGroup",
+      "AvatarGroupCount",
+      "AvatarBadge"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/badge.tsx",
+    "exports": ["Badge"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/button.tsx",
+    "exports": ["Button"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/card.tsx",
+    "exports": [
+      "Card",
+      "CardHeader",
+      "CardFooter",
+      "CardTitle",
+      "CardAction",
+      "CardDescription",
+      "CardContent"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/checkbox.tsx",
+    "exports": ["Checkbox"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui", "lucide-react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/dialog.tsx",
+    "exports": [
+      "Dialog",
+      "DialogClose",
+      "DialogContent",
+      "DialogDescription",
+      "DialogFooter",
+      "DialogHeader",
+      "DialogOverlay",
+      "DialogPortal",
+      "DialogTitle",
+      "DialogTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "22:function DialogPortal({",
+      "24:}: React.ComponentProps<typeof DialogPrimitive.Portal>) {",
+      "25:return <DialogPrimitive.Portal data-slot=\"dialog-portal\" {...props} />",
+      "42:\"fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0\",",
+      "59:<DialogPortal>",
+      "64:\"fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\",",
+      "84:</DialogPortal>",
+      "165:DialogPortal,"
+    ],
+    "dependencies": [
+      "react",
+      "cn",
+      "radix-ui",
+      "@/components/ui/button",
+      "lucide-react"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/dropdown-menu.tsx",
+    "exports": [
+      "DropdownMenu",
+      "DropdownMenuPortal",
+      "DropdownMenuTrigger",
+      "DropdownMenuContent",
+      "DropdownMenuGroup",
+      "DropdownMenuLabel",
+      "DropdownMenuItem",
+      "DropdownMenuCheckboxItem",
+      "DropdownMenuRadioGroup",
+      "DropdownMenuRadioItem",
+      "DropdownMenuSeparator",
+      "DropdownMenuShortcut",
+      "DropdownMenuSub",
+      "DropdownMenuSubTrigger",
+      "DropdownMenuSubContent"
+    ],
+    "portal_and_stacking_evidence": [
+      "14:function DropdownMenuPortal({",
+      "16:}: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {",
+      "18:<DropdownMenuPrimitive.Portal data-slot=\"dropdown-menu-portal\" {...props} />",
+      "40:<DropdownMenuPrimitive.Portal>",
+      "45:className={cn(\"z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\", className )}",
+      "48:</DropdownMenuPrimitive.Portal>",
+      "246:className={cn(\"z-50 min-w-[96px] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\", className )}",
+      "254:DropdownMenuPortal,"
+    ],
+    "dependencies": ["react", "cn", "radix-ui", "lucide-react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/input.tsx",
+    "exports": ["Input"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/label.tsx",
+    "exports": ["Label"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/popover.tsx",
+    "exports": [
+      "Popover",
+      "PopoverAnchor",
+      "PopoverContent",
+      "PopoverDescription",
+      "PopoverHeader",
+      "PopoverTitle",
+      "PopoverTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "26:<PopoverPrimitive.Portal>",
+      "32:\"z-50 flex w-72 origin-(--radix-popover-content-transform-origin) flex-col gap-2.5 rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\",",
+      "37:</PopoverPrimitive.Portal>"
+    ],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/progress.tsx",
+    "exports": ["Progress"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/radio-group.tsx",
+    "exports": ["RadioGroup", "RadioGroupItem"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/select.tsx",
+    "exports": [
+      "Select",
+      "SelectContent",
+      "SelectGroup",
+      "SelectItem",
+      "SelectLabel",
+      "SelectScrollDownButton",
+      "SelectScrollUpButton",
+      "SelectSeparator",
+      "SelectTrigger",
+      "SelectValue"
+    ],
+    "portal_and_stacking_evidence": [
+      "67:<SelectPrimitive.Portal>",
+      "71:className={cn(\"relative z-50 max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\", position ===\"popper\"&&\"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1\", className )}",
+      "88:</SelectPrimitive.Portal>"
+    ],
+    "dependencies": ["react", "cn", "radix-ui", "lucide-react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/separator.tsx",
+    "exports": ["Separator"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sheet.tsx",
+    "exports": [
+      "Sheet",
+      "SheetTrigger",
+      "SheetClose",
+      "SheetContent",
+      "SheetHeader",
+      "SheetFooter",
+      "SheetTitle",
+      "SheetDescription"
+    ],
+    "portal_and_stacking_evidence": [
+      "26:function SheetPortal({",
+      "28:}: React.ComponentProps<typeof SheetPrimitive.Portal>) {",
+      "29:return <SheetPrimitive.Portal data-slot=\"sheet-portal\" {...props} />",
+      "40:\"fixed inset-0 z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0\",",
+      "59:<SheetPortal>",
+      "65:\"fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg transition duration-200 ease-in-out data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-sm data-[side=right]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-[side=bottom]:data-open:slide-in-from-bottom-10 data-[side=left]:data-open:slide-in-from-left-10 data-[side=right]:data-open:slide-in-from-right-10 data-[side=top]:data-open:slide-in-from-top-10 data-closed:animate-out data-closed:fade-out-0 data-[side=bottom]:data-closed:slide-out-to-bottom-10 data-[side=left]:data-closed:slide-out-to-left-10 data-[side=right]:data-closed:slide-out-to-right-10 data-[side=top]:data-closed:slide-out-to-top-10\",",
+      "85:</SheetPortal>"
+    ],
+    "dependencies": [
+      "react",
+      "cn",
+      "radix-ui",
+      "@/components/ui/button",
+      "lucide-react"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sidebar.tsx",
+    "exports": [
+      "Sidebar",
+      "SidebarContent",
+      "SidebarFooter",
+      "SidebarGroup",
+      "SidebarGroupAction",
+      "SidebarGroupContent",
+      "SidebarGroupLabel",
+      "SidebarHeader",
+      "SidebarInput",
+      "SidebarInset",
+      "SidebarMenu",
+      "SidebarMenuAction",
+      "SidebarMenuBadge",
+      "SidebarMenuButton",
+      "SidebarMenuItem",
+      "SidebarMenuSkeleton",
+      "SidebarMenuSub",
+      "SidebarMenuSubButton",
+      "SidebarMenuSubItem",
+      "SidebarProvider",
+      "SidebarRail",
+      "SidebarSeparator",
+      "SidebarTrigger"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": [
+      "react",
+      "class-variance-authority",
+      "cn",
+      "radix-ui",
+      "@/hooks/use-mobile",
+      "@/components/ui/button",
+      "@/components/ui/input",
+      "@/components/ui/separator",
+      "@/components/ui/sheet",
+      "@/components/ui/skeleton",
+      "@/components/ui/tooltip",
+      "lucide-react"
+    ],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/skeleton.tsx",
+    "exports": ["Skeleton"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sonner.tsx",
+    "exports": ["Toaster"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["next-themes", "sonner", "lucide-react"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/switch.tsx",
+    "exports": ["Switch"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/table.tsx",
+    "exports": [
+      "Table",
+      "TableHeader",
+      "TableBody",
+      "TableFooter",
+      "TableHead",
+      "TableRow",
+      "TableCell",
+      "TableCaption"
+    ],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/tabs.tsx",
+    "exports": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "class-variance-authority", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/textarea.tsx",
+    "exports": ["Textarea"],
+    "portal_and_stacking_evidence": [],
+    "dependencies": ["react", "cn"],
+    "runtime_status": "not individually exercised",
+    "assessment": "requires composition review; no failure established"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/tooltip.tsx",
+    "exports": [
+      "Tooltip",
+      "TooltipContent",
+      "TooltipProvider",
+      "TooltipTrigger"
+    ],
+    "portal_and_stacking_evidence": [
+      "39:<TooltipPrimitive.Portal>",
+      "44:\"z-50 inline-flex w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\",",
+      "50:<TooltipPrimitive.Arrow className=\"z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground\" />",
+      "52:</TooltipPrimitive.Portal>"
+    ],
+    "dependencies": ["react", "cn", "radix-ui"],
+    "runtime_status": "not individually exercised",
+    "assessment": "portal/stacking candidate"
+  }
+]

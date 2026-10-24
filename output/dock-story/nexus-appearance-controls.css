@@ -1,0 +1,165 @@
+/* Nexus controls own interaction. Compact row presentation is an app comparison. */
+.nexus-appearance-controls {
+  max-height: calc(100svh - 240px);
+  overflow: auto;
+  min-width: 0;
+  padding: 2px;
+}
+.nexus-color-control > [data-slot='appearance-color-field'] {
+  flex-wrap: wrap;
+}
+.nexus-color-control input {
+  max-width: 100%;
+  min-width: 0;
+}
+.appearance-preview-frame {
+  border: 0;
+  background: transparent;
+}
+
+.appearance-range-body {
+  display: contents;
+}
+.compact-property-controls {
+  --property-row-height: var(--nx-spacing-10);
+  --property-label-inset: var(--nx-spacing-3);
+}
+.compact-property-controls [data-slot='field-label'],
+.compact-property-controls select,
+.compact-property-controls input {
+  font-size: var(--nx-typography-size-xs);
+  font-weight: var(--nx-typography-weight-medium);
+}
+.compact-property-controls [data-slot='field-description'] {
+  font-size: var(--nx-typography-size-xxs);
+  line-height: var(--nx-typography-line-height-xs);
+}
+.compact-property-select {
+  position: relative;
+}
+.compact-property-select > [data-slot='field-label'] {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--property-row-height) / 2);
+  left: var(--property-label-inset);
+  transform: translateY(-50%);
+  width: auto;
+  max-width: 45%;
+  pointer-events: none;
+  color: var(--nx-color-muted-foreground);
+}
+.compact-property-select select {
+  height: var(--property-row-height);
+  padding-left: 46%;
+  text-align: right;
+  text-overflow: ellipsis;
+  background: var(--nx-color-container);
+}
+.compact-property-toggle {
+  min-height: var(--property-row-height);
+  box-sizing: border-box;
+  padding-inline: var(--property-label-inset);
+  border-radius: var(--nx-radius-md);
+  background: var(--nx-color-container);
+}
+.compact-property-toggle > [data-slot='field-label'] {
+  color: var(--nx-color-muted-foreground);
+}
+.compact-property-range {
+  position: relative;
+  height: var(--property-row-height);
+  border-radius: var(--nx-radius-md);
+}
+.compact-property-range > [data-slot='field-label'] {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: var(--property-label-inset);
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: auto;
+  color: var(--nx-color-foreground);
+}
+.compact-property-range [data-slot='slider'] {
+  height: 100%;
+}
+.compact-property-range [data-slot='slider-track'] {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  border-radius: var(--nx-radius-md);
+  background: var(--nx-color-container);
+}
+.compact-property-range [data-slot='slider-range'] {
+  padding: 0;
+  border-radius: 0;
+  background: var(--nx-color-control-background-hover);
+}
+.compact-property-range [data-slot='slider-thumb'] {
+  opacity: 0;
+}
+.compact-property-range:has([data-slot='slider-thumb']:focus-visible) {
+  outline: var(--nx-borderwidth-thick) solid var(--nx-color-focus-default);
+  outline-offset: var(--nx-spacing-0_5);
+}
+.compact-property-value {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: var(--nx-spacing-2);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  width: auto;
+  max-width: 40%;
+  color: var(--nx-color-muted-foreground);
+  font-size: var(--nx-typography-size-xxs);
+}
+.compact-property-value input {
+  width: var(--nx-spacing-12);
+  padding-inline: var(--nx-spacing-1);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--nx-typography-family-font-mono);
+}
+.compact-property-controls .nexus-color-control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--property-row-height);
+  padding-inline: var(--property-label-inset);
+  box-sizing: border-box;
+  border-radius: var(--nx-radius-md);
+  background: var(--nx-color-container);
+}
+.compact-property-controls .nexus-color-control > [data-slot='field-label'] {
+  width: auto;
+  color: var(--nx-color-muted-foreground);
+  white-space: nowrap;
+}
+.compact-property-controls
+  .nexus-color-control
+  > [data-slot='appearance-color-field'] {
+  flex-wrap: nowrap;
+  flex-direction: row-reverse;
+  width: auto;
+  min-width: 0;
+  gap: var(--nx-spacing-1);
+}
+.compact-property-controls .nexus-color-control [data-slot='input'] {
+  width: 9ch;
+  padding-inline: var(--nx-spacing-1);
+  border-color: transparent;
+  background: transparent;
+  text-align: right;
+}
+.compact-property-controls
+  .nexus-color-control
+  [data-slot='input'][aria-invalid='true'] {
+  border-color: var(--nx-color-error-border);
+}
+.compact-property-controls .appearance-choices {
+  padding-top: var(--nx-spacing-2);
+}

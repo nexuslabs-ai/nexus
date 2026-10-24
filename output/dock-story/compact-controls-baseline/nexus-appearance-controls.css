@@ -1,0 +1,18 @@
+/* Panel content layout only. Nexus owns the controls' appearance. */
+.nexus-appearance-controls {
+  max-height: calc(100svh - 240px);
+  overflow: auto;
+  min-width: 0;
+  padding: 2px;
+}
+.nexus-color-control > [data-slot='appearance-color-field'] {
+  flex-wrap: wrap;
+}
+.nexus-color-control input {
+  max-width: 100%;
+  min-width: 0;
+}
+.appearance-preview-frame {
+  border: 0;
+  background: transparent;
+}

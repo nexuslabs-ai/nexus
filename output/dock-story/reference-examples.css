@@ -1,0 +1,52 @@
+.reference-example {
+  max-inline-size: 1120px;
+  margin-inline: auto;
+}
+.reference-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-block-end: 24px;
+}
+.reference-heading h2,
+.reference-heading h3 {
+  margin-block: 4px 8px;
+}
+.reference-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+.reference-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-inline-size: 0;
+}
+.reference-row,
+.reference-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-inline-size: 0;
+}
+.reference-row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.reference-person > div {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+@container workspace (max-width: 680px) {
+  .reference-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reference-heading {
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

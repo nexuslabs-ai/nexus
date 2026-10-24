@@ -1,0 +1,27 @@
+{
+  "captured": "2026-10-23",
+  "preview": "http://127.0.0.1:4187/dock-story/",
+  "previewRoot": "/Users/temp/.codex/visualizations/2026/10/09/01a1207c-3282-7f41-85ed-b4a86353c110/nexus-home",
+  "nexusSourceRoot": "/Users/temp/.codex/worktrees/nexus-homepage/nexus",
+  "nexusRevision": "502069b45a516821d3528d3ea69b9eeb4ea527e7",
+  "runtimeImport": "@nexus_ds/react",
+  "canonicalImport": "@nxds/react",
+  "original": {
+    "ShowcaseCards.jsx": "4d39163d508cff9a79f07c6fb00b57685163992745d9a5836fae391a8eb21f2e",
+    "ShowcaseGrid.jsx": "fb2e0707138cbb1dd87d8341c934fe76e49ec6e6a3f2e293fc94bf131587d715",
+    "showcase-grid.css": "b2aa15e936a1253598a5a9115f68295c4396ea64a931e3c416cadcc1fb39d53c",
+    "DockChapterJourney.jsx": "89ff8a02b19ece47ab58610c4627e26b38ff8ef1fbeb2d9afa61b258998e8606",
+    "SourceAudit.jsx": "1c28660140c7fee8d6dcfa9d5b775939173ae432d25a8724772ccd2f30009610"
+  },
+  "preservedGeometry": {
+    "StraightDock.jsx": "f9a26ff79c420140fb47aed5011c44cc6664a876b8afc294efea23f231335a65",
+    "straight-dock.css": "6bea19ac8ff1fb836d1c69acb7e694750fdb295ed1a863c124723ccbdb6b04e3",
+    "dock-chapter-journey.css": "619789135db00a2aa948a6b1e762e1de2f93dd00683ff82a28901de7346b9b23",
+    "page.css": "3b17066f3bc0aadd135935e97042b386947b2ad02c94278bdd13c5369a8c4339",
+    "showcase-grid.css": "b2aa15e936a1253598a5a9115f68295c4396ea64a931e3c416cadcc1fb39d53c"
+  },
+  "originalSnapshot": {
+    "ShowcaseCards.jsx": "1e67b98551a028883f4516d2b01116e4e70ef1ec75ca229468c8eb3cbaeb910d",
+    "ShowcaseGrid.jsx": "bccdedcba5b25bcabb571b20218ba749855c4ce85d84bca4cb58750cd83337a3"
+  }
+}

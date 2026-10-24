@@ -6,10 +6,12 @@ import { useNxdsAppearance } from '@nxds/react/appearance';
 import dynamic from 'next/dynamic';
 
 import { CtaJourney } from './CtaJourney';
+import { EvidenceHeadlineJourney } from './EvidenceHeadlineJourney';
 import { FeatureStripJourney } from './FeatureStripJourney';
 import { FoilJourney } from './FoilJourney';
 import { HeadlineJourney } from './HeadlineJourney';
 import { InlineStacksJourney } from './InlineStacksJourney';
+import { MiniatureHeadlineJourney } from './MiniatureHeadlineJourney';
 import { RotatingHeadlineJourney } from './RotatingHeadlineJourney';
 import { ScrollHeadlineJourney } from './ScrollHeadlineJourney';
 import { StackedHeadlineJourney } from './StackedHeadlineJourney';
@@ -44,6 +46,18 @@ export function HomeHero({ children }) {
   if (iteration === 'tile-shuffle')
     return (
       <TileShuffleJourney mode={resolvedMode}>{children}</TileShuffleJourney>
+    );
+  if (iteration === 'miniature-tiles')
+    return (
+      <MiniatureHeadlineJourney mode={resolvedMode}>
+        {children}
+      </MiniatureHeadlineJourney>
+    );
+  if (iteration === 'live-examples')
+    return (
+      <EvidenceHeadlineJourney mode={resolvedMode}>
+        {children}
+      </EvidenceHeadlineJourney>
     );
   if (iteration === 'scroll-headlines')
     return (

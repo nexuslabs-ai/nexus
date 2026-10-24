@@ -1,0 +1,268 @@
+{
+  "controls": [
+    {
+      "kit": "shadcn",
+      "reset": "off",
+      "values": [
+        {
+          "bg": "oklch(0.922 0 0)",
+          "color": "oklch(0.205 0 0)",
+          "slot": "button",
+          "state": null
+        },
+        {
+          "bg": "oklch(0.922 0 0)",
+          "color": "oklch(0.205 0 0)",
+          "slot": "checkbox",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.205 0 0)",
+          "slot": "radio-group-indicator",
+          "state": "checked"
+        },
+        {
+          "bg": "oklch(0.205 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "switch-thumb",
+          "state": "checked"
+        },
+        {
+          "bg": "oklab(1 0 0 / 0.045)",
+          "color": "oklch(0.985 0 0)",
+          "slot": "tabs-trigger",
+          "state": "active"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "slot": "tabs-trigger",
+          "state": "inactive"
+        }
+      ]
+    },
+    {
+      "kit": "shadcn",
+      "reset": "on",
+      "values": [
+        {
+          "bg": "oklch(0.922 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "button",
+          "state": null
+        },
+        {
+          "bg": "oklch(0.922 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "checkbox",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "radio-group-indicator",
+          "state": "checked"
+        },
+        {
+          "bg": "oklch(0.205 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "switch-thumb",
+          "state": "checked"
+        },
+        {
+          "bg": "oklab(1 0 0 / 0.045)",
+          "color": "oklch(0.708 0 0)",
+          "slot": "tabs-trigger",
+          "state": "active"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "slot": "tabs-trigger",
+          "state": "inactive"
+        }
+      ]
+    },
+    {
+      "kit": "nexus",
+      "reset": "off",
+      "values": [
+        {
+          "bg": "oklch(1 0 0)",
+          "color": "oklch(0 0 0)",
+          "slot": "button",
+          "state": null
+        },
+        {
+          "bg": "oklch(1 0 0)",
+          "color": "oklch(0 0 0)",
+          "slot": "checkbox",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(1 0 0)",
+          "slot": "radio-group-indicator",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(255, 255, 255)",
+          "slot": "radio-group-indicator",
+          "state": "unchecked"
+        },
+        {
+          "bg": "oklch(0 0 0)",
+          "color": "rgb(255, 255, 255)",
+          "slot": "switch-thumb",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.8838 0 0)",
+          "slot": "tabs-trigger",
+          "state": "active"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.8157 0 0)",
+          "slot": "tabs-trigger",
+          "state": "inactive"
+        }
+      ]
+    },
+    {
+      "kit": "nexus",
+      "reset": "on",
+      "values": [
+        {
+          "bg": "oklch(1 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "button",
+          "state": null
+        },
+        {
+          "bg": "oklch(1 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "checkbox",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "radio-group-indicator",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "radio-group-indicator",
+          "state": "unchecked"
+        },
+        {
+          "bg": "oklch(0 0 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "switch-thumb",
+          "state": "checked"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "tabs-trigger",
+          "state": "active"
+        },
+        {
+          "bg": "rgba(0, 0, 0, 0)",
+          "color": "rgb(238, 238, 238)",
+          "slot": "tabs-trigger",
+          "state": "inactive"
+        }
+      ]
+    }
+  ],
+  "overlays": [
+    {
+      "host": "mui",
+      "kit": "shadcn",
+      "coveringElement": "MuiDialogContent-root css-kw13he-MuiDialogContent-root",
+      "focused": true,
+      "hostZ": "1300",
+      "inputVisuallyCovered": true,
+      "popupZ": "50",
+      "keyboardSelected": 1
+    },
+    {
+      "host": "mui",
+      "kit": "nexus",
+      "coveringElement": "",
+      "focused": true,
+      "hostZ": "1300",
+      "inputVisuallyCovered": true,
+      "popupZ": "70",
+      "keyboardSelected": 1
+    },
+    {
+      "host": "ant",
+      "kit": "shadcn",
+      "coveringElement": "ant-modal-container",
+      "focused": false,
+      "hostZ": "1000",
+      "inputVisuallyCovered": true,
+      "popupZ": "50",
+      "keyboardSelected": 1
+    },
+    {
+      "host": "ant",
+      "kit": "nexus",
+      "hostZ": "1000",
+      "popupZ": "70",
+      "inputVisuallyCovered": true,
+      "coveringElement": "ant-modal-container",
+      "focused": true,
+      "keyboardSelected": 1
+    }
+  ],
+  "scope": {
+    "nexusSourceModules": 79,
+    "localShadcnModules": 24,
+    "upstreamRegistryEntries": 65,
+    "upstreamRetrieved": 64,
+    "unavailable": ["toast"],
+    "runtimeControls": [
+      "Button",
+      "Input",
+      "Textarea",
+      "Checkbox",
+      "RadioGroup",
+      "Switch",
+      "Tabs"
+    ],
+    "runtimeOverlays": "MUI Dialog and Ant Modal each with installed shadcn Popover/Input/cmdk composition and Nexus Combobox",
+    "limits": "Dark mode; default host overlay layers; Ant reset on/off. Source scans flag candidates, not proven failures. Not every component variant or upstream Base UI/React Aria implementation was runtime tested."
+  },
+  "versions": {
+    "mui": "9.5.0",
+    "antd": "6.6.6",
+    "shadcnCssHelper": "4.22.1",
+    "shadcnLocalStyle": "radix-nova"
+  },
+  "findings": [
+    "All four searchable popup combinations rendered behind host dialogs: shadcn 50, Nexus 70, MUI 1300, Ant 1000. Keyboard filtering and Enter selection still succeeded; do not label this a proven focus-trap failure.",
+    "Ant unlayered reset overrides layered color on both Button and Checkbox; neutral dark themes reveal severe contrast loss.",
+    "Active Tabs text loses its distinct color under Ant reset in both libraries; active background/other indicators remain.",
+    "Radio indicator computed color changes, but the inner dot remains visible; Switch thumb remains visible. Do not market these as visually broken.",
+    "Input and Textarea had no obvious visual break in tested states. This is not coverage of every variant or state."
+  ],
+  "sourceCandidates": {
+    "both": ["Select", "Popover", "Tooltip", "DropdownMenu", "Dialog", "Sheet"],
+    "nexusAdditional": [
+      "HoverCard",
+      "ContextMenu",
+      "Menubar",
+      "MultiSelect (Popover)",
+      "CommandDialog (Dialog)"
+    ],
+    "status": "Same portal/stacking structure identified; individual browser reproductions not yet claimed."
+  }
+}

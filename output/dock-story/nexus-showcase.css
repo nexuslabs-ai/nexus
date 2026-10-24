@@ -1,0 +1,36 @@
+/* Page-owned viewport sizing; Nexus owns field, row and message appearance. */
+.nexus-showcase-message-scroll {
+  max-height: 124px;
+  overflow: auto;
+  padding: 2px;
+  margin-bottom: 12px;
+}
+@container showcase-card (min-height: 440px) and (min-width: 280px) {
+  .nexus-showcase-message-scroll {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    margin-bottom: 24px;
+  }
+}
+@container showcase-card (min-height: 600px) and (min-width: 280px) {
+  .nexus-showcase-person.showcase-expanded,
+  .nexus-showcase-message.showcase-expanded {
+    display: flex;
+  }
+}
+@container showcase-card (max-height: 360px) {
+  .nexus-showcase-message-scroll {
+    max-height: 64px;
+  }
+}
+
+@container showcase-card (max-width: 210px) {
+  .nexus-showcase-person-actions {
+    flex-basis: 100%;
+  }
+  .nexus-showcase-person-detail,
+  .nexus-showcase-message-avatar {
+    display: none;
+  }
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "lib": "daisy",
+    "correction": ":root{--border:1px!important}",
+    "results": [
+      {
+        "tag": "INPUT",
+        "border": "1px",
+        "bg": "oklch(1 0 0)",
+        "color": "oklch(0.145 0 0)",
+        "radius": "4px",
+        "visibility": "visible"
+      },
+      {
+        "tag": "BUTTON",
+        "border": "1px",
+        "bg": "oklch(0.45 0.24 277.023)",
+        "color": "oklch(0.93 0.034 272.788)",
+        "radius": "4px",
+        "visibility": "visible"
+      }
+    ]
+  },
+  {
+    "lib": "hero",
+    "correction": ":root{--accent:oklch(0.6204 0.195 253.83)!important;--accent-foreground:oklch(0.9911 0 0)!important;--muted:oklch(0.5517 0.0138 285.94)!important;--radius:.5rem!important}",
+    "results": [
+      {
+        "tag": "P",
+        "border": "0px",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.5517 0.0138 285.94)",
+        "radius": "0px",
+        "visibility": "visible"
+      },
+      {
+        "tag": "BUTTON",
+        "border": "0px",
+        "bg": "oklch(0.6204 0.195 253.83)",
+        "color": "oklch(0.9911 0 0)",
+        "radius": "24px",
+        "visibility": "visible"
+      }
+    ]
+  },
+  {
+    "lib": "bootstrap",
+    "correction": ".collapse{visibility:visible!important}",
+    "results": [
+      {
+        "tag": "BUTTON",
+        "border": "1px",
+        "bg": "rgb(13, 110, 253)",
+        "color": "rgb(255, 255, 255)",
+        "radius": "6px",
+        "visibility": "visible"
+      },
+      {
+        "tag": "DIV",
+        "border": "0px",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(33, 37, 41)",
+        "radius": "0px",
+        "visibility": "visible"
+      }
+    ]
+  }
+]

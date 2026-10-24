@@ -17,9 +17,9 @@ import { TiltedCtaJourney } from './TiltedCtaJourney';
 import './rotating-headline-journey.css';
 
 export const lines = [
-  'Customizable in every detail.',
-  'Works with your existing app.',
-  'Yours to copy. Yours to change.',
+  'Customize every detail.',
+  'Keep the app. Add Nexus.',
+  'Own the source.',
 ];
 
 export const tileSets = [
@@ -32,9 +32,9 @@ export const tileSets = [
     ['Bootstrap', BootstrapLogo],
   ],
   [
-    ['Copy source', IconCopy],
-    ['Make it yours', IconPencilCode],
-    ['Own the changes', IconBrandGit],
+    ['Edit components', IconCopy],
+    ['Extend variants', IconPencilCode],
+    ['Commit changes', IconBrandGit],
   ],
 ];
 

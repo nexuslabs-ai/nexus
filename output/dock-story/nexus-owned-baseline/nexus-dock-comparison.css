@@ -1,0 +1,21 @@
+.nexus-hug-dock [data-slot='dock-item'][data-state='active'] {
+  width: var(--story-hug-width, max-content);
+  min-width: 0;
+  flex-shrink: 0;
+  padding-inline: var(--nx-spacing-5);
+  transition: width var(--nx-motion-duration-default) var(--nx-motion-ease-move);
+}
+.nexus-hug-dock[data-state='open']
+  [data-slot='dock-item'][data-state='active'] {
+  width: calc(var(--nx-spacing-64) + var(--nx-spacing-6));
+}
+.nexus-hug-dock
+  [data-slot='dock-item'][data-state='active']
+  [data-slot='dock-label'] {
+  flex-shrink: 0;
+  width: max-content;
+  overflow: visible;
+}
+.compact-nexus-panel [data-slot='dock-panel-header'] {
+  margin-bottom: var(--nx-spacing-4);
+}
