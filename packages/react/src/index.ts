@@ -44,6 +44,7 @@ export * from './components/command/command';
 export * from './components/context-menu/context-menu';
 export * from './components/date-picker/date-picker';
 export * from './components/dialog/dialog';
+export * from './components/dock/dock';
 export * from './components/drawer/drawer';
 export * from './components/dropdown-menu/dropdown-menu';
 export * from './components/empty-state/empty-state';
