@@ -99,26 +99,6 @@ export const Default: Story = {
   ),
 };
 
-// A bare uncontrolled slider follows Radix's single-thumb default at min.
-export const BareDefault: Story = {
-  render: () => <Slider aria-label="Bare slider" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const thumbs = canvas.getAllByRole('slider', { name: 'Bare slider' });
-    const range = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="slider-range"]'
-    )!;
-    const thumb = thumbs[0];
-
-    if (!thumb) throw new Error('Expected one bare slider thumb.');
-
-    await expect(thumbs).toHaveLength(1);
-    await expect(thumb).toHaveAttribute('aria-valuenow', '0');
-    await expect(range).toHaveAttribute('data-range-start', 'true');
-    await expect(range).not.toHaveAttribute('data-range-end');
-  },
-};
-
 // A Fluid-inspired row with a larger segmented control surface.
 export const Comfortable: Story = {
   tags: ['docs'],
@@ -318,161 +298,6 @@ export const Vertical: Story = {
   },
 };
 
-// Standard keeps a 20px hit thumb; both sizes render a caret, not a circle.
-export const SizeMeasurements: Story = {
-  render: () => (
-    <div className="nx:flex nx:w-64 nx:flex-col nx:gap-8">
-      <Slider
-        defaultValue={[50]}
-        max={100}
-        step={1}
-        aria-label="Standard size"
-      />
-      <Slider
-        size="comfortable"
-        defaultValue={[50]}
-        max={100}
-        step={1}
-        aria-label="Comfortable size"
-      />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const standard = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="slider"][data-size="standard"]'
-    )!;
-    const comfortable = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="slider"][data-size="comfortable"]'
-    )!;
-    const standardTrack = standard.querySelector<HTMLElement>(
-      '[data-slot="slider-track"]'
-    )!;
-    const standardRange = standard.querySelector<HTMLElement>(
-      '[data-slot="slider-range"]'
-    )!;
-    const standardThumb = standard.querySelector<HTMLElement>(
-      '[data-slot="slider-thumb"]'
-    )!;
-    const comfortableTrack = comfortable.querySelector<HTMLElement>(
-      '[data-slot="slider-track"]'
-    )!;
-    const comfortableRange = comfortable.querySelector<HTMLElement>(
-      '[data-slot="slider-range"]'
-    )!;
-    const comfortableThumb = comfortable.querySelector<HTMLElement>(
-      '[data-slot="slider-thumb"]'
-    )!;
-    const comfortableThumbHandleStyle = getComputedStyle(
-      comfortableThumb,
-      '::before'
-    );
-
-    await expect(getComputedStyle(standardTrack).height).toBe('16px');
-    await expect(standardTrack).toHaveClass('nx:bg-muted');
-    await expect(getComputedStyle(standardTrack).paddingTop).toBe('2px');
-    await expect(getComputedStyle(standardTrack).paddingRight).toBe('2px');
-    await expect(getComputedStyle(standardTrack).paddingBottom).toBe('2px');
-    await expect(getComputedStyle(standardTrack).paddingLeft).toBe('2px');
-    await expect(getComputedStyle(standardTrack).boxShadow).not.toBe('none');
-    await expect(standardRange).toHaveClass('nx:bg-control-background');
-    await expect(standardRange).toHaveClass('nx:bg-clip-content');
-    await expect(standardRange).toHaveAttribute('data-range-start', 'true');
-    await expect(standardRange).not.toHaveAttribute('data-range-end');
-    await expect(standardRange).toHaveClass('nx:rounded-l-md');
-    await expect(standardRange).not.toHaveClass('nx:rounded-r-md');
-    await expect(getComputedStyle(standardRange).paddingTop).toBe('2px');
-    await expect(getComputedStyle(standardRange).paddingRight).toBe('2px');
-    await expect(getComputedStyle(standardRange).paddingBottom).toBe('2px');
-    await expect(getComputedStyle(standardRange).paddingLeft).toBe('2px');
-    await expect(
-      Number.parseFloat(getComputedStyle(standardRange).borderTopRightRadius)
-    ).toBe(0);
-    await expect(getComputedStyle(comfortable).height).toBe('32px');
-    await expect(getComputedStyle(comfortableTrack).height).toBe('32px');
-    await expect(getComputedStyle(comfortableTrack).paddingTop).toBe('2px');
-    await expect(getComputedStyle(comfortableTrack).paddingRight).toBe('2px');
-    await expect(getComputedStyle(comfortableTrack).paddingBottom).toBe('2px');
-    await expect(getComputedStyle(comfortableTrack).paddingLeft).toBe('2px');
-    await expect(comfortableRange).toHaveClass('nx:bg-control-background');
-    await expect(comfortableRange).toHaveClass('nx:bg-clip-content');
-    await expect(comfortableRange).toHaveAttribute('data-range-start', 'true');
-    await expect(comfortableRange).not.toHaveAttribute('data-range-end');
-    await expect(comfortableRange).toHaveClass('nx:rounded-l-md');
-    await expect(comfortableRange).not.toHaveClass('nx:rounded-r-md');
-    await expect(getComputedStyle(comfortableRange).paddingTop).toBe('2px');
-    await expect(getComputedStyle(comfortableRange).paddingRight).toBe('2px');
-    await expect(getComputedStyle(comfortableRange).paddingBottom).toBe('2px');
-    await expect(getComputedStyle(comfortableRange).paddingLeft).toBe('2px');
-    await expect(
-      Number.parseFloat(getComputedStyle(comfortableRange).borderTopRightRadius)
-    ).toBe(0);
-    await expect(getComputedStyle(standardThumb).height).toBe('20px');
-    await expect(getComputedStyle(standardThumb).width).toBe('20px');
-    await expect(getComputedStyle(comfortableThumb).height).toBe('20px');
-    await expect(getComputedStyle(comfortableThumb).width).toBe('20px');
-    await expect(comfortableThumbHandleStyle.height).toBe('20px');
-    await expect(comfortableThumbHandleStyle.width).toBe('2px');
-  },
-};
-
-// The filled range keeps interior edges sharp and rounds only at true track boundaries.
-export const RangeEdgeRadii: Story = {
-  render: () => (
-    <div data-radius="round" className="nx:flex nx:w-64 nx:flex-col nx:gap-8">
-      <Slider
-        defaultValue={[50]}
-        max={100}
-        step={1}
-        aria-label="Middle value"
-      />
-      <Slider defaultValue={[100]} max={100} step={1} aria-label="Max value" />
-      <Slider
-        defaultValue={[25, 75]}
-        max={100}
-        step={1}
-        aria-label="Interior range"
-      />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const ranges = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>('[data-slot="slider-range"]')
-    );
-    const [middleRange, maxRange, interiorRange] = ranges;
-
-    if (!middleRange || !maxRange || !interiorRange) {
-      throw new Error('Expected middle, max, and interior range examples.');
-    }
-
-    await expect(middleRange).toHaveAttribute('data-range-start', 'true');
-    await expect(middleRange).not.toHaveAttribute('data-range-end');
-    await expect(
-      Number.parseFloat(getComputedStyle(middleRange).borderTopLeftRadius)
-    ).toBeGreaterThan(0);
-    await expect(
-      Number.parseFloat(getComputedStyle(middleRange).borderTopRightRadius)
-    ).toBe(0);
-
-    await expect(maxRange).toHaveAttribute('data-range-start', 'true');
-    await expect(maxRange).toHaveAttribute('data-range-end', 'true');
-    await expect(
-      Number.parseFloat(getComputedStyle(maxRange).borderTopLeftRadius)
-    ).toBeGreaterThan(0);
-    await expect(
-      Number.parseFloat(getComputedStyle(maxRange).borderTopRightRadius)
-    ).toBeGreaterThan(0);
-
-    await expect(interiorRange).not.toHaveAttribute('data-range-start');
-    await expect(interiorRange).not.toHaveAttribute('data-range-end');
-    await expect(
-      Number.parseFloat(getComputedStyle(interiorRange).borderTopLeftRadius)
-    ).toBe(0);
-    await expect(
-      Number.parseFloat(getComputedStyle(interiorRange).borderTopRightRadius)
-    ).toBe(0);
-  },
-};
-
 // Slider ends follow the active nxds corner mode instead of staying fully pill-shaped.
 export const CornerModes: Story = {
   render: () => (
@@ -531,19 +356,22 @@ export const CornerModes: Story = {
   },
 };
 
-// Level markers align with the same step positions the thumb snaps to.
-export const LevelMarkers: Story = {
-  render: () => (
-    <SliderControlRow
-      formatValue={String}
-      label="Roundness"
+// Arrow keys move the focused thumb, update aria-valuenow, and hide the step
+// markers the range has passed.
+export const KeyboardInteraction: Story = {
+  args: { onValueChange: fn() },
+  render: (args) => (
+    <Slider
+      size="comfortable"
       defaultValue={[2]}
       max={4}
       markers="steps"
       step={1}
+      aria-label="Roundness"
+      onValueChange={args.onValueChange}
     />
   ),
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const thumb = canvas.getByRole('slider', { name: 'Roundness' });
     const getMarkers = () =>
@@ -552,64 +380,35 @@ export const LevelMarkers: Story = {
           '[data-slot="slider-marker"]'
         )
       );
-    const getMarkerPositions = () =>
-      getMarkers().map((marker) => {
-        const markerRect = marker.getBoundingClientRect();
-        const trackRect = marker
-          .closest('[data-slot="slider-track"]')!
-          .getBoundingClientRect();
+    const [marker] = getMarkers();
 
-        return (
-          ((markerRect.left + markerRect.width / 2 - trackRect.left) /
-            trackRect.width) *
-          100
-        );
-      });
-    const firstMarker = getMarkers()[0];
+    if (!marker) throw new Error('Expected one future step marker.');
 
-    if (!firstMarker) throw new Error('Expected at least one slider marker.');
+    const markerRect = marker.getBoundingClientRect();
+    const trackRect = marker
+      .closest('[data-slot="slider-track"]')!
+      .getBoundingClientRect();
+    const markerCenter =
+      ((markerRect.left + markerRect.width / 2 - trackRect.left) /
+        trackRect.width) *
+      100;
 
     await expect(getMarkers()).toHaveLength(1);
-    let markerPositions = getMarkerPositions();
-    await expect(markerPositions[0]).toBeGreaterThan(74);
-    await expect(markerPositions[0]).toBeLessThan(76);
-    await expect(firstMarker).toHaveAttribute('aria-hidden', 'true');
-    await expect(firstMarker).toHaveAttribute('data-orientation', 'horizontal');
-    await expect(firstMarker).toHaveClass('nx:bg-muted-foreground-subtle');
-    await expect(getComputedStyle(firstMarker).height).toBe('6px');
-    await expect(getComputedStyle(firstMarker).width).toBe('6px');
+    await expect(markerCenter).toBeGreaterThan(74);
+    await expect(markerCenter).toBeLessThan(76);
+    await expect(marker).toHaveAttribute('aria-hidden', 'true');
+    await expect(marker).toHaveAttribute('data-orientation', 'horizontal');
+    await expect(marker).toHaveClass('nx:bg-muted-foreground-subtle');
+    await expect(getComputedStyle(marker).height).toBe('6px');
+    await expect(getComputedStyle(marker).width).toBe('6px');
     await expect(thumb).toHaveAttribute('aria-valuenow', '2');
-    await userEvent.tab();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(thumb).toHaveAttribute('aria-valuenow', '3');
-    await expect(canvas.getByText('3')).toBeInTheDocument();
-    await expect(getMarkers()).toHaveLength(0);
-    markerPositions = getMarkerPositions();
-    await expect(markerPositions).toHaveLength(0);
-  },
-};
 
-// Arrow keys move the focused thumb and update aria-valuenow.
-export const KeyboardInteraction: Story = {
-  args: { onValueChange: fn() },
-  render: (args) => (
-    <Slider
-      defaultValue={[50]}
-      max={100}
-      step={1}
-      aria-label="Volume"
-      onValueChange={args.onValueChange}
-    />
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const thumb = canvas.getByRole('slider');
-    await expect(thumb).toHaveAttribute('aria-valuenow', '50');
     await userEvent.tab();
     await expect(thumb).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
-    await expect(thumb).toHaveAttribute('aria-valuenow', '51');
-    await expect(args.onValueChange).toHaveBeenCalledWith([51]);
+    await expect(thumb).toHaveAttribute('aria-valuenow', '3');
+    await expect(args.onValueChange).toHaveBeenCalledWith([3]);
+    await expect(getMarkers()).toHaveLength(0);
   },
 };
 

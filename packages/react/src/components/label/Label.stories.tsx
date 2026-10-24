@@ -32,8 +32,6 @@ type Story = StoryObj<typeof Label>;
 // BASIC STORIES
 // ============================================
 
-export const Default: Story = {};
-
 export const WithInput: Story = {
   tags: ['docs'],
   render: () => (

@@ -3,7 +3,6 @@ import { expect } from 'storybook/test';
 
 import {
   createNxdsAppearanceScript,
-  type CreateNxdsAppearanceScriptOptions,
   NxdsAppearanceScript,
   type NxdsAppearanceScriptProps,
 } from './server';
@@ -28,43 +27,30 @@ const meta: Meta<NxdsAppearanceScriptProps> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function bootstrapScriptIn(root: ParentNode) {
-  const script = root.querySelector<HTMLScriptElement>(
-    'script[data-nxds-appearance-script]'
-  );
-  if (!script) throw new Error('Missing the appearance bootstrap script');
-  return script;
-}
+const ConfiguredAppearanceScript = createNxdsAppearanceScript({
+  storageKey: false,
+});
 
 export const Default: Story = {
+  render: (args) => (
+    <>
+      <NxdsAppearanceScript {...args} />
+      <ConfiguredAppearanceScript nonce="nxds-factory-nonce" />
+    </>
+  ),
   play: async ({ canvasElement }) => {
-    const script = bootstrapScriptIn(canvasElement);
+    const scripts = [
+      ...canvasElement.querySelectorAll<HTMLScriptElement>(
+        'script[data-nxds-appearance-script]'
+      ),
+    ];
 
-    await expect(script.nonce).toBe('');
-    await expect(script.textContent).toContain('data-nxds-appearance-theme');
-  },
-};
-
-export const WithNonce: Story = {
-  args: { nonce: 'nxds-first-paint-nonce' },
-  play: async ({ canvasElement, args }) => {
-    const script = bootstrapScriptIn(canvasElement);
-
-    await expect(script.nonce).toBe(args.nonce);
-  },
-};
-
-const factoryOptions: CreateNxdsAppearanceScriptOptions = {
-  storageKey: false,
-};
-const ConfiguredAppearanceScript = createNxdsAppearanceScript(factoryOptions);
-
-export const FromFactory: Story = {
-  render: () => <ConfiguredAppearanceScript nonce="nxds-factory-nonce" />,
-  play: async ({ canvasElement }) => {
-    const script = bootstrapScriptIn(canvasElement);
-
-    await expect(script.nonce).toBe('nxds-factory-nonce');
-    await expect(script.textContent).toContain('data-nxds-appearance-theme');
+    await expect(scripts.map((script) => script.nonce)).toEqual([
+      '',
+      'nxds-factory-nonce',
+    ]);
+    for (const script of scripts) {
+      await expect(script.textContent).toContain('data-nxds-appearance-theme');
+    }
   },
 };

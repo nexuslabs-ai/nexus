@@ -193,56 +193,16 @@ export const OpenCloseInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', { name: 'Open popover' });
-    await expect(trigger).toBeInTheDocument();
-
-    // Open the popover
-    await userEvent.click(trigger);
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="popover-content"]')
-      ).toBeInTheDocument();
-    });
-
-    // Close with Escape
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="popover-content"]')
-      ).toBeNull();
-    });
-  },
-};
-
-export const InterruptibleOpenClose: Story = {
-  render: (_args) => (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">Open interruptible popover</Button>
-      </PopoverTrigger>
-      <PopoverContent>
-        <p className="nx:typography-body-default">Interruptible content</p>
-      </PopoverContent>
-    </Popover>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', {
-      name: 'Open interruptible popover',
-    });
 
     await userEvent.click(trigger);
-    const content = await within(document.body).findByText(
-      'Interruptible content'
-    );
+    const content = await within(document.body).findByText('Popover content');
     const panel = content.closest('[data-slot="popover-content"]');
 
     await waitFor(() => expect(content).toBeVisible());
     await expectInterruptibleOverlayMotion(panel);
 
     await userEvent.keyboard('{Escape}');
-    await expectExitBeforeUnmount(
-      document.body.querySelector('[data-slot="popover-content"]')
-    );
+    await expectExitBeforeUnmount(panel);
   },
 };
 

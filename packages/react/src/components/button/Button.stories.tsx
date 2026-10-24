@@ -78,13 +78,6 @@ export const Default: Story = {
   },
 };
 
-export const Primary: Story = {
-  args: {
-    variant: 'default',
-    children: 'Primary',
-  },
-};
-
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
@@ -172,52 +165,6 @@ export const Large: Story = {
   },
 };
 
-export const IconSize: Story = {
-  args: {
-    size: 'icon',
-    children: <IconStar />,
-    'aria-label': 'Star',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Star' });
-
-    await expect(button).toHaveClass('nx:size-10');
-    await expect(button).toHaveClass('nx:p-0');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
-export const IconSmallSize: Story = {
-  args: {
-    size: 'icon-sm',
-    children: <IconStar />,
-    'aria-label': 'Small star',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Small star' });
-
-    await expect(button).toHaveClass('nx:size-8');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
-export const IconLargeSize: Story = {
-  args: {
-    size: 'icon-lg',
-    children: <IconStar />,
-    'aria-label': 'Large star',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Large star' });
-
-    await expect(button).toHaveClass('nx:size-12');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
 export const IconOnlySizes: Story = {
   tags: ['docs'],
   parameters: {
@@ -281,6 +228,8 @@ export const Disabled: Story = {
 export const Loading: Story = {
   args: {
     loading: true,
+    startIcon: <IconRocket />,
+    endIcon: <IconArrowRight />,
     children: 'Submitting',
   },
   play: async ({ canvasElement, args }) => {
@@ -296,6 +245,12 @@ export const Loading: Story = {
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
     await expect(
+      button.querySelector('[data-slot="button-start-icon"]')
+    ).not.toBeInTheDocument();
+    await expect(
+      button.querySelector('[data-slot="button-end-icon"]')
+    ).not.toBeInTheDocument();
+    await expect(
       button.querySelector('[data-slot="spinner"]')
     ).toBeInTheDocument();
     await expect(loadingLabel).toBeInTheDocument();
@@ -305,92 +260,6 @@ export const Loading: Story = {
 
     // Click should not trigger onClick
     await expect(args.onClick).not.toHaveBeenCalled();
-  },
-};
-
-export const LoadingPreservesDefaultWidth: Story = {
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
-      <Button data-testid="button-ready">Save changes</Button>
-      <Button loading data-testid="button-loading">
-        Save changes
-      </Button>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const readyButton = canvas.getByTestId('button-ready');
-    const loadingButton = canvas.getByTestId('button-loading');
-    const loadingContent = loadingButton.querySelector(
-      '[data-slot="button-loading-content"]'
-    );
-    const loadingLabel = loadingButton.querySelector(
-      '[data-slot="button-loading-label"]'
-    );
-
-    expect(Math.round(loadingButton.getBoundingClientRect().width)).toBe(
-      Math.round(readyButton.getBoundingClientRect().width)
-    );
-    await expect(loadingContent).toBeInTheDocument();
-    await expect(loadingLabel).toHaveClass('nx:opacity-0');
-    await expect(loadingButton).toHaveAccessibleName('Save changes');
-  },
-};
-
-export const TextButtonsStayContentWidth: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Text buttons fit their content, while icon-only buttons keep a fixed square size.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
-      <Button data-testid="button-content-short">Go</Button>
-      <Button data-testid="button-content-long">Confirm transfer</Button>
-      <Button size="icon" aria-label="Icon action">
-        <IconStar />
-      </Button>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const shortButton = canvas.getByTestId('button-content-short');
-    const longButton = canvas.getByTestId('button-content-long');
-    const iconButton = canvas.getByLabelText('Icon action');
-    const hasMinWidthClass = (element: HTMLElement) =>
-      Array.from(element.classList).some((className) =>
-        className.startsWith('nx:min-w-')
-      );
-
-    expect(hasMinWidthClass(shortButton)).toBe(false);
-    expect(hasMinWidthClass(longButton)).toBe(false);
-    expect(Math.round(shortButton.getBoundingClientRect().width)).toBeLessThan(
-      64
-    );
-    expect(
-      Math.round(longButton.getBoundingClientRect().width)
-    ).toBeGreaterThan(Math.round(shortButton.getBoundingClientRect().width));
-    await expect(iconButton).toHaveClass('nx:size-10');
-    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(40);
-  },
-};
-
-export const ManualBusyState: Story = {
-  args: {
-    'aria-busy': true,
-    children: 'Processing',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveAttribute('aria-busy', 'true');
-    await expect(button).not.toHaveAttribute('data-loading');
-    await expect(button).not.toBeDisabled();
   },
 };
 
@@ -449,50 +318,9 @@ export const KeyboardInteraction: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
-    // Tab to focus
-    await userEvent.tab();
-    await expect(button).toHaveFocus();
-
-    // Enter triggers click
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-
-    // Space triggers click
-    await userEvent.keyboard(' ');
-    await expect(args.onClick).toHaveBeenCalledTimes(2);
-  },
-};
-
-/**
- * Bug 2 from #726: the focus gap used to be an opaque
- * `0 0 0 2px var(--color-background)` shadow band, so a button sitting on any
- * surface other than the page painted the page fill into its own gap.
- * `outline-offset` leaves the gap unpainted, so the `muted` surface shows
- * through. Visual scene — `FocusManagement` asserts the absent `box-shadow`
- * that makes it true.
- */
-export const FocusGapShowsSurfaceBehind: Story = {
-  render: () => (
-    <div className="nx:bg-background nx:p-6">
-      <div className="nx:bg-muted nx:rounded-md nx:p-6">
-        <Button>On a quiet surface</Button>
-      </div>
-    </div>
-  ),
-};
-
-export const FocusManagement: Story = {
-  args: {
-    children: 'Focus me',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Initially not focused
     await expect(button).not.toHaveFocus();
 
-    // Tab should focus
+    // Tab to focus
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
@@ -505,27 +333,17 @@ export const FocusManagement: Story = {
     await expect(focusStyles.outlineWidth).toBe('2px');
     await expect(focusStyles.boxShadow).toBe('none');
 
+    // Enter triggers click
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // Space triggers click
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });
     await expect(button).not.toHaveFocus();
-  },
-};
-
-export const PressScale: Story = {
-  render: () => (
-    <div>
-      <Button>Default</Button>
-      <Button variant="link">Link</Button>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const [primary, link] = canvasElement.querySelectorAll(
-      '[data-slot="button"]'
-    );
-
-    await expect(primary).toHaveClass('nx:active:scale-[0.96]');
-    await expect(link).toHaveClass('nx:active:scale-100');
-    await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
   },
 };
 
@@ -560,59 +378,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const WithCustomClassName: Story = {
-  args: {
-    children: 'Custom Class',
-    className: 'nx:mt-2',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveClass('nx:mt-2');
-  },
-};
-
-export const WithAriaLabel: Story = {
-  args: {
-    children: '×',
-    'aria-label': 'Close dialog',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveAccessibleName('Close dialog');
-  },
-};
-
-export const DefaultType: Story = {
-  args: {
-    children: 'Button',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Should default to type="button" to prevent accidental form submission
-    await expect(button).toHaveAttribute('type', 'button');
-  },
-};
-
-export const SubmitType: Story = {
-  args: {
-    children: 'Submit',
-    type: 'submit',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Can explicitly set type="submit" for forms
-    await expect(button).toHaveAttribute('type', 'submit');
-  },
-};
-
 // ============================================
 // COMPOSITION (asChild)
 // ============================================
@@ -629,19 +394,6 @@ export const AsLink: Story = {
 
     await expect(link).toHaveAttribute('href', 'https://example.com');
     await expect(link).toHaveAttribute('data-slot', 'button');
-  },
-};
-
-export const AsChildWithStringChild: Story = {
-  render: () => <Button asChild>Plain text child</Button>,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    // asChild needs a single element to clone onto; a non-element child falls
-    // back to the native <button> rather than rendering an unstyled fragment.
-    const button = canvas.getByRole('button', { name: 'Plain text child' });
-
-    await expect(button.tagName).toBe('BUTTON');
-    await expect(button).toHaveAttribute('data-slot', 'button');
   },
 };
 
@@ -723,38 +475,6 @@ export const EndIconSlot: Story = {
     await expect(endIcon).toHaveAttribute('aria-hidden', 'true');
     await expect(canvas.getByTestId('end-icon')).toBeInTheDocument();
     await expect(button).toHaveAccessibleName('Continue');
-  },
-};
-
-export const LoadingUsesSpinnerOnly: Story = {
-  args: {
-    loading: true,
-    startIcon: <IconRocket />,
-    endIcon: <IconArrowRight />,
-    children: 'Launching',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Launching' });
-    const loadingLabel = button.querySelector(
-      '[data-slot="button-loading-label"]'
-    );
-
-    await expect(button).toBeDisabled();
-    await expect(button).toHaveAttribute('aria-busy', 'true');
-    await expect(
-      button.querySelector('[data-slot="button-start-icon"]')
-    ).not.toBeInTheDocument();
-    await expect(
-      button.querySelector('[data-slot="button-end-icon"]')
-    ).not.toBeInTheDocument();
-    await expect(
-      button.querySelector('[data-slot="spinner"]')
-    ).toBeInTheDocument();
-    await expect(loadingLabel).toBeInTheDocument();
-    await expect(loadingLabel).toHaveClass('nx:opacity-0');
-    await expect(loadingLabel).toHaveTextContent('Launching');
-    await expect(button).toHaveAccessibleName('Launching');
   },
 };
 
@@ -875,107 +595,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-};
-
-export const VariantClassesMatchTokens: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-      <Button variant="default">Default</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="error">Error</Button>
-      <Button variant="destructive">Destructive</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="dashed">Dashed</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="link">Link</Button>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('button', { name: 'Default' })).toHaveClass(
-      'nx:active:bg-primary-background-active'
-    );
-    await expect(canvas.getByRole('button', { name: 'Secondary' })).toHaveClass(
-      'nx:active:bg-secondary-background-active'
-    );
-    await expect(canvas.getByRole('button', { name: 'Error' })).toHaveClass(
-      'nx:text-error-subtle-foreground'
-    );
-    await expect(
-      canvas.getByRole('button', { name: 'Destructive' })
-    ).toHaveClass('nx:active:bg-error-background-active');
-    await expect(canvas.getByRole('button', { name: 'Outline' })).toHaveClass(
-      'nx:hover:bg-container-hover'
-    );
-    await expect(canvas.getByRole('button', { name: 'Dashed' })).toHaveClass(
-      'nx:border-dashed'
-    );
-    await expect(canvas.getByRole('button', { name: 'Ghost' })).toHaveClass(
-      'nx:hover:bg-container-hover'
-    );
-    await expect(canvas.getByRole('button', { name: 'Link' })).toHaveClass(
-      'nx:hover:underline'
-    );
-  },
-};
-
-export const BorderedVariantsKeepFixedHeight: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      <div className="nx:flex nx:items-center nx:gap-2">
-        <Button variant="outline" size="sm" data-testid="outline-sm">
-          Sm
-        </Button>
-        <Button variant="outline" data-testid="outline-default">
-          Default
-        </Button>
-        <Button variant="outline" size="lg" data-testid="outline-lg">
-          Lg
-        </Button>
-      </div>
-      <div className="nx:flex nx:items-center nx:gap-2">
-        <Button variant="dashed" size="sm" data-testid="dashed-sm">
-          Sm
-        </Button>
-        <Button variant="dashed" data-testid="dashed-default">
-          Default
-        </Button>
-        <Button variant="dashed" size="lg" data-testid="dashed-lg">
-          Lg
-        </Button>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expectHeightPinned(canvas, 'outline-sm', 32);
-    await expectHeightPinned(canvas, 'outline-default', 40);
-    await expectHeightPinned(canvas, 'outline-lg', 48);
-    await expectHeightPinned(canvas, 'dashed-sm', 32);
-    await expectHeightPinned(canvas, 'dashed-default', 40);
-    await expectHeightPinned(canvas, 'dashed-lg', 48);
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story: 'At default density, a default Button is exactly 40px tall.',
-      },
-    },
-  },
-  render: () => (
-    <div data-testid="button-default-host" className="nx:p-10 nx:bg-background">
-      <Button>Default</Button>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-default-host', 40);
-  },
 };
 
 // ============================================

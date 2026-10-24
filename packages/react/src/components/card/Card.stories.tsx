@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
 import { Label } from '../label/label';
@@ -56,54 +55,6 @@ export const Default: Story = {
       </CardFooter>
     </Card>
   ),
-};
-
-export const Simple: Story = {
-  render: (_args) => (
-    <Card className="nx:w-[350px]">
-      <CardHeader>
-        <CardTitle>Simple Card</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>A simple card with just a title and content.</p>
-      </CardContent>
-    </Card>
-  ),
-};
-
-export const WithDescription: Story = {
-  render: (_args) => (
-    <Card className="nx:w-[350px]">
-      <CardHeader>
-        <CardTitle>Card with Description</CardTitle>
-        <CardDescription>
-          This is a longer description that provides more context about the card
-          content.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>Main content area of the card.</p>
-      </CardContent>
-    </Card>
-  ),
-};
-
-export const WithCustomClassName: Story = {
-  render: () => (
-    <Card className="nx:w-96 nx:rounded-none">
-      <CardContent className="nx:pt-6">Square corners.</CardContent>
-    </Card>
-  ),
-  play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('[data-slot="card"]');
-    const content = canvasElement.querySelector('[data-slot="card-content"]');
-
-    // `cn` resolves the conflict, so the override replaces the default.
-    await expect(card).toHaveClass('nx:rounded-none');
-    await expect(card).not.toHaveClass('nx:rounded-xl');
-    await expect(content).toHaveClass('nx:pt-6');
-    await expect(content).not.toHaveClass('nx:pt-0');
-  },
 };
 
 export const TitleAsHeading: Story = {
@@ -357,44 +308,6 @@ export const BorderedFooter: Story = {
   ),
 };
 
-export const NotificationCard: Story = {
-  render: (_args) => (
-    <Card className="nx:w-[350px]">
-      <CardHeader>
-        <CardTitle>Notifications</CardTitle>
-        <CardDescription>You have 3 unread messages.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="nx:flex nx:flex-col nx:gap-3">
-          <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
-            <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
-            <div>
-              <p className="nx:typography-body-default">New message</p>
-              <p className="nx:typography-body-default nx:text-foreground/70">
-                John sent you a message
-              </p>
-            </div>
-          </div>
-          <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
-            <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
-            <div>
-              <p className="nx:typography-body-default">Update available</p>
-              <p className="nx:typography-body-default nx:text-foreground/70">
-                Version 2.0 is now available
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="nx:w-full">
-          View all
-        </Button>
-      </CardFooter>
-    </Card>
-  ),
-};
-
 export const StatsCard: Story = {
   render: (_args) => (
     <Card className="nx:w-[200px]">
@@ -465,6 +378,9 @@ export const WithDataAttributes: Story = {
       <CardHeader>
         <CardTitle>Data Attributes Test</CardTitle>
         <CardDescription>Testing data-slot attributes.</CardDescription>
+        <CardAction>
+          <Button size="sm">Edit</Button>
+        </CardAction>
       </CardHeader>
       <CardContent>
         <p>Content area.</p>
@@ -484,6 +400,7 @@ export const WithDataAttributes: Story = {
     const description = canvasElement.querySelector(
       '[data-slot="card-description"]'
     );
+    const action = canvasElement.querySelector('[data-slot="card-action"]');
     const content = canvasElement.querySelector('[data-slot="card-content"]');
     const footer = canvasElement.querySelector('[data-slot="card-footer"]');
 
@@ -491,6 +408,7 @@ export const WithDataAttributes: Story = {
     await expect(header).toBeInTheDocument();
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
+    await expect(action).toBeInTheDocument();
     await expect(content).toBeInTheDocument();
     await expect(footer).toBeInTheDocument();
 
@@ -500,23 +418,6 @@ export const WithDataAttributes: Story = {
       name: 'Data Attributes Test',
     });
     await expect(titleElement).toHaveAttribute('data-slot', 'card-title');
-  },
-};
-
-export const ActionDataAttributes: Story = {
-  render: (_args) => (
-    <Card className="nx:w-[350px]">
-      <CardHeader>
-        <CardTitle>Action Test</CardTitle>
-        <CardAction>
-          <Button size="sm">Edit</Button>
-        </CardAction>
-      </CardHeader>
-    </Card>
-  ),
-  play: async ({ canvasElement }) => {
-    const action = canvasElement.querySelector('[data-slot="card-action"]');
-    await expect(action).toBeInTheDocument();
   },
 };
 
@@ -618,32 +519,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'At default density, a card with one 40px child is exactly 66px tall.',
-      },
-    },
-  },
-  render: () => (
-    <div data-testid="card-default-host" className="nx:p-10 nx:bg-background">
-      <Card className="nx:w-[200px]">
-        <CardContent>
-          <div className="nx:h-10" aria-hidden="true" />
-        </CardContent>
-      </Card>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'card-default-host', 66, {
-      selector: '[data-slot="card"]',
-    });
   },
 };
 

@@ -6,7 +6,6 @@ import {
   IconFile,
   IconFileTypeDocx,
   IconFileTypePdf,
-  IconFileTypePng,
   IconFileTypeTxt,
   IconFileTypeZip,
   IconRefresh,
@@ -245,54 +244,6 @@ export const Sizes: Story = {
   ),
 };
 
-// The file-type glyphs a consumer maps their own MIME types onto.
-export const FileTypes: Story = {
-  render: () => (
-    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
-      {[
-        { name: 'report.pdf', size: '2.4 MB', icon: <IconFileTypePdf /> },
-        { name: 'notes.txt', size: '8 KB', icon: <IconFileTypeTxt /> },
-        { name: 'archive.zip', size: '18 MB', icon: <IconFileTypeZip /> },
-        { name: 'cover.png', size: '412 KB', icon: <IconFileTypePng /> },
-        { name: 'brief.docx', size: '96 KB', icon: <IconFileTypeDocx /> },
-        { name: 'data.bin', size: '1.1 MB', icon: <IconFile /> },
-      ].map((file) => (
-        <Attachment key={file.name}>
-          <AttachmentMedia variant="icon">{file.icon}</AttachmentMedia>
-          <AttachmentContent>
-            <AttachmentTitle>{file.name}</AttachmentTitle>
-            <AttachmentDescription>{file.size}</AttachmentDescription>
-          </AttachmentContent>
-          <AttachmentActions>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Remove ${file.name}`}
-            >
-              <IconX />
-            </Button>
-          </AttachmentActions>
-        </Attachment>
-      ))}
-    </div>
-  ),
-};
-
-// The vertical tile: media fills the card width, name sits beneath.
-export const VerticalOrientation: Story = {
-  render: () => (
-    <Attachment orientation="vertical">
-      <AttachmentMedia variant="image">
-        <img src={THUMB} alt="" />
-      </AttachmentMedia>
-      <AttachmentContent>
-        <AttachmentTitle>cover.png</AttachmentTitle>
-        <AttachmentDescription>412 KB</AttachmentDescription>
-      </AttachmentContent>
-    </Attachment>
-  ),
-};
-
 // A composer strip — mixed file types scrolling horizontally.
 export const Grouped: Story = {
   tags: ['docs'],
@@ -510,60 +461,14 @@ export const Disabled: StoryObj<AttachmentProps & { onRemove: () => void }> = {
   },
 };
 
-// The trigger composes as a link via asChild.
-export const AsChild: Story = {
+export const WithDataAttributes: Story = {
   render: () => (
-    <Attachment className="nx:w-80">
+    <Attachment state="uploading" orientation="vertical">
       <AttachmentTrigger asChild>
         <a href="#report">
           <span className="nx:sr-only">Open report.pdf</span>
         </a>
       </AttachmentTrigger>
-      <AttachmentContent>
-        <AttachmentTitle>report.pdf</AttachmentTitle>
-      </AttachmentContent>
-    </Attachment>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link', { name: 'Open report.pdf' });
-
-    await expect(link).toHaveAttribute('href', '#report');
-    await expect(link).toHaveAttribute('data-slot', 'attachment-trigger');
-  },
-};
-
-// State reaches the DOM as data attributes, and is announced via role=status.
-// The live region is mounted even when nothing is being announced, so a later
-// state change lands in a region screen readers were already observing.
-export const SettledStatusRegion: Story = {
-  render: () => (
-    <Attachment state="done" className="nx:w-80">
-      <AttachmentMedia variant="icon">
-        <IconFileTypeTxt />
-      </AttachmentMedia>
-      <AttachmentContent>
-        <AttachmentTitle>notes.txt</AttachmentTitle>
-        <AttachmentDescription>8 KB</AttachmentDescription>
-      </AttachmentContent>
-    </Attachment>
-  ),
-  play: async ({ canvasElement }) => {
-    const status = canvasElement.querySelector(
-      '[data-slot="attachment-status"]'
-    );
-
-    // Present, so it is observed before any transition writes into it...
-    await expect(status).toBeInTheDocument();
-    await expect(status).toHaveAttribute('role', 'status');
-    // ...but silent, so a settled card announces nothing.
-    await expect(status).toHaveTextContent('');
-  },
-};
-
-export const WithDataAttributes: Story = {
-  render: () => (
-    <Attachment state="uploading" orientation="vertical">
       <AttachmentMedia variant="icon">
         <IconFileTypePdf />
       </AttachmentMedia>
@@ -613,6 +518,11 @@ export const WithDataAttributes: Story = {
     ).toHaveAttribute('data-item-part', 'description');
 
     await expect(canvas.getByRole('status')).toHaveTextContent('Uploading');
+
+    // The trigger composes as a link via asChild.
+    const link = canvas.getByRole('link', { name: 'Open report.pdf' });
+    await expect(link).toHaveAttribute('href', '#report');
+    await expect(link).toHaveAttribute('data-slot', 'attachment-trigger');
   },
 };
 

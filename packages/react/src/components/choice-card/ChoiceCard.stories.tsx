@@ -765,26 +765,6 @@ export const EdgeCases: Story = {
   },
 };
 
-export const Dark: Story = {
-  render: () => (
-    <div className="dark nx:grid nx:w-96 nx:max-w-full nx:gap-3 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
-      <CheckboxChoiceCard
-        id="choice-card-dark"
-        defaultChecked
-        title="Dark mode card"
-        description="Semantic tokens adapt across themes."
-      />
-      <RadioChoiceCard
-        id="choice-card-dark-radio"
-        trailing
-        variant="borderless"
-        title="Dark radio card"
-        description="Radio card states use the same semantic tokens."
-      />
-    </div>
-  ),
-};
-
 export const AllVariants: Story = {
   tags: ['docs'],
   parameters: {

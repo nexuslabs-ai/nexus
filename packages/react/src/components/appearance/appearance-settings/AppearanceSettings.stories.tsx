@@ -89,89 +89,93 @@ function SavedAppearanceExample({ storageKey }: { storageKey: string }) {
   );
 }
 
-function savedColorStory(brandColor: string, expectedLabel: string): Story {
-  const storageKey = `storybook-saved-brand-${brandColor}`;
-  return {
-    beforeEach: () => {
-      const previous = localStorage.getItem(storageKey);
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify(
-          createNxdsAppearanceSnapshotFromState({
-            ...DEFAULT_NXDS_APPEARANCE,
-            brandColor,
-          })
-        )
-      );
-      return () => {
-        if (previous === null) localStorage.removeItem(storageKey);
-        else localStorage.setItem(storageKey, previous);
-      };
-    },
-    render: () => <SavedAppearanceExample storageKey={storageKey} />,
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      await waitFor(() => {
-        expect(
-          canvas.getByRole('textbox', { name: 'Brand color hex value' })
-        ).toHaveValue(brandColor);
-      });
-      await expect(
-        canvas.getByRole('combobox', { name: 'Brand color preset' })
-      ).toHaveTextContent(expectedLabel);
-      const restored = JSON.parse(localStorage.getItem(storageKey)!);
-      await expect(restored.state).toEqual({
+const SAVED_APPEARANCE_KEY = 'storybook-saved-brand';
+
+function saveBrandColor(brandColor: string) {
+  localStorage.setItem(
+    SAVED_APPEARANCE_KEY,
+    JSON.stringify(
+      createNxdsAppearanceSnapshotFromState({
         ...DEFAULT_NXDS_APPEARANCE,
         brandColor,
-      });
-
-      const next = BRAND_COLOR_PRESETS.find(
-        (preset) => preset.value === 'teal'
-      )!;
-      await userEvent.click(
-        canvas.getByRole('combobox', { name: 'Brand color preset' })
-      );
-      const listbox = await within(document.body).findByRole('listbox');
-      await userEvent.click(
-        within(listbox).getByRole('option', { name: next.label })
-      );
-      await waitFor(() => {
-        expect(JSON.parse(localStorage.getItem(storageKey)!).state).toEqual({
-          ...DEFAULT_NXDS_APPEARANCE,
-          brandColor: next.color,
-        });
-      });
-      await userEvent.click(
-        canvas.getByRole('button', { name: 'Reload saved appearance' })
-      );
-      await waitFor(() => {
-        expect(
-          canvas.getByRole('textbox', { name: 'Brand color hex value' })
-        ).toHaveValue(next.color);
-        expect(
-          canvas.getByRole('combobox', { name: 'Brand color preset' })
-        ).toHaveTextContent(next.label);
-      });
-    },
-  };
+      })
+    )
+  );
 }
 
-export const SavedPresetRestoration: Story = savedColorStory(
-  BRAND_COLOR_PRESETS.find(
-    (preset) => preset.value === 'blue'
-  )!.color.toUpperCase(),
-  'Blue'
-);
+async function expectRestoredBrandColor(
+  canvasElement: HTMLElement,
+  brandColor: string,
+  label: string
+) {
+  const canvas = within(canvasElement);
+  await waitFor(() => {
+    expect(
+      canvas.getByRole('textbox', { name: 'Brand color hex value' })
+    ).toHaveValue(brandColor);
+    expect(
+      canvas.getByRole('combobox', { name: 'Brand color preset' })
+    ).toHaveTextContent(label);
+  });
+  const restored = JSON.parse(localStorage.getItem(SAVED_APPEARANCE_KEY)!);
+  await expect(restored.state).toEqual({
+    ...DEFAULT_NXDS_APPEARANCE,
+    brandColor,
+  });
+}
 
-export const SavedCustomRestoration: Story = savedColorStory(
-  '#95bf47',
-  'Custom'
-);
+export const SavedPresetRestoration: Story = {
+  beforeEach: () => {
+    const previous = localStorage.getItem(SAVED_APPEARANCE_KEY);
+    saveBrandColor(
+      BRAND_COLOR_PRESETS.find(
+        (preset) => preset.value === 'blue'
+      )!.color.toUpperCase()
+    );
+    return () => {
+      if (previous === null) localStorage.removeItem(SAVED_APPEARANCE_KEY);
+      else localStorage.setItem(SAVED_APPEARANCE_KEY, previous);
+    };
+  },
+  render: () => <SavedAppearanceExample storageKey={SAVED_APPEARANCE_KEY} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const reload = canvas.getByRole('button', {
+      name: 'Reload saved appearance',
+    });
+    const blue = BRAND_COLOR_PRESETS.find((preset) => preset.value === 'blue')!;
+    await expectRestoredBrandColor(
+      canvasElement,
+      blue.color.toUpperCase(),
+      blue.label
+    );
 
-export const SavedCssColorRestoration: Story = savedColorStory(
-  'rgb(12 34 56)',
-  'Custom'
-);
+    for (const customColor of ['#95bf47', 'rgb(12 34 56)']) {
+      saveBrandColor(customColor);
+      await userEvent.click(reload);
+      await expectRestoredBrandColor(canvasElement, customColor, 'Custom');
+    }
+
+    const next = BRAND_COLOR_PRESETS.find((preset) => preset.value === 'teal')!;
+    await userEvent.click(
+      canvas.getByRole('combobox', { name: 'Brand color preset' })
+    );
+    const listbox = await within(document.body).findByRole('listbox');
+    await userEvent.click(
+      within(listbox).getByRole('option', { name: next.label })
+    );
+    await waitFor(() => {
+      expect(
+        JSON.parse(localStorage.getItem(SAVED_APPEARANCE_KEY)!).state
+      ).toEqual({
+        ...DEFAULT_NXDS_APPEARANCE,
+        brandColor: next.color,
+      });
+    });
+    await userEvent.click(reload);
+    await expectRestoredBrandColor(canvasElement, next.color, next.label);
+  },
+};
 
 async function expectSelectOptions(
   canvasElement: HTMLElement,

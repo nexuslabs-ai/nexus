@@ -25,9 +25,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { tags: ['docs'] };
 export const ClickInteraction: Story = {
+  render: (args) => (
+    <form aria-label="Filter form" onSubmit={(event) => event.preventDefault()}>
+      <FilterChip {...args} />
+    </form>
+  ),
   play: async ({ canvasElement, args }) => {
-    await userEvent.click(within(canvasElement).getByRole('button'));
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    const canvas = within(canvasElement);
+    const submit = fn();
+    const form = canvas.getByRole('form');
+    form.addEventListener('submit', submit);
+    try {
+      await userEvent.click(canvas.getByRole('button'));
+      await expect(args.onClick).toHaveBeenCalledTimes(1);
+      await expect(submit).not.toHaveBeenCalled();
+    } finally {
+      form.removeEventListener('submit', submit);
+    }
   },
 };
 export const KeyboardInteraction: Story = {
@@ -54,26 +68,6 @@ export const WithDataAttributes: Story = {
     await expect(
       within(canvasElement).getByTestId('applied-filter')
     ).toHaveAttribute('data-slot', 'filter-chip');
-  },
-};
-export const InForm: Story = {
-  render: (args) => (
-    <form aria-label="Filter form" onSubmit={(event) => event.preventDefault()}>
-      <FilterChip {...args} />
-    </form>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const submit = fn();
-    const form = canvas.getByRole('form');
-    form.addEventListener('submit', submit);
-    try {
-      await userEvent.click(canvas.getByRole('button'));
-      await expect(args.onClick).toHaveBeenCalledTimes(1);
-      await expect(submit).not.toHaveBeenCalled();
-    } finally {
-      form.removeEventListener('submit', submit);
-    }
   },
 };
 export const LongLabel: Story = {

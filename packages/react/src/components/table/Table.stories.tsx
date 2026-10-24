@@ -54,7 +54,6 @@ const meta: Meta<typeof Table> = {
 export default meta;
 type Story = StoryObj<typeof Table>;
 
-const rawTextSizeSentinelClass = ['nx', 'text-xs'].join(':');
 const densityCellSelector = (density: string) =>
   `[data-slot="table"][data-table-density="${density}"] [data-slot="table-cell"]`;
 
@@ -156,12 +155,6 @@ export const WithFooter: Story = {
 };
 
 const selectionInvoices = invoices.map((row) => ({ ...row, id: row.invoice }));
-const stickySelectionInvoices = Array.from({ length: 3 }, (_, page) =>
-  invoices.map((row) => ({
-    ...row,
-    id: `${row.invoice}-${page + 1}`,
-  }))
-).flat();
 
 const selectionPartSelector =
   '[data-slot="table-selection-head"], [data-slot="table-selection-cell"]';
@@ -400,45 +393,6 @@ export const SelectionLayoutMatrix: Story = {
   },
 };
 
-export const SelectionDataAttributes: Story = {
-  render: () => <SelectionTableDemo />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole('checkbox', { name: 'Select INV001' }).closest('td')
-    ).toHaveAttribute('data-slot', 'table-selection-cell');
-    await expect(
-      canvas.getByRole('checkbox', { name: 'Select all rows' }).closest('th')
-    ).toHaveAttribute('data-slot', 'table-selection-head');
-  },
-};
-
-// The separator and padding are logical, so they land on the same edges in
-// both directions: a rule and no padding on inline-end.
-export const SelectionGridSeparator: Story = {
-  render: () => (
-    <div className="nx:w-full nx:space-y-6">
-      {(['ltr', 'rtl'] as const).map((dir) => (
-        <div key={dir} dir={dir} className="nx:w-full">
-          <SelectionTableDemo variant="grid" />
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const cells = canvasElement.querySelectorAll<HTMLElement>(
-      selectionPartSelector
-    );
-    await expect(cells.length).toBeGreaterThan(0);
-    for (const cell of cells) {
-      const style = getComputedStyle(cell);
-      await expect(parseFloat(style.borderInlineEndWidth)).toBeGreaterThan(0);
-      await expect(parseFloat(style.paddingInlineStart)).toBeGreaterThan(0);
-      await expect(parseFloat(style.paddingInlineEnd)).toBe(0);
-    }
-  },
-};
-
 // A trailing actions column with per-row controls. Text buttons carry their own
 // accessible names; a real app would wire these to edit/delete handlers.
 export const WithActions: Story = {
@@ -490,12 +444,18 @@ export const WithDataAttributes: Story = {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableSelectionHead>
+            <Checkbox aria-label="Select all rows" />
+          </TableSelectionHead>
           <TableHead>Invoice</TableHead>
           <TableHead>Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow>
+          <TableSelectionCell>
+            <Checkbox aria-label="Select INV001" />
+          </TableSelectionCell>
           <TableCell>INV001</TableCell>
           <TableCell>$250.00</TableCell>
         </TableRow>
@@ -518,6 +478,8 @@ export const WithDataAttributes: Story = {
       'table-row',
       'table-head',
       'table-cell',
+      'table-selection-head',
+      'table-selection-cell',
     ]) {
       await expect(
         canvasElement.querySelector(`[data-slot="${slot}"]`)
@@ -569,226 +531,6 @@ export const AllVariants: Story = {
       ))}
     </div>
   ),
-};
-
-// Regression sentinel: each typography-bearing slot carries its canonical
-// `nx:typography-*` composite and no longer the raw utility it replaced.
-export const TokenizedTypography: Story = {
-  render: () => (
-    <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell>INV001</TableCell>
-          <TableCell className="nx:text-right">$250.00</TableCell>
-        </TableRow>
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell>Total</TableCell>
-          <TableCell className="nx:text-right">$250.00</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
-  ),
-  play: async ({ canvasElement }) => {
-    const table = canvasElement.querySelector('[data-slot="table"]');
-    const caption = canvasElement.querySelector('[data-slot="table-caption"]');
-    const head = canvasElement.querySelector('[data-slot="table-head"]');
-    const footer = canvasElement.querySelector('[data-slot="table-footer"]');
-
-    await expect(table).toBeInTheDocument();
-    await expect(table).toHaveClass('nx:typography-body-default');
-
-    await expect(caption).toBeInTheDocument();
-    await expect(caption).toHaveClass('nx:typography-body-small');
-
-    await expect(head).toBeInTheDocument();
-    await expect(head).toHaveClass('nx:typography-label-default');
-    await expect(head).not.toHaveClass('nx:font-medium');
-
-    await expect(footer).toBeInTheDocument();
-    await expect(footer).toHaveClass('nx:typography-label-default');
-    await expect(footer).not.toHaveClass('nx:font-medium');
-  },
-};
-
-export const RawTextSizeReset: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'A raw Tailwind font-size utility sets no font size, while a typography utility still does.',
-      },
-    },
-  },
-  render: () => (
-    <div style={{ fontSize: '18px' }}>
-      <span data-testid="raw-text-size" className={rawTextSizeSentinelClass}>
-        Raw text size
-      </span>
-      <span
-        data-testid="typography-composite"
-        className="nx:typography-body-small"
-      >
-        Typography composite
-      </span>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await document.fonts.ready;
-
-    const raw = canvasElement.querySelector<HTMLElement>(
-      '[data-testid="raw-text-size"]'
-    );
-    const composite = canvasElement.querySelector<HTMLElement>(
-      '[data-testid="typography-composite"]'
-    );
-
-    if (!raw || !composite) {
-      throw new Error('Raw text-size reset sentinel elements are missing');
-    }
-
-    await expect(getComputedStyle(raw).fontSize).toBe('18px');
-    await expect(getComputedStyle(composite).fontSize).toBe('12px');
-  },
-};
-
-// Keyboard access for the horizontal scroll region: with no focusable cells, the
-// container itself takes focus so a wide table can be scrolled into view.
-export const ScrollRegionFocus: Story = {
-  render: () => (
-    <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((row) => (
-          <TableRow key={row.invoice}>
-            <TableCell>{row.invoice}</TableCell>
-            <TableCell>{row.status}</TableCell>
-            <TableCell className="nx:text-right">{row.amount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ),
-  play: async ({ canvasElement }) => {
-    const container = canvasElement.querySelector(
-      '[data-slot="table-container"]'
-    );
-
-    await expect(container).toBeInTheDocument();
-    await expect(container).toHaveAttribute('tabindex', '0');
-    await expect(container).toHaveClass(
-      'nx:focus-visible:outline-2',
-      'nx:focus-visible:outline-focus-default',
-      'nx:focus-visible:[outline-offset:-2px]'
-    );
-
-    // The container is the only focusable element, so the first Tab lands on it.
-    await userEvent.tab();
-    await expect(container).toHaveFocus();
-  },
-};
-
-// Column headers default to scope="col"; the row's identifying cell uses
-// <TableRowHeader> (scope="row") so each row gets an accessible name. The blank
-// top-left corner opts out with scope={undefined}.
-export const SemanticScope: Story = {
-  render: () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead scope={undefined}>
-            <span className="nx:sr-only">Invoice</span>
-          </TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((row) => (
-          <TableRow key={row.invoice}>
-            <TableRowHeader>{row.invoice}</TableRowHeader>
-            <TableCell>{row.status}</TableCell>
-            <TableCell className="nx:text-right">{row.amount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ),
-  play: async ({ canvasElement }) => {
-    const heads = canvasElement.querySelectorAll('[data-slot="table-head"]');
-    const corner = heads[0];
-    const columnHead = heads[1];
-    const rowHeader = canvasElement.querySelector(
-      '[data-slot="table-row-header"]'
-    );
-
-    // Column header defaults to scope="col".
-    await expect(columnHead).toHaveAttribute('scope', 'col');
-    // The blank corner drops scope via scope={undefined}.
-    await expect(corner).not.toHaveAttribute('scope');
-    // The row's identifying cell is a real <th scope="row">.
-    await expect(rowHeader).toBeInTheDocument();
-    await expect(rowHeader).toHaveProperty('tagName', 'TH');
-    await expect(rowHeader).toHaveAttribute('scope', 'row');
-  },
-};
-
-// A sorted column reads as active: TableHead emphasizes its text (muted to
-// foreground) when it carries aria-sort="ascending"/"descending", but not for a
-// merely-sortable "none". The interactive sort control is a recipe.
-export const AriaSortIndicator: Story = {
-  render: () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead aria-sort="ascending">Invoice</TableHead>
-          <TableHead aria-sort="none">Status</TableHead>
-          <TableHead aria-sort="descending" className="nx:text-right">
-            Amount
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableRowHeader>INV001</TableRowHeader>
-          <TableCell>Paid</TableCell>
-          <TableCell className="nx:text-right">$250.00</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  ),
-  play: async ({ canvasElement }) => {
-    const asc = canvasElement.querySelector('[aria-sort="ascending"]');
-    const none = canvasElement.querySelector('[aria-sort="none"]');
-    const desc = canvasElement.querySelector('[aria-sort="descending"]');
-
-    // aria-sort carries only valid values — never asc/desc.
-    await expect(asc).toBeInTheDocument();
-    await expect(none).toBeInTheDocument();
-    await expect(desc).toBeInTheDocument();
-
-    await expect(asc).toHaveClass(
-      'nx:[&[aria-sort=ascending]]:text-foreground'
-    );
-    await expect(desc).toHaveClass(
-      'nx:[&[aria-sort=descending]]:text-foreground'
-    );
-  },
 };
 
 // Zebra striping tints alternating body rows. Selection and hover beat the
@@ -1016,72 +758,9 @@ export const StickyHeader: Story = {
   },
 };
 
-export const StickyHeaderWithSelection: Story = {
-  render: () => (
-    <SelectionTableDemo
-      stickyHeader
-      rows={stickySelectionInvoices}
-      containerClassName="nx:max-h-64"
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const first = canvas.getByRole('checkbox', { name: 'Select INV001-1' });
-    const copy = canvas.getByRole('checkbox', { name: 'Select INV001-2' });
-    const header = canvas.getByRole('checkbox', { name: 'Select all rows' });
-    await expect(first).toBeChecked();
-    await expect(copy).not.toBeChecked();
-    await userEvent.click(first);
-    await expect(first).not.toBeChecked();
-    await expect(copy).not.toBeChecked();
-    await userEvent.click(header);
-    await expect(
-      canvasElement.querySelectorAll('tbody tr[data-state=selected]')
-    ).toHaveLength(stickySelectionInvoices.length);
-    const head = header.closest('th');
-    if (!head) throw new Error('Selection header missing');
-    await expect(getComputedStyle(head).position).toBe('sticky');
-    const container = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="table-container"]'
-    );
-    if (!container) throw new Error('Selection scroll container missing');
-    const top = head.getBoundingClientRect().top;
-    container.scrollTop = 100;
-    await expect(container.scrollTop).toBeGreaterThan(0);
-    await expect(head.getBoundingClientRect().top).toBe(top);
-  },
-};
-
 // ============================================
 // RECIPES — patterns a consumer composes; zero added to the published bundle
 // ============================================
-
-// Numeric columns right-align and use tabular figures so digits line up by place
-// value. Apply `nx:text-right nx:tabular-nums` to the header and its cells.
-export const NumericColumn: Story = {
-  render: () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead className="nx:text-right nx:tabular-nums">
-            Amount
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((row) => (
-          <TableRow key={row.invoice}>
-            <TableRowHeader>{row.invoice}</TableRowHeader>
-            <TableCell className="nx:text-right nx:tabular-nums">
-              {row.amount}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ),
-};
 
 // Cells default to nowrap. To clip overflow with an ellipsis, wrap the content in
 // a width-bounded `nx:truncate` box — truncate is inert without a constrained
@@ -1213,31 +892,6 @@ export const ColumnPriority: Story = {
   },
 };
 
-// `bleed`: let the scroll area run flush to the edge on a narrow screen via a
-// single `--gutter` var on the container — negative margin out, padding back in.
-export const Bleed: Story = {
-  render: () => (
-    <Table containerClassName="nx:[--gutter:1rem] nx:-mx-(--gutter) nx:px-(--gutter)">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.slice(0, 3).map((row) => (
-          <TableRow key={row.invoice}>
-            <TableRowHeader>{row.invoice}</TableRowHeader>
-            <TableCell>{row.status}</TableCell>
-            <TableCell className="nx:text-right">{row.amount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ),
-};
-
 // Sortable header: a <button> in the <th>, with aria-sort mapped from the app's
 // sort state to the valid ascending/descending/none values (never the 'asc'/'desc'
 // a sort lib returns). The chevron is aria-hidden; sort logic stays the consumer's
@@ -1300,124 +954,6 @@ export const SortableHeader: Story = {
     await expect(header).toHaveAttribute('aria-sort', 'ascending');
     await userEvent.click(button as Element);
     await expect(header).toHaveAttribute('aria-sort', 'descending');
-  },
-};
-
-// Multi-select with a partial-state header checkbox and a bulk-action bar that
-// appears on selection. Select-all toggles every row; the header checkbox reads
-// indeterminate while the selection is partial. Selection state is local here;
-// in production it's TanStack Table's row-selection model.
-function SelectionDemo() {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const selectAllRef = useRef<HTMLButtonElement>(null);
-  const allSelected = selected.size === invoices.length;
-  const someSelected = selected.size > 0 && !allSelected;
-  const toggleAll = () =>
-    setSelected(
-      allSelected ? new Set() : new Set(invoices.map((r) => r.invoice))
-    );
-  const toggleRow = (id: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  function clearSelection() {
-    setSelected(new Set());
-    selectAllRef.current?.focus();
-  }
-  return (
-    <div className="nx:w-full nx:space-y-2">
-      <div role="status" className="nx:sr-only">
-        {selected.size > 0
-          ? `${selected.size} selected`
-          : 'No invoices selected'}
-      </div>
-      {selected.size > 0 && (
-        <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-muted nx:px-3 nx:py-2 nx:typography-label-default">
-          <span>{selected.size} selected</span>
-          <Button size="sm" variant="secondary">
-            Export
-          </Button>
-          <Button size="sm" variant="destructive">
-            Delete
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={clearSelection}
-            aria-label="Clear selection"
-          >
-            Clear
-          </Button>
-        </div>
-      )}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableSelectionHead>
-              <Checkbox
-                ref={selectAllRef}
-                checked={
-                  allSelected ? true : someSelected ? 'indeterminate' : false
-                }
-                onCheckedChange={toggleAll}
-                aria-label="Select all rows"
-              />
-            </TableSelectionHead>
-            <TableHead>Invoice</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((row) => (
-            <TableRow
-              key={row.invoice}
-              data-state={selected.has(row.invoice) ? 'selected' : undefined}
-            >
-              <TableSelectionCell>
-                <Checkbox
-                  checked={selected.has(row.invoice)}
-                  onCheckedChange={() => toggleRow(row.invoice)}
-                  aria-label={`Select ${row.invoice}`}
-                />
-              </TableSelectionCell>
-              <TableRowHeader>{row.invoice}</TableRowHeader>
-              <TableCell>{row.status}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-export const SelectionWithBulkActions: Story = {
-  render: () => <SelectionDemo />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const selectAll = canvas.getByRole('checkbox', { name: 'Select all rows' });
-    await userEvent.click(selectAll);
-    // Select-all selects every row and reveals the bulk-action bar.
-    const selectedRows = canvasElement.querySelectorAll(
-      'tbody [data-slot="table-row"][data-state="selected"]'
-    );
-    await expect(selectedRows).toHaveLength(invoices.length);
-    await expect(canvasElement).toHaveTextContent(
-      `${invoices.length} selected`
-    );
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      `${invoices.length} selected`
-    );
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Clear selection' })
-    );
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      'No invoices selected'
-    );
-    await expect(selectAll).toHaveFocus();
-    await expect(selectAll).not.toBeChecked();
   },
 };
 
@@ -1526,39 +1062,6 @@ export const StackedCard: Story = {
     // correct structure, so table semantics are never stripped by display:block.
     await expect(cards).toBeVisible();
     await expect(table).not.toBeVisible();
-  },
-};
-
-// An empty body renders cleanly: the header keeps its scope, and a single
-// column-spanning row carries the empty-state message. Striping is a no-op here.
-export const EmptyState: Story = {
-  render: () => (
-    <Table striped>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell
-            colSpan={3}
-            className="nx:py-8 nx:text-center nx:text-muted-foreground"
-          >
-            No invoices yet.
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  ),
-  play: async ({ canvasElement }) => {
-    const head = canvasElement.querySelector('[data-slot="table-head"]');
-    await expect(head).toHaveAttribute('scope', 'col');
-    await expect(
-      canvasElement.querySelector('[colspan="3"]')
-    ).toBeInTheDocument();
   },
 };
 

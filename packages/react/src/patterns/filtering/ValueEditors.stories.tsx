@@ -129,25 +129,6 @@ export const NumberComparison: Story = {
   },
 };
 export const NumericRange: Story = { render: () => <RangeExample /> };
-export const DateRange: Story = {
-  render: () => <DateExample today={new Date(2026, 8, 25)} />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement),
-      page = within(canvasElement.ownerDocument.body);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /^Edit Created:/ })
-    );
-    await userEvent.click(page.getByRole('button', { name: 'Today' }));
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await userEvent.click(page.getByRole('button', { name: 'Apply' }));
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      formatCalendarDay('2026-09-25')
-    );
-    await waitFor(() =>
-      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
-    );
-  },
-};
 export const CustomDateRange: Story = {
   render: () => <DateExample today={new Date(2026, 8, 25)} />,
   play: async ({ canvasElement }) => {

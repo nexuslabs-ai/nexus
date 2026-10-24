@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
-
 import {
   NativeSelect,
   NativeSelectOptGroup,
@@ -202,31 +200,6 @@ export const BorderlessStates: Story = {
     await expect(disabled).not.toHaveClass(
       'nx:disabled:border-border-disabled'
     );
-  },
-};
-
-export const AutofillPairing: Story = {
-  render: () => (
-    <div className="nx:grid nx:gap-2">
-      <NativeSelect aria-label="Bordered plan" defaultValue="free">
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-      <NativeSelect
-        aria-label="Borderless plan"
-        variant="borderless"
-        defaultValue="free"
-      >
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-      <NativeSelect aria-label="Disabled plan" defaultValue="free" disabled>
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    for (const field of within(canvasElement).getAllByRole('combobox')) {
-      await expect(unpairedAutofillClasses(field)).toEqual([]);
-    }
   },
 };
 

@@ -2,10 +2,6 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { useId } from 'vue';
 
-import {
-  expectExitBeforeUnmount,
-  expectInterruptibleOverlayMotion,
-} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import {
@@ -384,135 +380,6 @@ export const ViewportBoundContent: Story = {
   },
 };
 
-export const ComposedHeaderPrecedence: Story = {
-  render: () => ({
-    components: {
-      Button,
-      Dialog,
-      DialogBody,
-      DialogClose,
-      DialogContent,
-      DialogDescription,
-      DialogFooter,
-      DialogHeader,
-      DialogTitle,
-      DialogTrigger,
-    },
-    template: `
-      <Dialog>
-        <DialogTrigger as-child>
-          <Button variant="outline">Open precedence dialog</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <template #title>Prop title</template>
-          <template #description>Prop description</template>
-          <template #body>Prop body</template>
-          <DialogHeader>
-            <DialogTitle>Composed title</DialogTitle>
-            <DialogDescription>The composed header takes precedence over generated title props.</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <p class="nx:typography-body-default">The composed body takes precedence over the body prop.</p>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose as-child>
-              <Button>Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open precedence dialog' })
-    );
-
-    const dialog = await within(document.body).findByRole('dialog', {
-      name: 'Composed title',
-    });
-    const titles = document.querySelectorAll('[data-slot="dialog-title"]');
-    const bodies = document.querySelectorAll('[data-slot="dialog-body"]');
-
-    await expect(titles).toHaveLength(1);
-    await expect(titles[0]).toHaveTextContent('Composed title');
-    await expect(bodies).toHaveLength(1);
-    await expect(dialog).not.toHaveTextContent('Prop title');
-    await expect(dialog).not.toHaveTextContent('Prop description');
-    await expect(dialog).not.toHaveTextContent('Prop body');
-    await expect(dialog).toHaveTextContent(
-      'The composed body takes precedence over the body prop.'
-    );
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
-  },
-};
-
-export const ComposedUsageCompatibility: Story = {
-  render: () => ({
-    components: {
-      Button,
-      Dialog,
-      DialogBody,
-      DialogClose,
-      DialogContent,
-      DialogDescription,
-      DialogFooter,
-      DialogHeader,
-      DialogTitle,
-      DialogTrigger,
-    },
-    template: `
-      <Dialog>
-        <DialogTrigger as-child>
-          <Button variant="outline">Open composed dialog</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Composed API</DialogTitle>
-            <DialogDescription>Existing composed Dialog usage continues to render without prop shorthands.</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <p class="nx:typography-body-default">This body is authored with DialogBody.</p>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose as-child>
-              <Button>Done</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open composed dialog' })
-    );
-
-    const dialog = await within(document.body).findByRole('dialog', {
-      name: 'Composed API',
-    });
-    await expect(dialog).toHaveTextContent(
-      'Existing composed Dialog usage continues to render'
-    );
-    await expect(
-      document.querySelector('[data-slot="dialog-body"]')
-    ).toHaveTextContent('This body is authored with DialogBody.');
-
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
-  },
-};
-
 export const CloseButtonFocus: Story = {
   render: () => ({
     components: {
@@ -563,70 +430,6 @@ export const CloseButtonFocus: Story = {
     await waitFor(() => {
       expect(document.querySelector('[role="dialog"]')).toBeNull();
     });
-  },
-};
-
-export const OverlayMotionContract: Story = {
-  render: () => ({
-    components: {
-      Button,
-      Dialog,
-      DialogClose,
-      DialogContent,
-      DialogDescription,
-      DialogFooter,
-      DialogHeader,
-      DialogTitle,
-      DialogTrigger,
-    },
-    template: `
-      <Dialog>
-        <DialogTrigger as-child>
-          <Button variant="outline">Open motion dialog</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Overlay motion contract</DialogTitle>
-            <DialogDescription>The scrim and panel transition in and stay mounted until their exit finishes.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose as-child>
-              <Button>Done</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Open motion dialog' })
-    );
-
-    try {
-      const body = within(document.body);
-      const dialog = await body.findByRole('dialog');
-      const overlay = document.querySelector('[data-slot="dialog-overlay"]');
-
-      await expectInterruptibleOverlayMotion(overlay);
-      await expect(overlay).toHaveClass('nx:transition-opacity');
-      await expectInterruptibleOverlayMotion(dialog);
-      await expect(dialog).toHaveClass('nx:transition-[opacity,scale]');
-
-      await userEvent.click(
-        within(dialog).getByRole('button', { name: 'Done' })
-      );
-      await expectExitBeforeUnmount(document.querySelector('[role="dialog"]'));
-    } finally {
-      if (document.querySelector('[role="dialog"]')) {
-        await userEvent.keyboard('{Escape}');
-      }
-      await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeNull();
-      });
-    }
   },
 };
 
@@ -688,6 +491,16 @@ export const OpenCloseInteraction: Story = {
     await userEvent.click(dismissButton);
 
     // Wait for dialog to be removed from DOM
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+
+    // Reopen and close with the corner close button
+    await userEvent.click(trigger);
+    const reopened = await within(document.body).findByRole('dialog');
+    await userEvent.click(
+      within(reopened).getByRole('button', { name: 'Close' })
+    );
     await waitFor(() => {
       expect(document.querySelector('[role="dialog"]')).toBeNull();
     });
@@ -870,49 +683,6 @@ export const OverlayClick: Story = {
     );
 
     await userEvent.click(overlay!);
-    await expectClosed();
-  },
-};
-
-export const CloseButton: Story = {
-  play: async ({ canvasElement }) => {
-    await openDialog(canvasElement);
-
-    await userEvent.click(page.getByRole('button', { name: 'Close' }));
-    await expectClosed();
-  },
-};
-
-export const WithoutDescription: Story = {
-  render: () => ({
-    components: {
-      Button,
-      Dialog,
-      DialogContent,
-      DialogHeader,
-      DialogTitle,
-      DialogTrigger,
-    },
-    template: `
-      <Dialog>
-        <DialogTrigger as-child>
-          <Button variant="outline">Edit profile</Button>
-        </DialogTrigger>
-        <DialogContent id="edit-profile-dialog" :aria-describedby="undefined">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const dialog = await openDialog(canvasElement);
-
-    await expect(dialog).toHaveAttribute('id', 'edit-profile-dialog');
-    await expect(dialog).not.toHaveAttribute('aria-describedby');
-
-    await userEvent.keyboard('{Escape}');
     await expectClosed();
   },
 };

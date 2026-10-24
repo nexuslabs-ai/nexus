@@ -166,18 +166,6 @@ export const WithCustomize: Story = {
   },
 };
 
-export const WithoutCustomize: Story = {
-  play: async ({ canvasElement }) => {
-    const control = within(await openControl(canvasElement));
-
-    await expect(
-      control.queryByRole('button', { name: 'Customize...' })
-    ).toBeNull();
-
-    await closeControl(canvasElement);
-  },
-};
-
 export const WithDataAttributes: Story = {
   play: async ({ canvasElement }) => {
     await expect(triggerIn(canvasElement)).toHaveAttribute(

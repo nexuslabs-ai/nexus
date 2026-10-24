@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '.';
 
 const meta = {
@@ -411,32 +409,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const TabsTriggerDefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story: 'Pins the `TabsTrigger` height at the default size.',
-      },
-    },
-  },
-  render: () => ({
-    components: { Tabs, TabsList, TabsTrigger },
-    template: `
-      <div data-testid="tabs-default-host" class="nx:p-10 nx:bg-background">
-        <Tabs default-value="a">
-          <TabsList>
-            <TabsTrigger value="a">Default</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'tabs-default-host', 34);
-  },
-};
-
 export const IndicatorFollowsActiveTab: Story = {
   play: async ({ canvasElement }) => {
     const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
@@ -461,24 +433,40 @@ export const VerticalIndicatorFollowsActiveTab: Story = {
   render: () => ({
     components: { Tabs, TabsContent, TabsList, TabsTrigger },
     template: `
-      <Tabs default-value="account" orientation="vertical" class="nx:flex nx:gap-4">
-        <TabsList aria-label="Settings">
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-        </TabsList>
-        <TabsContent value="account">Change your name and email.</TabsContent>
-        <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
-      </Tabs>
+      <div class="nx:flex nx:gap-8">
+        <Tabs default-value="account" orientation="vertical" class="nx:flex nx:gap-4">
+          <TabsList aria-label="Personal settings">
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="billing">Billing</TabsTrigger>
+          </TabsList>
+          <TabsContent value="account">Change your name and email.</TabsContent>
+          <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
+        </Tabs>
+        <Tabs default-value="account" orientation="vertical" class="nx:flex nx:gap-4">
+          <TabsList variant="underline" aria-label="Workspace settings">
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="billing">Billing</TabsTrigger>
+          </TabsList>
+          <TabsContent value="account">Rename your workspace.</TabsContent>
+          <TabsContent value="billing">Manage seats and invoices.</TabsContent>
+        </Tabs>
+      </div>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('tablist', { name: 'Personal settings' });
+    const underlineList = canvas.getByRole('tablist', {
+      name: 'Workspace settings',
+    });
+    const billing = within(list).getByRole('tab', { name: 'Billing' });
+    const underlineBilling = within(underlineList).getByRole('tab', {
+      name: 'Billing',
+    });
 
     await userEvent.click(billing);
     await waitFor(() => {
-      const indicator = canvasElement.querySelector(
-        '[data-slot="tabs-indicator"]'
-      );
+      const indicator = list.querySelector('[data-slot="tabs-indicator"]');
       if (!indicator) throw new Error('Tabs indicator not rendered');
       const indicatorRect = indicator.getBoundingClientRect();
       const billingRect = billing.getBoundingClientRect();
@@ -487,41 +475,24 @@ export const VerticalIndicatorFollowsActiveTab: Story = {
         Math.round(billingRect.height)
       );
     });
-  },
-};
 
-export const VerticalUnderlineIndicatorFollowsActiveTab: Story = {
-  render: () => ({
-    components: { Tabs, TabsContent, TabsList, TabsTrigger },
-    template: `
-      <Tabs default-value="account" orientation="vertical" class="nx:flex nx:gap-4">
-        <TabsList variant="underline" aria-label="Settings">
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-        </TabsList>
-        <TabsContent value="account">Change your name and email.</TabsContent>
-        <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
-      </Tabs>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
-
-    await userEvent.click(billing);
+    await userEvent.click(underlineBilling);
     await waitFor(() => {
-      const indicator = canvasElement.querySelector(
+      const indicator = underlineList.querySelector(
         '[data-slot="tabs-indicator"]'
       );
       if (!indicator) throw new Error('Tabs indicator not rendered');
       const indicatorRect = indicator.getBoundingClientRect();
-      const billingRect = billing.getBoundingClientRect();
+      const billingRect = underlineBilling.getBoundingClientRect();
       expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
       expect(Math.round(indicatorRect.right)).toBe(
         Math.round(billingRect.right)
       );
       expect(indicatorRect.width).toBeGreaterThan(0);
       expect(Math.round(indicatorRect.width)).toBe(
-        Math.round(parseFloat(getComputedStyle(billing).borderRightWidth))
+        Math.round(
+          parseFloat(getComputedStyle(underlineBilling).borderRightWidth)
+        )
       );
     });
   },

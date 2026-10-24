@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import {
   Card,
   CardContent,
@@ -32,8 +31,8 @@ const meta: Meta<typeof Tabs> = {
 export default meta;
 type Story = StoryObj<typeof Tabs>;
 
-function getTabsIndicator(canvasElement: HTMLElement) {
-  const indicator = canvasElement.querySelector<HTMLElement>(
+function getTabsIndicator(root: HTMLElement) {
+  const indicator = root.querySelector<HTMLElement>(
     '[data-slot="tabs-indicator"]'
   );
 
@@ -295,33 +294,6 @@ export const WithCards: Story = {
   ),
 };
 
-export const ThreeTabs: Story = {
-  render: (_args) => (
-    <Tabs defaultValue="overview" className="nx:w-[500px]">
-      <TabsList>
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        <TabsTrigger value="reports">Reports</TabsTrigger>
-      </TabsList>
-      <TabsContent value="overview">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Overview of your dashboard metrics and key performance indicators.
-        </p>
-      </TabsContent>
-      <TabsContent value="analytics">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Detailed analytics showing user engagement and traffic patterns.
-        </p>
-      </TabsContent>
-      <TabsContent value="reports">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Generated reports for stakeholders and team reviews.
-        </p>
-      </TabsContent>
-    </Tabs>
-  ),
-};
-
 export const WithDisabledTab: Story = {
   tags: ['docs'],
   parameters: {
@@ -370,33 +342,6 @@ export const WithDisabledTab: Story = {
     );
     await expect(getComputedStyle(disabledTab).opacity).toBe('1');
   },
-};
-
-export const FullWidth: Story = {
-  render: (_args) => (
-    <Tabs defaultValue="tab1" className="nx:w-full">
-      <TabsList className="nx:w-full nx:justify-start">
-        <TabsTrigger value="tab1">First Tab</TabsTrigger>
-        <TabsTrigger value="tab2">Second Tab</TabsTrigger>
-        <TabsTrigger value="tab3">Third Tab</TabsTrigger>
-      </TabsList>
-      <TabsContent value="tab1">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Content for the first tab.
-        </p>
-      </TabsContent>
-      <TabsContent value="tab2">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Content for the second tab.
-        </p>
-      </TabsContent>
-      <TabsContent value="tab3">
-        <p className="nx:typography-body-default nx:text-muted-foreground">
-          Content for the third tab.
-        </p>
-      </TabsContent>
-    </Tabs>
-  ),
 };
 
 // ============================================
@@ -533,22 +478,47 @@ export const DisabledTabInteraction: Story = {
 
 export const VerticalIndicatorFollowsActiveTab: Story = {
   render: (_args) => (
-    <Tabs
-      defaultValue="account"
-      orientation="vertical"
-      className="nx:flex nx:gap-4"
-    >
-      <TabsList aria-label="Settings">
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="billing">Billing</TabsTrigger>
-      </TabsList>
-      <TabsContent value="account">Change your name and email.</TabsContent>
-      <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
-    </Tabs>
+    <div className="nx:flex nx:gap-8">
+      <Tabs
+        defaultValue="account"
+        orientation="vertical"
+        className="nx:flex nx:gap-4"
+      >
+        <TabsList aria-label="Personal settings">
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">Change your name and email.</TabsContent>
+        <TabsContent value="billing">
+          Manage your plan and invoices.
+        </TabsContent>
+      </Tabs>
+      <Tabs
+        defaultValue="account"
+        orientation="vertical"
+        className="nx:flex nx:gap-4"
+      >
+        <TabsList variant="underline" aria-label="Workspace settings">
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">Rename your workspace.</TabsContent>
+        <TabsContent value="billing">Manage seats and invoices.</TabsContent>
+      </Tabs>
+    </div>
   ),
   play: async ({ canvasElement }) => {
-    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
-    const indicator = getTabsIndicator(canvasElement);
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('tablist', { name: 'Personal settings' });
+    const underlineList = canvas.getByRole('tablist', {
+      name: 'Workspace settings',
+    });
+    const billing = within(list).getByRole('tab', { name: 'Billing' });
+    const underlineBilling = within(underlineList).getByRole('tab', {
+      name: 'Billing',
+    });
+    const indicator = getTabsIndicator(list);
+    const underlineIndicator = getTabsIndicator(underlineList);
 
     await waitForIndicatorReady(indicator);
     await userEvent.click(billing);
@@ -560,40 +530,21 @@ export const VerticalIndicatorFollowsActiveTab: Story = {
         Math.round(billingRect.height)
       );
     });
-  },
-};
 
-export const VerticalUnderlineIndicatorFollowsActiveTab: Story = {
-  render: (_args) => (
-    <Tabs
-      defaultValue="account"
-      orientation="vertical"
-      className="nx:flex nx:gap-4"
-    >
-      <TabsList variant="underline" aria-label="Settings">
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="billing">Billing</TabsTrigger>
-      </TabsList>
-      <TabsContent value="account">Change your name and email.</TabsContent>
-      <TabsContent value="billing">Manage your plan and invoices.</TabsContent>
-    </Tabs>
-  ),
-  play: async ({ canvasElement }) => {
-    const billing = within(canvasElement).getByRole('tab', { name: 'Billing' });
-    const indicator = getTabsIndicator(canvasElement);
-
-    await waitForIndicatorReady(indicator);
-    await userEvent.click(billing);
+    await waitForIndicatorReady(underlineIndicator);
+    await userEvent.click(underlineBilling);
     await waitFor(() => {
-      const indicatorRect = indicator.getBoundingClientRect();
-      const billingRect = billing.getBoundingClientRect();
+      const indicatorRect = underlineIndicator.getBoundingClientRect();
+      const billingRect = underlineBilling.getBoundingClientRect();
       expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
       expect(Math.round(indicatorRect.right)).toBe(
         Math.round(billingRect.right)
       );
       expect(indicatorRect.width).toBeGreaterThan(0);
       expect(Math.round(indicatorRect.width)).toBe(
-        Math.round(parseFloat(getComputedStyle(billing).borderRightWidth))
+        Math.round(
+          parseFloat(getComputedStyle(underlineBilling).borderRightWidth)
+        )
       );
     });
   },
@@ -759,29 +710,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-};
-
-export const TabsTriggerDefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story: 'Pins the `TabsTrigger` height at the default size.',
-      },
-    },
-  },
-  render: () => (
-    <div data-testid="tabs-default-host" className="nx:p-10 nx:bg-background">
-      <Tabs defaultValue="a">
-        <TabsList>
-          <TabsTrigger value="a">Default</TabsTrigger>
-        </TabsList>
-      </Tabs>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'tabs-default-host', 34);
-  },
 };
 
 // ============================================

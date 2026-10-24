@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -84,25 +82,6 @@ type Story = StoryObj<typeof MultiSelect>;
 export const Default: Story = {
   tags: ['docs'],
   render: () => <Frameworks />,
-};
-
-export const WithDefaultValue: Story = {
-  render: () => <Frameworks defaultValues={['react', 'svelte']} />,
-};
-
-export const Controlled: Story = {
-  render: function ControlledStory() {
-    const [value, setValue] = React.useState(['react']);
-
-    return (
-      <div className="nx:flex nx:flex-col nx:gap-3">
-        <Frameworks values={value} onValuesChange={setValue} />
-        <output className="nx:typography-body-small nx:text-muted-foreground">
-          Selected: {value.join(', ') || 'none'}
-        </output>
-      </div>
-    );
-  },
 };
 
 export const Grouped: Story = {

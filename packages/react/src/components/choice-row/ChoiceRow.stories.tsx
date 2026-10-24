@@ -349,21 +349,6 @@ export const EdgeCases: Story = {
   },
 };
 
-export const Dark: Story = {
-  render: () => (
-    <div className="dark nx:w-80 nx:rounded-md nx:bg-background nx:p-4 nx:text-foreground">
-      <ChoiceRow htmlFor="choice-dark">
-        <Checkbox
-          id="choice-dark"
-          defaultChecked
-          aria-labelledby="choice-dark-title"
-        />
-        <ChoiceRowTitle id="choice-dark-title">Dark mode row</ChoiceRowTitle>
-      </ChoiceRow>
-    </div>
-  ),
-};
-
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:w-96 nx:max-w-full nx:flex-col nx:gap-6">

@@ -106,8 +106,6 @@ export const behaviourOnlyIn: Record<
   Record<string, string>
 > = {
   react: {
-    'alert/Playground':
-      'drives Storybook-only controls that build the children; it tests the story, not Alert',
     'dialog/NestedOverlayStacking':
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
   },
@@ -127,7 +125,6 @@ export const behaviourDifferences: Record<string, string> = {
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
-  'tabs/VerticalUnderlineIndicatorFollowsActiveTab': TABS_INDICATOR,
   'switch/Small':
     "a Vue docs story renders without args, so it can't spy on the emit; ClickInteraction asserts it",
 };
@@ -150,10 +147,6 @@ export const copies: [react: string, vue: string][] = [
   [
     'packages/react/src/stories/support/story-height-test-utils.ts',
     'packages/vue/src/stories/support/story-height-test-utils.ts',
-  ],
-  [
-    'packages/react/src/stories/support/overlay-motion-test-utils.ts',
-    'packages/vue/src/stories/support/overlay-motion-test-utils.ts',
   ],
 ];
 

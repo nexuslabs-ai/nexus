@@ -36,243 +36,6 @@ const meta: Meta<typeof Breadcrumb> = {
 export default meta;
 type Story = StoryObj<typeof Breadcrumb>;
 
-type PlaygroundArgs = {
-  itemCount: number;
-  showIcons: boolean;
-  iconOnly: boolean;
-  showMenus: boolean;
-  collapseMiddle: boolean;
-  constrainedWidth: boolean;
-};
-
-const playgroundCrumbs = [
-  {
-    label: 'Home',
-    href: '/home',
-    icon: IconHome,
-    menuItems: ['Dashboard', 'Activity', 'Reports'],
-  },
-  {
-    label: 'Workspace',
-    href: '/workspaces/team',
-    icon: IconFolder,
-    menuItems: ['Personal', 'Team', 'Archived'],
-  },
-  {
-    label: 'Projects',
-    href: '/projects',
-    icon: IconFolder,
-    menuItems: ['Components', 'Patterns', 'Tokens'],
-  },
-  {
-    label: 'Breadcrumb settings with a long page name',
-    href: '/components/breadcrumb',
-    icon: IconSettings,
-    menuItems: ['API', 'Stories', 'Changelog'],
-  },
-];
-
-function renderCrumbContent({
-  crumb,
-  iconOnly,
-  isCurrent,
-  showIcons,
-}: {
-  crumb: (typeof playgroundCrumbs)[number];
-  iconOnly: boolean;
-  isCurrent: boolean;
-  showIcons: boolean;
-}) {
-  const CrumbIcon = crumb.icon;
-  const showVisualIcon = showIcons || iconOnly;
-
-  if (iconOnly) {
-    return (
-      <>
-        <CrumbIcon aria-hidden />
-        {isCurrent ? <span className="nx:sr-only">{crumb.label}</span> : null}
-      </>
-    );
-  }
-
-  return (
-    <>
-      {showVisualIcon ? <CrumbIcon aria-hidden /> : null}
-      <span>{crumb.label}</span>
-    </>
-  );
-}
-
-function renderMenuContent(crumb: (typeof playgroundCrumbs)[number]) {
-  return (
-    <DropdownMenuContent align="start">
-      {crumb.menuItems.map((label) => (
-        <DropdownMenuItem key={label} asChild>
-          <a href={`${crumb.href}/${label.toLowerCase()}`}>{label}</a>
-        </DropdownMenuItem>
-      ))}
-    </DropdownMenuContent>
-  );
-}
-
-function renderPlaygroundItem({
-  crumb,
-  iconOnly,
-  isCurrent,
-  showIcons,
-  showMenus,
-}: {
-  crumb: (typeof playgroundCrumbs)[number];
-  iconOnly: boolean;
-  isCurrent: boolean;
-  showIcons: boolean;
-  showMenus: boolean;
-}) {
-  return (
-    <BreadcrumbItem key={crumb.label}>
-      {isCurrent ? (
-        <BreadcrumbPage>
-          {renderCrumbContent({ crumb, iconOnly, isCurrent, showIcons })}
-        </BreadcrumbPage>
-      ) : (
-        <BreadcrumbLink
-          href={crumb.href}
-          aria-label={iconOnly ? crumb.label : undefined}
-        >
-          {renderCrumbContent({ crumb, iconOnly, isCurrent, showIcons })}
-        </BreadcrumbLink>
-      )}
-      {showMenus ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <BreadcrumbMenuTrigger
-              aria-label={
-                isCurrent
-                  ? `Show related pages for ${crumb.label}`
-                  : `Show alternate paths for ${crumb.label}`
-              }
-            />
-          </DropdownMenuTrigger>
-          {renderMenuContent(crumb)}
-        </DropdownMenu>
-      ) : null}
-    </BreadcrumbItem>
-  );
-}
-
-function renderSeparator(key: string) {
-  return <BreadcrumbSeparator key={key} />;
-}
-
-// Compound playground for trying the breadcrumb anatomy without adding runtime
-// props to the component itself.
-export const Playground: StoryObj<PlaygroundArgs> = {
-  args: {
-    itemCount: 4,
-    showIcons: true,
-    iconOnly: false,
-    showMenus: true,
-    collapseMiddle: false,
-    constrainedWidth: false,
-  },
-  argTypes: {
-    itemCount: {
-      control: 'select',
-      options: [2, 3, 4],
-      description: 'Number of items.',
-    },
-    showIcons: {
-      control: 'boolean',
-      description: 'Shows a leading icon in each segment.',
-    },
-    iconOnly: {
-      control: 'boolean',
-      description: 'Shows icons only and keeps accessible names.',
-    },
-    showMenus: {
-      control: 'boolean',
-      description: 'Shows a menu trigger beside each segment.',
-    },
-    collapseMiddle: {
-      control: 'boolean',
-      description: 'Collapses middle items into the ellipsis menu.',
-    },
-    constrainedWidth: {
-      control: 'boolean',
-      description: 'Renders in a narrow container to show truncation.',
-    },
-  },
-  render: ({
-    collapseMiddle,
-    constrainedWidth,
-    iconOnly,
-    itemCount,
-    showIcons,
-    showMenus,
-  }) => {
-    const selectedCrumbs = playgroundCrumbs.slice(0, itemCount);
-    const shouldCollapse = collapseMiddle && selectedCrumbs.length > 3;
-    const visibleTrail = shouldCollapse
-      ? [
-          renderPlaygroundItem({
-            crumb: selectedCrumbs[0]!,
-            iconOnly,
-            isCurrent: false,
-            showIcons,
-            showMenus,
-          }),
-          renderSeparator('separator-ellipsis'),
-          <BreadcrumbItem key="ellipsis">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <BreadcrumbEllipsis />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {selectedCrumbs.slice(1, -1).map((crumb) => (
-                  <DropdownMenuItem key={crumb.label} asChild>
-                    <a href={crumb.href}>{crumb.label}</a>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </BreadcrumbItem>,
-          renderSeparator('separator-current'),
-          renderPlaygroundItem({
-            crumb: selectedCrumbs[selectedCrumbs.length - 1]!,
-            iconOnly,
-            isCurrent: true,
-            showIcons,
-            showMenus,
-          }),
-        ]
-      : selectedCrumbs.flatMap((crumb, index) => {
-          const isCurrent = index === selectedCrumbs.length - 1;
-          const item = renderPlaygroundItem({
-            crumb,
-            iconOnly,
-            isCurrent,
-            showIcons,
-            showMenus,
-          });
-
-          return index === 0
-            ? [item]
-            : [renderSeparator(`separator-${crumb.label}`), item];
-        });
-    const breadcrumb = (
-      <Breadcrumb>
-        <BreadcrumbList>{visibleTrail}</BreadcrumbList>
-      </Breadcrumb>
-    );
-
-    return constrainedWidth ? (
-      <div className="nx:w-[240px]">{breadcrumb}</div>
-    ) : (
-      breadcrumb
-    );
-  },
-};
-
 // A three-level trail ending on the current page.
 export const Default: Story = {
   tags: ['docs'],
@@ -536,34 +299,6 @@ export const LongContent: Story = {
   ),
 };
 
-// BreadcrumbLink composes with a custom element via asChild (e.g. a router
-// link), keeping the link styling and the data-slot hook.
-export const AsChild: Story = {
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <a href="/contacts" data-testid="router-link">
-              Home
-            </a>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Contacts</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-  play: async ({ canvasElement }) => {
-    // Slot merges BreadcrumbLink's props onto the child anchor.
-    const link = within(canvasElement).getByTestId('router-link');
-    await expect(link.tagName).toBe('A');
-    await expect(link).toHaveAttribute('data-slot', 'breadcrumb-link');
-  },
-};
-
 // Breadcrumb links are native anchors; the current page is a non-interactive span.
 export const KeyboardInteraction: Story = {
   render: () => (
@@ -618,14 +353,17 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-// Every structural part carries a data-slot hook; the current page advertises
+// Every structural part carries a data-slot hook, including a BreadcrumbLink
+// composed onto a custom anchor via asChild. The current page advertises
 // aria-current without pretending to be a disabled link.
 export const WithDataAttributes: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <BreadcrumbLink asChild>
+            <a href="/home">Home</a>
+          </BreadcrumbLink>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <BreadcrumbMenuTrigger aria-label="Show alternate paths for Home" />
@@ -672,6 +410,11 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector(`[data-slot="${slot}"]`)
       ).toBeInTheDocument();
     }
+
+    // Slot merges BreadcrumbLink's props onto the child anchor.
+    const link = within(canvasElement).getByRole('link', { name: 'Home' });
+    await expect(link.tagName).toBe('A');
+    await expect(link).toHaveAttribute('data-slot', 'breadcrumb-link');
 
     const page = canvasElement.querySelector('[data-slot="breadcrumb-page"]');
     await expect(page).toHaveAttribute('aria-current', 'page');

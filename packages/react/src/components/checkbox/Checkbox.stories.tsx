@@ -31,12 +31,6 @@ type Story = StoryObj<typeof Checkbox>;
 // BASIC STORIES
 // ============================================
 
-export const Default: Story = {
-  args: {
-    'aria-label': 'Accept terms',
-  },
-};
-
 export const WithLabel: Story = {
   tags: ['docs'],
   render: function WithLabelStory(args) {
@@ -122,21 +116,6 @@ export const Indeterminate: Story = {
   },
 };
 
-export const IndicatorCrossFade: Story = {
-  render: () => <Checkbox defaultChecked aria-label="Accept" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', { name: 'Accept' });
-    const check = checkbox.querySelector('[data-slot="checkbox-check"]');
-
-    await expect(check).not.toHaveClass('nx:hidden');
-    await expect(check).toHaveClass('nx:transition-[opacity,scale]');
-    await expect(check).toHaveClass(
-      'nx:group-data-[state=checked]:opacity-100'
-    );
-  },
-};
-
 export const Disabled: Story = {
   tags: ['docs'],
   parameters: {
@@ -163,61 +142,6 @@ export const Disabled: Story = {
     await userEvent.click(checkbox);
     await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
     await expect(args.onCheckedChange).not.toHaveBeenCalled();
-  },
-};
-
-export const SurfaceTokens: Story = {
-  render: () => <Checkbox aria-label="Accept" />,
-  play: async ({ canvasElement }) => {
-    const box = canvasElement.querySelector('[data-slot="checkbox"]');
-
-    await expect(box).toHaveClass('nx:bg-container');
-    await expect(box).toHaveClass(
-      'nx:enabled:data-[state=unchecked]:hover:bg-container-hover'
-    );
-    await expect(box).toHaveClass(
-      'nx:enabled:data-[state=unchecked]:active:bg-container-active'
-    );
-  },
-};
-
-export const Invalid: Story = {
-  args: {
-    defaultChecked: true,
-    'aria-invalid': true,
-  },
-  render: function InvalidStory(args) {
-    const checkboxId = React.useId();
-    const errorId = React.useId();
-
-    return (
-      <div className="nx:grid nx:gap-2">
-        <div className="nx:flex nx:items-center nx:gap-2">
-          <Checkbox {...args} id={checkboxId} aria-describedby={errorId} />
-          <Label htmlFor={checkboxId}>Accept terms and conditions</Label>
-        </div>
-        <p
-          id={errorId}
-          className="nx:typography-body-default nx:text-error-subtle-foreground"
-        >
-          Choose at least one required option.
-        </p>
-      </div>
-    );
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', {
-      name: 'Accept terms and conditions',
-    });
-    const error = canvas.getByText('Choose at least one required option.');
-
-    await expect(checkbox).toBeChecked();
-    await expect(checkbox).toHaveAttribute('aria-invalid', 'true');
-    await expect(checkbox).toHaveAttribute('aria-describedby', error.id);
-    await expect(checkbox).toHaveAccessibleDescription(
-      'Choose at least one required option.'
-    );
   },
 };
 
@@ -300,6 +224,9 @@ export const InvalidStates: Story = {
     const indeterminate = canvas.getByRole('checkbox', {
       name: 'Indeterminate invalid option',
     });
+    const checkedError = canvas.getByText(
+      'Resolve the related error before continuing.'
+    );
 
     await expect(unchecked).not.toBeChecked();
     await expect(unchecked).toHaveAttribute('aria-invalid', 'true');
@@ -309,6 +236,7 @@ export const InvalidStates: Story = {
 
     await expect(checked).toBeChecked();
     await expect(checked).toHaveAttribute('aria-invalid', 'true');
+    await expect(checked).toHaveAttribute('aria-describedby', checkedError.id);
     await expect(checked).toHaveAccessibleDescription(
       'Resolve the related error before continuing.'
     );

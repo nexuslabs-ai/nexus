@@ -53,10 +53,6 @@ export const Empty: Story = {
   },
 };
 
-export const Half: Story = {
-  args: { value: 50 },
-};
-
 export const Full: Story = {
   args: { value: 100 },
   play: async ({ canvasElement }) => {

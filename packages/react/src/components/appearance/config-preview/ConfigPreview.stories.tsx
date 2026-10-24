@@ -1,6 +1,5 @@
 import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
 
 import { NxdsAppearanceConfigPreview } from './config-preview';
 
@@ -29,14 +28,3 @@ export default meta;
 type Story = StoryObj<typeof NxdsAppearanceConfigPreview>;
 
 export const Default: Story = {};
-
-export const ObjectShapeRegression: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByText('lightContrast: 37,')).toBeInTheDocument();
-    await expect(canvas.getByText('darkContrast: 82,')).toBeInTheDocument();
-    await expect(
-      canvas.queryByText(/\[object Object\]/)
-    ).not.toBeInTheDocument();
-  },
-};

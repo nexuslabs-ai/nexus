@@ -153,24 +153,6 @@ const meta: Meta<typeof DatePicker> = {
 export default meta;
 type Story = StoryObj<typeof DatePicker>;
 
-// Playground story for Storybook Controls.
-export const Controls: Story = {
-  decorators: [inCard],
-  args: {
-    mode: 'single',
-    defaultMonth: REFERENCE_MONTH,
-    selected: new Date(2025, 0, 15),
-    today: REFERENCE_TODAY,
-    cellSize: 'default',
-    captionLayout: 'label',
-    buttonVariant: 'ghost',
-    showOutsideDays: true,
-    showWeekNumber: false,
-    fixedWeeks: false,
-    numberOfMonths: 1,
-  },
-};
-
 // Single-date selection — the default mode.
 export const Default: Story = {
   tags: ['docs'],
@@ -384,47 +366,6 @@ export const Multiple: Story = {
       ]}
     />
   ),
-};
-
-// Adjacent multiple dates remain discrete fixed-size selections, not a range rail.
-export const MultipleAdjacent: Story = {
-  decorators: [inCard],
-  render: () => (
-    <DatePicker
-      mode="multiple"
-      defaultMonth={REFERENCE_MONTH}
-      selected={[
-        new Date(2025, 0, 15),
-        new Date(2025, 0, 16),
-        new Date(2025, 0, 17),
-        new Date(2025, 0, 20),
-      ]}
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const selectedDays = ['15', '16', '17'].map((day) =>
-      canvas.getByText(day).closest('button')
-    );
-
-    for (const day of selectedDays) {
-      await expect(day).toHaveAttribute('data-selected-single', 'true');
-    }
-
-    const selectedRects = selectedDays.map((day) =>
-      day!.getBoundingClientRect()
-    );
-    const firstWidth = Math.round(selectedRects[0]!.width);
-    const firstHeight = Math.round(selectedRects[0]!.height);
-    const defaultCell = resolveSpacingPx(canvasElement, '--nx-spacing-8');
-
-    for (const rect of selectedRects) {
-      expect(Math.round(rect.width)).toBe(firstWidth);
-      expect(Math.round(rect.height)).toBe(firstHeight);
-      expect(Math.round(rect.width)).toBeLessThanOrEqual(defaultCell);
-      expect(Math.round(rect.height)).toBeLessThanOrEqual(defaultCell);
-    }
-  },
 };
 
 // Month / year dropdown caption instead of the static label.

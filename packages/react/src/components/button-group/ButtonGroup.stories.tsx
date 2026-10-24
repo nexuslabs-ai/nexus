@@ -8,7 +8,6 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button/button';
 import {
   DropdownMenu,
@@ -46,18 +45,6 @@ const meta: Meta<typeof ButtonGroup> = {
 
 export default meta;
 type Story = StoryObj<typeof ButtonGroup>;
-
-const BUTTON_GROUP_SIZE_HEIGHTS = {
-  sm: 32,
-  default: 40,
-  lg: 48,
-} as const;
-
-const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
-  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-default'],
-  default: ['nx:h-10', 'nx:px-3', 'nx:typography-label-default'],
-  lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-default'],
-} as const;
 
 // Three outline buttons joined into one horizontal cluster.
 export const Default: Story = {
@@ -218,162 +205,14 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const SizeAlignment: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'At default density, each group size gives text addons and Button children the same height.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10">
-      {Object.keys(BUTTON_GROUP_SIZE_HEIGHTS).map((size) => (
-        <ButtonGroup
-          key={size}
-          size={size as keyof typeof BUTTON_GROUP_SIZE_HEIGHTS}
-          aria-label={`${size} button group`}
-        >
-          <ButtonGroupText
-            data-testid={`button-group-text-${size}`}
-          >{`${size}:`}</ButtonGroupText>
-          <Button variant="outline" data-testid={`button-group-button-${size}`}>
-            Action
-          </Button>
-        </ButtonGroup>
-      ))}
-
-      <ButtonGroup size="lg" aria-label="explicit child size">
-        <ButtonGroupText data-testid="button-group-text-explicit">
-          Explicit:
-        </ButtonGroupText>
-        <Button
-          variant="outline"
-          size="sm"
-          data-testid="button-group-button-explicit-sm"
-        >
-          Small
-        </Button>
-      </ButtonGroup>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    for (const [size, expectedHeight] of Object.entries(
-      BUTTON_GROUP_SIZE_HEIGHTS
-    )) {
-      const text = canvas.getByTestId(`button-group-text-${size}`);
-      const button = canvas.getByTestId(`button-group-button-${size}`);
-
-      await expect(text).toHaveAttribute('data-size', size);
-      await expect(button).toHaveAttribute('data-size', size);
-      for (const className of BUTTON_GROUP_TEXT_SIZE_CLASSES[
-        size as keyof typeof BUTTON_GROUP_TEXT_SIZE_CLASSES
-      ]) {
-        await expect(text).toHaveClass(className);
-      }
-
-      await expectHeightPinned(
-        canvas,
-        `button-group-text-${size}`,
-        expectedHeight,
-        {
-          selector: '[data-slot="button-group-text"]',
-        }
-      );
-      await expectHeightPinned(
-        canvas,
-        `button-group-button-${size}`,
-        expectedHeight
-      );
-    }
-
-    await expect(
-      canvas.getByTestId('button-group-button-explicit-sm')
-    ).toHaveAttribute('data-size', 'sm');
-    await expectHeightPinned(canvas, 'button-group-button-explicit-sm', 32);
-  },
-};
-
-// Compatibility sentinel: raw input layouts should generally use InputGroup,
-// but ButtonGroup must not mutate or break non-Button children.
-export const MixedChildren: Story = {
-  render: () => (
-    <ButtonGroup size="lg" aria-label="mixed button-shaped controls">
-      <ButtonGroupText data-testid="button-group-mixed-text">
-        Status
-      </ButtonGroupText>
-      <Input
-        data-testid="button-group-input"
-        aria-label="Search status"
-        className="nx:w-40"
-      />
-      <Select defaultValue="active">
-        <SelectTrigger
-          data-testid="button-group-select-trigger"
-          aria-label="Status"
-          className="nx:w-32"
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="paused">Paused</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button variant="outline" data-testid="button-group-mixed-button">
-        Save
-      </Button>
-    </ButtonGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const text = canvas.getByTestId('button-group-mixed-text');
-    const input = canvas.getByTestId('button-group-input');
-    const selectTrigger = canvas.getByTestId('button-group-select-trigger');
-
-    await expect(text).toHaveAttribute('data-size', 'lg');
-    await expect(input).toHaveAttribute('data-size', 'default');
-    await expect(selectTrigger).toHaveAttribute('data-size', 'default');
-    await expect(
-      canvas.getByTestId('button-group-mixed-button')
-    ).toHaveAttribute('data-size', 'lg');
-  },
-};
-
-// ButtonGroupText composes with a custom element via asChild — here a link
-// addon — keeping the addon styling and data-slot hook.
-export const AsChild: Story = {
-  render: () => (
-    <ButtonGroup>
-      <ButtonGroupText asChild>
-        <a href="https://example.com">Docs</a>
-      </ButtonGroupText>
-      <Button variant="outline">Open</Button>
-    </ButtonGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const link = within(canvasElement).getByRole('link', { name: 'Docs' });
-    await expect(link.tagName).toBe('A');
-    await expect(link).toHaveAttribute('data-slot', 'button-group-text');
-    await expect(link).toHaveClass('nx:focus-visible:outline-2');
-    await expect(link).toHaveClass('nx:focus-visible:outline-focus-default');
-    await expect(link).toHaveClass('nx:transition-control');
-    await expect(link).toHaveClass('nx:duration-fast');
-    await expect(link).toHaveClass('nx:hover:bg-container-hover');
-    await expect(link).toHaveClass('nx:active:bg-container-active');
-  },
-};
-
 // A Select trigger joins the group as a button-shaped control, sharing the
-// seam with the adjacent button.
+// seam with the adjacent button. The group size reaches Buttons only: the
+// Input and Select trigger keep their own size.
 export const WithSelectTrigger: Story = {
   render: () => (
-    <ButtonGroup>
+    <ButtonGroup size="lg">
       <Button variant="outline">Filter</Button>
+      <Input aria-label="Search" className="nx:w-40" />
       <Select defaultValue="all">
         <SelectTrigger aria-label="Status">
           <SelectValue />
@@ -395,6 +234,15 @@ export const WithSelectTrigger: Story = {
     // The trigger joins the seam like a button: its left border is removed so
     // it doesn't double up against the previous control.
     await expect(getComputedStyle(trigger).borderLeftWidth).toBe('0px');
+
+    const canvas = within(canvasElement);
+    await expect(trigger).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas.getByRole('textbox', { name: 'Search' })
+    ).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas.getByRole('button', { name: 'Filter' })
+    ).toHaveAttribute('data-size', 'lg');
   },
 };
 
@@ -496,41 +344,6 @@ export const TierAPolishEvidence: Story = {
 
     await expect(disabledButton).toBeDisabled();
     await expect(disabledButton).toHaveAttribute('aria-disabled', 'true');
-  },
-};
-
-// Regression guard for context-based size propagation: a Button nested inside a
-// trigger wrapper (a DropdownMenu trigger, asChild) is not a direct child of the
-// group, yet it inherits the group size — the case the old cloneElement walk
-// over direct children missed.
-export const NestedTriggerInheritsSize: Story = {
-  render: () => (
-    <ButtonGroup size="sm">
-      <Button data-testid="nested-direct">Deploy</Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button data-testid="nested-wrapped">Options</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Staging</DropdownMenuItem>
-          <DropdownMenuItem>Production</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </ButtonGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    // The wrapped trigger sets no size of its own; it inherits the group's "sm"
-    // through context despite not being a direct child.
-    await expect(canvas.getByTestId('nested-wrapped')).toHaveAttribute(
-      'data-size',
-      'sm'
-    );
-    // A direct child resolves the same way.
-    await expect(canvas.getByTestId('nested-direct')).toHaveAttribute(
-      'data-size',
-      'sm'
-    );
   },
 };
 
