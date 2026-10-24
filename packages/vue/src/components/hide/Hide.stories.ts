@@ -3,7 +3,7 @@ import { expect, waitFor, within } from 'storybook/test';
 
 import { Hide } from '.';
 
-const meta = {
+const meta: Meta<typeof Hide> = {
   title: 'Primitives/Hide',
   component: Hide,
   parameters: {
@@ -15,10 +15,10 @@ const meta = {
     },
     layout: 'padded',
   },
-} satisfies Meta<typeof Hide>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Hide>;
 
 // ============================================
 // VISUAL

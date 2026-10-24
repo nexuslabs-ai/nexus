@@ -512,6 +512,19 @@ export const FocusBlurInteraction: Story = {
   },
 };
 
+// A plain `value` attribute renders as the field's value.
+export const StaticValue: Story = {
+  render: () => ({
+    components: { Input },
+    template: `<Input aria-label="Account id" value="acct_1024" readonly />`,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Account id' });
+    await expect(input).toHaveValue('acct_1024');
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     size: 'lg',

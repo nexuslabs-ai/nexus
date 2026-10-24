@@ -303,6 +303,21 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+// With no value set, the browser selects the first option.
+export const WithoutDefaultValue: Story = {
+  render: () => (
+    <NativeSelect aria-label="Plan">
+      <NativeSelectOption value="free">Free</NativeSelectOption>
+      <NativeSelectOption value="pro">Pro</NativeSelectOption>
+    </NativeSelect>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const select = canvas.getByRole('combobox', { name: 'Plan' });
+    await expect(select).toHaveValue('free');
+  },
+};
+
 // The wrapper, control, and icon carry data-slot hooks; the control carries data-size.
 export const WithDataAttributes: Story = {
   render: () => (

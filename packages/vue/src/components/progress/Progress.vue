@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<ProgressProps>(), {
     typeof value === 'number'
       ? `${Math.round((value / max) * 100)}%`
       : undefined,
+  getValueLabel: () => undefined,
 });
 const emits = defineEmits<ProgressRootEmits>();
 

@@ -50,6 +50,17 @@ export type VisibilityAxis =
       containerBelow: Breakpoint;
     };
 
+/** Props Show and Hide share; each adds its framework's attributes and children. */
+export type VisibilityProps = {
+  /**
+   * Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.
+   * Tag-only and non-semantic: `display: contents` can
+   * drop a semantic element's box from the accessibility tree, so put semantics
+   * on a child *inside* `<Show>` / `<Hide>` instead.
+   */
+  as?: 'span' | 'div';
+} & VisibilityAxis;
+
 /** Loose shape the resolver works with. */
 type AxisValues = {
   above?: Breakpoint;

@@ -5,7 +5,11 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 import { parse as parseSfc } from 'vue/compiler-sfc';
-import { createChecker, type PropertyMeta } from 'vue-component-meta';
+import {
+  createChecker,
+  type PropertyMeta,
+  type PropertyMetaSchema,
+} from 'vue-component-meta';
 
 import { importSpecifiers } from './files.mjs';
 import {
@@ -78,8 +82,28 @@ export function exportedParts(slug: string) {
 export function createVueChecker(): VueChecker {
   return createChecker(path.join(vueRoot, 'tsconfig.json'), {
     forceUseTs: true,
+    schema: true,
     printer: { newLine: ts.NewLineKind.LineFeed },
   });
+}
+
+/** A union schema's members as printed types, or null when one is not a plain type. */
+function unionMembers(schema: PropertyMetaSchema): string[] | null {
+  if (typeof schema === 'string') return [schema];
+  if (schema.kind !== 'enum' || !schema.schema) return null;
+  const members = schema.schema.map(unionMembers);
+  if (members.some((member) => member === null)) return null;
+  return members.flat() as string[];
+}
+
+/** A prop's type, with a union alias such as `Breakpoint` written out as its members. */
+function propType(prop: PropertyMeta) {
+  const type = prop.type.replace(/\s*\|\s*undefined$/, '');
+  if (!/^[A-Z]\w*$/.test(type)) return type;
+  const members = unionMembers(prop.schema)?.filter(
+    (member) => member !== 'undefined'
+  );
+  return members && members.length > 1 ? members.join(' | ') : type;
 }
 
 /** A prop's `withDefaults` value, held to the React props contract: a literal or nothing. */
@@ -116,7 +140,7 @@ export function partEntry({ name, file, meta }: VuePart): ComponentEntry {
       )
       .map((prop) => ({
         name: prop.name,
-        type: prop.type.replace(/\s*\|\s*undefined$/, ''),
+        type: propType(prop),
         required: prop.required,
         defaultValue: propDefault(prop, `${name}.${prop.name}`),
         description: prop.description,

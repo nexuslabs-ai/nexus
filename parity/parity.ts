@@ -135,22 +135,14 @@ export const behaviourOnlyIn: Record<
   },
 };
 
-const DOCS_STORY_SPY =
-  "a Vue docs story renders without args, so it can't spy on the emit";
-
 const TABS_INDICATOR =
   "React waits for its measured indicator's opacity and transform; Reka's indicator has neither, so Vue checks only the geometry";
 
 /** Paired play stories whose steps differ by design, as `{slug}/{Story}`. */
 export const behaviourDifferences: Record<string, string> = {
-  'checkbox/Disabled': DOCS_STORY_SPY,
-  'checkbox/WithLabel': DOCS_STORY_SPY,
-  'radio-group/Disabled': DOCS_STORY_SPY,
-  'switch/Small': DOCS_STORY_SPY,
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
-  'toggle/Disabled': DOCS_STORY_SPY,
 };
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */

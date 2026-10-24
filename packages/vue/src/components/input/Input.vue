@@ -32,10 +32,11 @@ const model = useVModel(props, 'modelValue', emits, {
 
 <template>
   <input
-    v-model="model"
+    :value="model"
     data-slot="input"
     :data-size="size"
     :data-variant="variant"
     :class="cn(inputVariants({ size, variant }), props.class)"
+    @input="model = ($event.target as HTMLInputElement).value"
   />
 </template>

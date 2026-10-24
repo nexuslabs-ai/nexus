@@ -1,8 +1,8 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
 import {
-  type VisibilityAxis,
   visibilityClassName,
+  type VisibilityProps,
 } from '../../lib/responsive-visibility';
 import { cn } from '../../lib/utils';
 
@@ -10,15 +10,8 @@ import { cn } from '../../lib/utils';
  * Props for Hide.
  */
 type HideProps = HTMLAttributes<HTMLElement> & {
-  /**
-   * Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.
-   * Tag-only and non-semantic: `display: contents` can
-   * drop a semantic element's box from the accessibility tree, so put semantics
-   * on a child *inside* `<Show>` / `<Hide>` instead.
-   */
-  as?: 'span' | 'div';
   children: ReactNode;
-} & VisibilityAxis;
+} & VisibilityProps;
 
 /**
  * Hides its children while a width condition matches. The opposite of `<Show>`.

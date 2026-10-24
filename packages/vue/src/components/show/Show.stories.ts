@@ -3,7 +3,7 @@ import { expect, waitFor, within } from 'storybook/test';
 
 import { Show } from '.';
 
-const meta = {
+const meta: Meta<typeof Show> = {
   title: 'Primitives/Show',
   component: Show,
   parameters: {
@@ -15,10 +15,10 @@ const meta = {
     },
     layout: 'padded',
   },
-} satisfies Meta<typeof Show>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Show>;
 
 // ============================================
 // VISUAL

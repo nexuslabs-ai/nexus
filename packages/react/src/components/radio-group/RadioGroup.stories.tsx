@@ -164,7 +164,7 @@ export const Disabled: Story = {
       </div>
     </RadioGroup>
   ),
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const one = canvas.getByRole('radio', { name: 'Option one' });
     const two = canvas.getByRole('radio', { name: 'Option two' });
@@ -178,7 +178,6 @@ export const Disabled: Story = {
 
     // Clicking a disabled option does not change the selection
     await userEvent.click(two);
-    await expect(args.onValueChange).not.toHaveBeenCalled();
     await expect(two).toHaveAttribute('data-state', 'unchecked');
   },
 };

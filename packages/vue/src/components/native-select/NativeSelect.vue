@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IconChevronDown } from '@tabler/icons-vue';
 import { useVModel } from '@vueuse/core';
-import type { HTMLAttributes } from 'vue';
+import { computed, type HTMLAttributes } from 'vue';
 
 import { cn } from '../../lib/utils';
 
@@ -32,6 +32,10 @@ const model = useVModel(props, 'modelValue', emits, {
   passive: true,
   defaultValue: props.defaultValue,
 });
+// Vue writes `''` for an undefined `value`, which would clear the native first-option selection.
+const valueAttrs = computed(() =>
+  model.value === undefined ? {} : { value: model.value }
+);
 </script>
 
 <template>
@@ -40,12 +44,12 @@ const model = useVModel(props, 'modelValue', emits, {
     class="nx:group/native-select nx:relative nx:w-full"
   >
     <select
-      v-bind="$attrs"
-      v-model="model"
+      v-bind="{ ...$attrs, ...valueAttrs }"
       data-slot="native-select"
       :data-size="size"
       :data-variant="variant"
       :class="cn(nativeSelectVariants({ size, variant }), props.class)"
+      @change="model = ($event.target as HTMLSelectElement).value"
     >
       <slot />
     </select>

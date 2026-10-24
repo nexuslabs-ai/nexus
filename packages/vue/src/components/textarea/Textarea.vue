@@ -30,9 +30,10 @@ const model = useVModel(props, 'modelValue', emits, {
 
 <template>
   <textarea
-    v-model="model"
+    :value="model"
     data-slot="textarea"
     :data-variant="variant"
     :class="cn(textareaVariants({ variant }), props.class)"
+    @input="model = ($event.target as HTMLTextAreaElement).value"
   />
 </template>
