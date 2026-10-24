@@ -89,7 +89,7 @@ export function createVueChecker(): VueChecker {
 }
 
 /** Type alias names declared in @nxds/vue that its public entry does not export. */
-function localAliasNames(checker: VueChecker) {
+export function localAliasNames(checker: VueChecker) {
   const program =
     checker.getProgram() ?? fail('the Vue checker has no program.');
   const exported = publicExports(program.getTypeChecker(), program, [
@@ -143,23 +143,19 @@ export function isOwnDeclaration(declarations: { file: string }[]) {
 
 /** Each part a component folder exports, with its `vue-component-meta` read once. */
 export function componentParts(checker: VueChecker, slug: string) {
-  const localAliases = localAliasNames(checker);
   return exportedParts(slug).map(({ name, file }) => ({
     name,
     file,
     meta: checker.getComponentMeta(file),
-    localAliases,
   }));
 }
 
 export type VuePart = ReturnType<typeof componentParts>[number];
 
-export function partEntry({
-  name,
-  file,
-  meta,
-  localAliases,
-}: VuePart): ComponentEntry {
+export function partEntry(
+  { name, file, meta }: VuePart,
+  localAliases: Set<string>
+): ComponentEntry {
   return {
     name,
     description: '',
@@ -179,8 +175,15 @@ export function partEntry({
   };
 }
 
-export function componentProps(checker: VueChecker, slug: string): PropsFile {
-  return toPropsFile(slug, componentParts(checker, slug).map(partEntry));
+export function componentProps(
+  checker: VueChecker,
+  localAliases: Set<string>,
+  slug: string
+): PropsFile {
+  return toPropsFile(
+    slug,
+    componentParts(checker, slug).map((part) => partEntry(part, localAliases))
+  );
 }
 
 // ── Install planning ────────────────────────────────────────────────────────

@@ -38,7 +38,7 @@ const valueAttrs = computed(() =>
 );
 
 const select = useTemplateRef('select');
-// A model reset to undefined blanks the select, so pick the first enabled option as React does.
+// A model reset to undefined blanks the select, so pick the first enabled option.
 watch(
   model,
   (value) => {

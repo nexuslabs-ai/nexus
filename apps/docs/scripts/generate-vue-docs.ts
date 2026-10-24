@@ -21,6 +21,7 @@ import {
   componentProps,
   createVueChecker,
   exportedSlugs,
+  localAliasNames,
   parseFile,
 } from '@nxds/source-model/vue-sources.ts';
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -338,6 +339,7 @@ rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(propsDir, { recursive: true });
 
 const checker = createVueChecker();
+const localAliases = localAliasNames(checker);
 const propsFiles: PropsFile[] = [];
 
 for (const slug of slugs) {
@@ -348,7 +350,7 @@ for (const slug of slugs) {
   /** Every package installing the component brings, its components' included. */
   const brings = new Set(walked.packages);
 
-  const propsFile = componentProps(checker, slug);
+  const propsFile = componentProps(checker, localAliases, slug);
   propsFiles.push(propsFile);
   writeFileSync(
     path.join(propsDir, `${slug}.json`),
