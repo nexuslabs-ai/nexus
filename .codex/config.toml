@@ -1,9 +1,6 @@
 [mcp_servers.chrome-devtools]
 command = "npx"
-args = [
-    "chrome-devtools-mcp@latest",
-    "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
-]
+args = ["chrome-devtools-mcp@latest"]
 
 [mcp_servers.figma]
 url = "https://mcp.figma.com/mcp"
