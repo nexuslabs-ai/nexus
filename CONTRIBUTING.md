@@ -146,7 +146,7 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ## Browser MCP (chrome-devtools)
 
-`.mcp.json` and `.codex/config.toml` start `chrome-devtools-mcp`, which launches Google Chrome stable. If you don't have Chrome, or want another Chromium browser, point the server at it in its own config file:
+`.mcp.json` and `.codex/config.toml` start `chrome-devtools-mcp`, which launches Google Chrome stable. If you don't have Chrome, or want another Chromium browser, point the server at it in its own config file. On macOS, for Brave:
 
 ```json
 {
@@ -154,12 +154,12 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 }
 ```
 
-| OS            | Config file                                                            |
-| ------------- | ---------------------------------------------------------------------- |
-| macOS / Linux | `$XDG_CONFIG_HOME/cd4a/config.json`, else `~/.config/cd4a/config.json` |
-| Windows       | `%LOCALAPPDATA%\Google\cd4a\config.json`                               |
+| OS            | Config file                                                                 |
+| ------------- | --------------------------------------------------------------------------- |
+| macOS / Linux | `$XDG_CONFIG_HOME/cd4a/config.json`, else `~/.config/cd4a/config.json`      |
+| Windows       | `%LOCALAPPDATA%\Google\cd4a\config.json`, else `~/.config/cd4a/config.json` |
 
-The file applies in every MCP client, so you don't edit the repo config. A user-level `chrome-devtools` entry in Claude Code or Codex doesn't work, because the project config wins. Keep the file and its folder outside anything an agent can write to, so an agent can't change which browser the server launches.
+The file applies in every MCP client, so you don't edit the repo config. A user-level `chrome-devtools` entry in Claude Code or Codex doesn't work, because the project config wins. Make the file and its folder read-only to agents. An agent that edits the file controls the browser, its flags and the URLs it may open.
 
 ---
 
