@@ -178,6 +178,16 @@ export default tseslint.config(
     ],
     rules: { 'vuejs-accessibility/form-control-has-label': 'off' },
   },
+  // Label wrappers render Label around the consumer's control; the consumer's
+  // `for` reaches the `<label>` through their props.
+  {
+    files: [
+      'packages/vue/src/components/choice-card/ChoiceCard.vue',
+      'packages/vue/src/components/choice-row/ChoiceRow.vue',
+      'packages/vue/src/components/field/FieldLabel.vue',
+    ],
+    rules: { 'vuejs-accessibility/label-has-for': 'off' },
+  },
 
   // Import sorting
   {

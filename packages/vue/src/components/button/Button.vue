@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { Primitive, type PrimitiveProps } from 'reka-ui';
-import {
-  Comment,
-  computed,
-  type HTMLAttributes,
-  inject,
-  Text,
-  type VNode,
-} from 'vue';
+import { computed, type HTMLAttributes, inject, type VNode } from 'vue';
 
+import { renderedNodes } from '../../lib/slots';
 import { cn } from '../../lib/utils';
 import Spinner from '../spinner/Spinner.vue';
 
@@ -65,11 +59,7 @@ const sharedAttrs = computed(() => ({
 // native `<button>`, as React's Slot does.
 function rendersAsChild() {
   if (!props.asChild) return false;
-  const nodes = (slots.default?.() ?? []).filter(
-    (node) =>
-      node.type !== Comment &&
-      !(node.type === Text && !String(node.children).trim())
-  );
+  const nodes = renderedNodes(slots.default?.());
   return nodes.length === 1 && typeof nodes[0]?.type !== 'symbol';
 }
 </script>

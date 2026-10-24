@@ -266,6 +266,9 @@ function FieldSeparator({
   );
 }
 
+/** Validation errors for a field, in the shape form libraries report them. */
+type FieldErrors = Array<{ message?: string } | undefined>;
+
 /**
  * FieldErrorProps
  *
@@ -274,9 +277,9 @@ function FieldSeparator({
 interface FieldErrorProps extends React.ComponentProps<'div'> {
   /**
    * Validation errors to show. Duplicate messages show once, and several render
-   * as a list. Ignored when `children` is set.
+   * as a list. Ignored when the error has content of its own.
    */
-  errors?: Array<{ message?: string } | undefined>;
+  errors?: FieldErrors;
 }
 
 /**
@@ -341,6 +344,7 @@ export {
   FieldDescription,
   FieldError,
   type FieldErrorProps,
+  type FieldErrors,
   FieldGroup,
   FieldLabel,
   FieldLegend,
