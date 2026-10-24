@@ -1,36 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-
 import { useNxdsAppearance } from '@nxds/react/appearance';
 import { cn } from '@nxds/react/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { PAGE_MANIFEST } from '../_lib/manifest';
+import { isActive, NAV_LINKS } from '../_lib/nav-links';
 import { SITE_NAME } from '../_lib/site';
 
+import { MobileNav } from './MobileNav';
 import { Button } from './nxds';
 import { SearchPalette } from './SearchPalette';
 
-const NAV_LINKS = [
-  { href: '/playground', label: 'Playground', match: '/playground' },
-  ...PAGE_MANIFEST.map((section) => ({
-    href: section.href,
-    label: section.title,
-    match: section.href,
-  })),
-  { href: '/changelog', label: 'Changelog', match: '/changelog' },
-];
-
 const NAV_LINK_BASE =
   'nx:px-3 nx:py-1 nx:shrink-0 nx:typography-label-default nx:rounded-sm nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
-
-const PANEL_LINK_BASE = cn(NAV_LINK_BASE, 'nx:block nx:border-l-2');
-
-function isActive(pathname: string, match: string) {
-  return pathname === match || pathname.startsWith(match + '/');
-}
 
 function centerInStrip(link: HTMLAnchorElement | null) {
   const strip = link?.parentElement;
@@ -43,41 +26,8 @@ function centerInStrip(link: HTMLAnchorElement | null) {
 
 export function TopNav() {
   const pathname = usePathname();
-  const menuRef = useRef<HTMLElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedMode, setState } = useNxdsAppearance();
   const isDark = resolvedMode === 'dark';
-  const currentLink = NAV_LINKS.find((link) => isActive(pathname, link.match));
-
-  // relatedTarget is null when focus goes nowhere, not when it leaves the nav.
-  const closeOnFocusLeave = (event: React.FocusEvent<HTMLElement>) => {
-    if (!event.relatedTarget) return;
-    if (event.currentTarget.contains(event.relatedTarget)) return;
-    setMenuOpen(false);
-  };
-
-  useEffect(() => {
-    if (!menuOpen) return;
-
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (menuRef.current?.contains(event.target as Node)) return;
-      setMenuOpen(false);
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      triggerRef.current?.focus();
-      setMenuOpen(false);
-    };
-
-    document.addEventListener('pointerdown', closeOnOutsidePointer);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutsidePointer);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [menuOpen]);
 
   const toggleMode = () => {
     const nextMode = isDark ? 'light' : 'dark';
@@ -95,53 +45,15 @@ export function TopNav() {
           docs
         </span>
       </Link>
-      <nav
-        ref={menuRef}
-        aria-label="Sections"
-        onBlur={closeOnFocusLeave}
-        className="nx:relative nx:flex-1 nx:xl:hidden"
-      >
-        <Button
-          ref={triggerRef}
-          variant="ghost"
-          size="sm"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span aria-hidden="true">☰</span>
-          {currentLink?.label ?? 'Sections'}
-        </Button>
-        {menuOpen && (
-          <ul className="nx:absolute nx:top-full nx:left-0 nx:mt-1 nx:z-popover nx:min-w-48 nx:max-h-[70svh] nx:overflow-y-auto nx:list-none nx:m-0 nx:flex nx:flex-col nx:gap-0.5 nx:p-1 nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg">
-            {NAV_LINKS.map((link) => {
-              const active = isActive(pathname, link.match);
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    aria-current={active ? 'true' : undefined}
-                    className={cn(
-                      PANEL_LINK_BASE,
-                      active
-                        ? 'nx:border-focus-default nx:font-semibold nx:bg-primary-subtle nx:text-primary-subtle-foreground'
-                        : 'nx:border-transparent nx:hover:bg-popover-hover'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </nav>
+      <div className="nx:flex-1 nx:lg:hidden">
+        <MobileNav />
+      </div>
       <nav
         aria-label="Sections"
-        className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
+        className="nx:hidden nx:lg:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
         {NAV_LINKS.map((link) => {
-          const active = isActive(pathname, link.match);
+          const active = isActive(pathname, link.href);
           return (
             <Link
               key={link.href}
