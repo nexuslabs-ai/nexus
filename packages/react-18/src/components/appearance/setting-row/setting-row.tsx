@@ -1,0 +1,32 @@
+import type { ReactNode } from 'react';
+
+interface NxdsAppearanceSettingRowProps {
+  label: string;
+  description?: string;
+  children: ReactNode;
+}
+
+export function NxdsAppearanceSettingRow({
+  label,
+  description,
+  children,
+}: NxdsAppearanceSettingRowProps) {
+  return (
+    <div
+      data-slot="appearance-setting-row"
+      className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-4 nx:py-3"
+    >
+      <div className="nx:min-w-44 nx:space-y-0.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          {label}
+        </span>
+        {description ? (
+          <p className="nx:m-0 nx:typography-body-small nx:text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      <div className="nx:min-w-0 nx:max-w-full nx:shrink-0">{children}</div>
+    </div>
+  );
+}

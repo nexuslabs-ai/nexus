@@ -1,0 +1,18 @@
+/* @nxds/react component styles.
+ *
+ * Ships UTILITIES ONLY — design tokens are NOT emitted here. We @reference the
+ * nxds theme so Tailwind can generate utilities against it (and resolve the
+ * composite @utility / @custom-variant definitions) without outputting any
+ * `--color-*` / `--nx-color-*` variables. Consumers supply the tokens by
+ * importing `@nxds/tailwind`; that way importing this file can never re-define
+ * (and thus override / stale-out) a consumer's tokens.
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) prefix(nx);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(nx) source(none);
+@source './components';
+@source './hooks';
+@source './lib';
+@reference '@nxds/tailwind';
+@import 'tw-animate-css';
+@import './components/progress/progress.css';

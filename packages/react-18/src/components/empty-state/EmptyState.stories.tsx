@@ -1,0 +1,277 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { IconUsers } from '@tabler/icons-react';
+import { expect, userEvent, within } from 'storybook/test';
+
+import { Button } from '../button/button';
+
+import {
+  EmptyState,
+  EmptyStateContent,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+} from './empty-state';
+
+const meta: Meta<typeof EmptyState> = {
+  title: 'Components/EmptyState',
+  component: EmptyState,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'EmptyState explains why a list, table or record view has no content yet. Give it an icon, a title, a short description and an optional action.',
+      },
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof EmptyState>;
+
+// The canonical empty state: an icon medallion, a title, a description, and a
+// primary action.
+export const Default: Story = {
+  tags: ['docs'],
+  render: () => (
+    <EmptyState>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Add your first contact to start building your CRM.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+      <EmptyStateContent>
+        <Button>Add contact</Button>
+      </EmptyStateContent>
+    </EmptyState>
+  ),
+};
+
+// Header only — an empty state with no call to action.
+export const WithoutAction: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Leave out EmptyStateContent when there is no action to offer.',
+      },
+    },
+  },
+  render: () => (
+    <EmptyState>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No results</EmptyStateTitle>
+        <EmptyStateDescription>
+          Try adjusting your filters or search terms.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
+  ),
+};
+
+export const TitleAsHeading: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use `asChild` on EmptyStateTitle to render a real `h2` that names its section.',
+      },
+    },
+  },
+  render: () => (
+    <section aria-labelledby="empty-state-section-heading">
+      <EmptyState>
+        <EmptyStateHeader>
+          <EmptyStateMedia variant="icon">
+            <IconUsers aria-hidden />
+          </EmptyStateMedia>
+          <EmptyStateTitle asChild>
+            <h2 id="empty-state-section-heading">No contacts yet</h2>
+          </EmptyStateTitle>
+          <EmptyStateDescription>
+            The empty-state title can be the section heading without adding a
+            duplicate hidden heading.
+          </EmptyStateDescription>
+        </EmptyStateHeader>
+      </EmptyState>
+    </section>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', {
+      level: 2,
+      name: 'No contacts yet',
+    });
+
+    await expect(heading).toHaveAttribute('data-slot', 'empty-state-title');
+  },
+};
+
+// Every structural part carries a data-slot hook; the media advertises its
+// variant.
+export const WithDataAttributes: Story = {
+  render: () => (
+    <EmptyState>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+        <EmptyStateDescription>Add your first contact.</EmptyStateDescription>
+      </EmptyStateHeader>
+      <EmptyStateContent>
+        <Button>Add contact</Button>
+      </EmptyStateContent>
+    </EmptyState>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const slot of [
+      'empty-state',
+      'empty-state-header',
+      'empty-state-media',
+      'empty-state-title',
+      'empty-state-description',
+      'empty-state-content',
+    ]) {
+      await expect(
+        canvasElement.querySelector(`[data-slot="${slot}"]`)
+      ).toBeInTheDocument();
+    }
+
+    const media = canvasElement.querySelector(
+      '[data-slot="empty-state-media"]'
+    );
+    await expect(media).toHaveAttribute('data-variant', 'icon');
+  },
+};
+
+// Long copy stresses the centered text-balance wrapping; an inline link in the
+// description exercises the [&>a] anchor hooks — the only story that does.
+export const LongCopyWithLink: Story = {
+  render: () => (
+    <EmptyState>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>
+          No team members match the filters you have applied to this view
+        </EmptyStateTitle>
+        <EmptyStateDescription>
+          Try broadening your search, clearing a filter, or inviting someone
+          new. You can also{' '}
+          <a href="/docs/team">learn more about managing your team</a> in the
+          docs.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link', { name: /learn more/i });
+
+    await expect(link.parentElement).toHaveAttribute(
+      'data-slot',
+      'empty-state-description'
+    );
+    // underline-offset-4 is unique to the hook — no anchor defaults to 4px.
+    await expect(link).toHaveStyle({ textUnderlineOffset: '4px' });
+
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+
+    await expect(
+      canvas.getByText(/broadening your search/i)
+    ).toBeInTheDocument();
+  },
+};
+
+// The `bordered` prop renders the dashed frame and advertises via data-bordered.
+export const Bordered: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `bordered` to add a dashed frame around the empty state.',
+      },
+    },
+  },
+  render: () => (
+    <EmptyState bordered>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Add your first contact to get started.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-slot="empty-state"]');
+    await expect(root).toHaveAttribute('data-bordered', 'true');
+    await expect(root).toHaveStyle({ borderStyle: 'dashed' });
+  },
+};
+
+// ============================================
+// ALL VARIANTS GRID
+// ============================================
+
+// Both media variants — the muted icon medallion inside a dashed-bordered box
+// with an action, and the borderless default wrapper holding a larger glyph.
+// Reused by the per-base variant generator.
+export const AllVariants: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare the `icon` and `default` media variants, with and without a frame.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      <EmptyState bordered>
+        <EmptyStateHeader>
+          <EmptyStateMedia variant="icon">
+            <IconUsers aria-hidden />
+          </EmptyStateMedia>
+          <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+          <EmptyStateDescription>
+            Add your first contact to get started.
+          </EmptyStateDescription>
+        </EmptyStateHeader>
+        <EmptyStateContent>
+          <Button>Add contact</Button>
+        </EmptyStateContent>
+      </EmptyState>
+
+      <EmptyState>
+        <EmptyStateHeader>
+          <EmptyStateMedia variant="default">
+            <IconUsers
+              aria-hidden
+              className="nx:size-12 nx:text-muted-foreground"
+            />
+          </EmptyStateMedia>
+          <EmptyStateTitle>No results</EmptyStateTitle>
+          <EmptyStateDescription>
+            Try adjusting your filters.
+          </EmptyStateDescription>
+        </EmptyStateHeader>
+      </EmptyState>
+    </div>
+  ),
+};

@@ -87,6 +87,9 @@ jobs:
             exit 1
           fi
 
+      - name: packages/react-18 matches packages/react
+        run: pnpm --filter @nxds/react-18 check
+
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:

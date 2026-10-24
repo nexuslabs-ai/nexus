@@ -129,14 +129,14 @@ function isDocsSpecimenPage(filename) {
 const RAW_TYPOGRAPHY_EXCEPTIONS = [
   {
     filename:
-      /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]avatar[/\\]avatar\.tsx$/,
+      /(?:^|[/\\])packages[/\\]react(?:-18)?[/\\]src[/\\]components[/\\]avatar[/\\]avatar\.tsx$/,
     className:
       'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none',
     messageIds: new Set(['rawFontWeight', 'rawLineHeight']),
   },
   {
     filename:
-      /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]chart[/\\]chart\.tsx$/,
+      /(?:^|[/\\])packages[/\\]react(?:-18)?[/\\]src[/\\]components[/\\]chart[/\\]chart\.tsx$/,
     className: 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums',
     messageIds: new Set(['rawFontWeight']),
   },

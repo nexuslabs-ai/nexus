@@ -83,6 +83,19 @@ export function NxdsThemeQuickControl({
     onCustomize();
   };
 
+  // The mode group registers its items in an effect, so on React 18 it isn't
+  // tabbable yet when the popover moves focus in. Focus the chosen mode directly.
+  const focusChosenMode = (event: Event) => {
+    const chosen = (
+      event.currentTarget as HTMLElement
+    ).querySelector<HTMLElement>(
+      '[data-slot="toggle-group-item"][data-state="on"]'
+    );
+    if (!chosen) return;
+    event.preventDefault();
+    chosen.focus();
+  };
+
   const handleModeChange = (mode: string) => {
     if (!mode) return;
     setState((current) => ({ ...current, mode: mode as NxdsAppearanceMode }));
@@ -104,6 +117,7 @@ export function NxdsThemeQuickControl({
         align="end"
         aria-label="Theme quick control"
         className="nx:w-72 nx:space-y-3"
+        onOpenAutoFocus={focusChosenMode}
       >
         <div className="nx:space-y-1.5">
           <p className="nx:m-0 nx:typography-label-small nx:text-muted-foreground">

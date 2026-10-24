@@ -17,6 +17,7 @@ does not index:
 | Third-party API lookups         | [`docs-mcp.md`](.claude/rules/docs-mcp.md)                     |
 | Docs prose and page templates   | [`docs-voice.md`](.claude/rules/docs-voice.md)                 |
 | React and Vue parity            | [`cross-stack-parity.md`](.claude/rules/cross-stack-parity.md) |
+| React 18 package                | [`react-18.md`](.claude/rules/react-18.md)                     |
 
 **Browser Support:** nxds does no feature detection and no OS, browser,
 preference, or input-device queries.
