@@ -29,7 +29,6 @@ export const planned = [
   'filter-chip',
   'filter-condition',
   'hover-card',
-  'input-group',
   'input-otp',
   'item',
   'marker',
@@ -71,6 +70,7 @@ export const shared = [
   'field',
   'hide',
   'input',
+  'input-group',
   'kbd',
   'label',
   'native-select',
@@ -103,6 +103,14 @@ export const vueOnlyApi: Record<string, string> = {
     "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
   'Input.defaultValue': NATIVE_DEFAULT_VALUE,
   'Input.modelValue': NATIVE_MODEL_VALUE,
+  'InputGroupButton.disabled':
+    'native <button> attribute React inherits from its props type; Vue declares it to pass on to Button',
+  'InputGroupButton.type':
+    "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
+  'InputGroupInput.defaultValue': NATIVE_DEFAULT_VALUE,
+  'InputGroupInput.modelValue': NATIVE_MODEL_VALUE,
+  'InputGroupTextarea.defaultValue': NATIVE_DEFAULT_VALUE,
+  'InputGroupTextarea.modelValue': NATIVE_MODEL_VALUE,
   'NativeSelect.defaultValue': NATIVE_DEFAULT_VALUE,
   'NativeSelect.modelValue': NATIVE_MODEL_VALUE,
   'Switch.thumb':

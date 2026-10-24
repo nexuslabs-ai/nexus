@@ -173,6 +173,7 @@ export default tseslint.config(
   // copied source lints clean in apps without vuejs-accessibility.
   {
     files: [
+      'packages/vue/src/components/input-group/InputGroupTextarea.vue',
       'packages/vue/src/components/native-select/NativeSelect.vue',
       'packages/vue/src/components/textarea/Textarea.vue',
     ],
