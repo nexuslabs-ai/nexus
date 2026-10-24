@@ -372,6 +372,7 @@ export const WithDataAttributes: Story = {
     await expect(defaultButton).toHaveAttribute('data-slot', 'button');
     await expect(defaultButton).toHaveAttribute('data-variant', 'default');
     await expect(defaultButton).toHaveAttribute('data-size', 'default');
+    await expect(defaultButton).toHaveAttribute('type', 'button');
     await expect(explicitButton).toHaveAttribute('data-slot', 'button');
     await expect(explicitButton).toHaveAttribute('data-variant', 'secondary');
     await expect(explicitButton).toHaveAttribute('data-size', 'lg');

@@ -206,11 +206,12 @@ export const WithDataAttributes: Story = {
 };
 
 // A Select trigger joins the group as a button-shaped control, sharing the
-// seam with the adjacent button. The group size reaches Buttons only: the
-// Input and Select trigger keep their own size.
+// seam with the previous control. The group size reaches Buttons and
+// ButtonGroupText only: the Input and Select trigger keep their own size.
 export const WithSelectTrigger: Story = {
   render: () => (
     <ButtonGroup size="lg">
+      <ButtonGroupText>Status</ButtonGroupText>
       <Button variant="outline">Filter</Button>
       <Input aria-label="Search" className="nx:w-40" />
       <Select defaultValue="all">
@@ -243,21 +244,20 @@ export const WithSelectTrigger: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Filter' })
     ).toHaveAttribute('data-size', 'lg');
+    await expect(canvas.getByText('Status')).toHaveAttribute('data-size', 'lg');
   },
 };
 
 // A split button: a primary action joined to a DropdownMenu trigger. The
 // trigger renders as a button via asChild, so it joins the seam like any
-// other button-shaped control.
+// other button-shaped control and inherits the group size.
 export const SplitButton: Story = {
   render: () => (
-    <ButtonGroup>
+    <ButtonGroup size="sm">
       <Button>Deploy</Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" aria-label="Deployment options">
-            <IconChevronDown />
-          </Button>
+          <Button endIcon={<IconChevronDown />}>Options</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem>Deploy to staging</DropdownMenuItem>
@@ -275,6 +275,8 @@ export const SplitButton: Story = {
     );
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
+    // The trigger sets no size of its own, so the group's "sm" reaches it.
+    await expect(trigger).toHaveAttribute('data-size', 'sm');
   },
 };
 

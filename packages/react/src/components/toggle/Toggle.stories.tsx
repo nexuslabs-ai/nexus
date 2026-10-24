@@ -150,7 +150,8 @@ export const ClickInteraction: Story = {
   },
 };
 
-// Enter/Space toggles when focused.
+// Enter/Space toggles when focused. Pressed outline-primary keeps a transparent
+// background, takes the primary active border, and never changes size.
 export const KeyboardInteraction: Story = {
   args: { onPressedChange: fn() },
   render: (args) => (

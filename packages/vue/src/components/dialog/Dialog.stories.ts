@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { useId } from 'vue';
 
+import { expectExitBeforeUnmount } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import {
@@ -490,10 +491,8 @@ export const OpenCloseInteraction: Story = {
     });
     await userEvent.click(dismissButton);
 
-    // Wait for dialog to be removed from DOM
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
+    // The dialog plays its exit before it unmounts
+    await expectExitBeforeUnmount(dialog);
 
     // Reopen and close with the corner close button
     await userEvent.click(trigger);

@@ -511,9 +511,13 @@ export const InvalidExternalValues: Story = {
     await expect(canvas.getByText('Enter a valid date.')).toBeVisible();
     await expect(canvas.getAllByText('Enter a valid number.')).toHaveLength(2);
     await expect(canvas.getByText('Choose an available option.')).toBeVisible();
-    await expect(
-      canvas.getAllByRole('combobox', { name: 'Status value' })[1]
-    ).toHaveTextContent('Unavailable selection');
+    // The stale rule is appended last.
+    const statusValues = canvas.getAllByRole('combobox', {
+      name: 'Status value',
+    });
+    await expect(statusValues[statusValues.length - 1]).toHaveTextContent(
+      'Unavailable selection'
+    );
     await expect(
       canvas.getByText('Use at most 0 levels of nested groups.')
     ).toBeVisible();

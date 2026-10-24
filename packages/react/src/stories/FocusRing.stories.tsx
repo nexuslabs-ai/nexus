@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
+import { Button } from '../components/button/button';
+import { Checkbox } from '../components/checkbox/checkbox';
 import { Input } from '../components/input/input';
 import {
   InputGroup,
@@ -415,5 +417,44 @@ export const FieldBorderWidthModes: Story = {
         await expect(outlineWidth).toBe(width);
       }
     }
+  },
+};
+
+export const RingSafeTransitions: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-3">
+      <Checkbox aria-label="control surface" />
+      <Button>Button surface</Button>
+      <Input aria-label="field surface" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('checkbox', { name: 'control surface' });
+    const button = canvas.getByRole('button', { name: 'Button surface' });
+    const field = canvas.getByRole('textbox', { name: 'field surface' });
+
+    // A control's border is its own decoration, so it may fade across states.
+    await expect(getComputedStyle(control).transitionProperty).toBe(
+      'color, background-color, border-color'
+    );
+
+    // A field's border is the ring's inner half — fading it would make focus a
+    // two-stage change, so it is excluded for the same reason outline-color is.
+    await expect(getComputedStyle(field).transitionProperty).toBe(
+      'color, background-color'
+    );
+
+    // A control draws its ring as an outline alone; the button's sits offset.
+    for (const surface of [control, button]) {
+      await focusAsKeyboard(surface);
+      const styles = getComputedStyle(surface);
+      await expect(styles.outlineStyle).toBe('solid');
+      await expect(Number.parseFloat(styles.outlineWidth)).toBeGreaterThan(0);
+      await expect(styles.transitionProperty).not.toContain('outline');
+    }
+    await expect(
+      Number.parseFloat(getComputedStyle(button).outlineOffset)
+    ).toBeGreaterThan(0);
   },
 };

@@ -413,10 +413,11 @@ export const OperatorKeepsValue: Story = {
   render: (args) => <Preview onChange={args.onChange} />,
   play: async ({ canvasElement, args }) => {
     const page = within(canvasElement.ownerDocument.body);
-    const operator = within(canvasElement).getByRole('button', {
-      name: 'Change Team operator',
-    });
-    await userEvent.click(operator);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
     await userEvent.click(
       page.getByRole('menuitemradio', { name: 'is none of' })
     );
@@ -426,11 +427,20 @@ export const OperatorKeepsValue: Story = {
       values: ['design'],
     });
     await expectMenuClosed(canvasElement);
-    await userEvent.click(operator);
+  },
+};
+export const ValuelessOperatorCommits: Story = {
+  render: (args) => <Preview onChange={args.onChange} />,
+  play: async ({ canvasElement, args }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      within(canvasElement).getByRole('button', {
+        name: 'Change Team operator',
+      })
+    );
     await userEvent.click(
       page.getByRole('menuitemradio', { name: 'is empty' })
     );
-    await expect(args.onChange).toHaveBeenCalledTimes(2);
     await expect(args.onChange).toHaveBeenLastCalledWith({
       operator: 'isEmpty',
     });

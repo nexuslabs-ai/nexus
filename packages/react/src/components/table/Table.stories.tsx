@@ -456,7 +456,7 @@ export const WithDataAttributes: Story = {
           <TableSelectionCell>
             <Checkbox aria-label="Select INV001" />
           </TableSelectionCell>
-          <TableCell>INV001</TableCell>
+          <TableRowHeader>INV001</TableRowHeader>
           <TableCell>$250.00</TableCell>
         </TableRow>
       </TableBody>
@@ -469,6 +469,8 @@ export const WithDataAttributes: Story = {
     const table = canvasElement.querySelector('[data-slot="table"]');
 
     await expect(container).toBeInTheDocument();
+    // The scroll container is focusable so keyboard users can scroll it.
+    await expect(container).toHaveAttribute('tabindex', '0');
     await expect(table?.tagName).toBe('TABLE');
 
     // Every structural part carries its own data-slot hook.
@@ -480,11 +482,20 @@ export const WithDataAttributes: Story = {
       'table-cell',
       'table-selection-head',
       'table-selection-cell',
+      'table-row-header',
     ]) {
       await expect(
         canvasElement.querySelector(`[data-slot="${slot}"]`)
       ).toBeInTheDocument();
     }
+
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('columnheader', { name: 'Invoice' })
+    ).toHaveAttribute('scope', 'col');
+    const rowHeader = canvas.getByRole('rowheader', { name: 'INV001' });
+    await expect(rowHeader.tagName).toBe('TH');
+    await expect(rowHeader).toHaveAttribute('scope', 'row');
   },
 };
 

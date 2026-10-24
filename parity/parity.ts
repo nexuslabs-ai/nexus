@@ -148,6 +148,10 @@ export const copies: [react: string, vue: string][] = [
     'packages/react/src/stories/support/story-height-test-utils.ts',
     'packages/vue/src/stories/support/story-height-test-utils.ts',
   ],
+  [
+    'packages/react/src/stories/support/overlay-motion-test-utils.ts',
+    'packages/vue/src/stories/support/overlay-motion-test-utils.ts',
+  ],
 ];
 
 /** Dependencies both packages declare, as `[react, vue]` names, which must take the same range. */

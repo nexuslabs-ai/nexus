@@ -90,6 +90,9 @@ function SavedAppearanceExample({ storageKey }: { storageKey: string }) {
 }
 
 const SAVED_APPEARANCE_KEY = 'storybook-saved-brand';
+const BLUE_PRESET = BRAND_COLOR_PRESETS.find(
+  (preset) => preset.value === 'blue'
+)!;
 
 function saveBrandColor(brandColor: string) {
   localStorage.setItem(
@@ -127,11 +130,7 @@ async function expectRestoredBrandColor(
 export const SavedPresetRestoration: Story = {
   beforeEach: () => {
     const previous = localStorage.getItem(SAVED_APPEARANCE_KEY);
-    saveBrandColor(
-      BRAND_COLOR_PRESETS.find(
-        (preset) => preset.value === 'blue'
-      )!.color.toUpperCase()
-    );
+    saveBrandColor(BLUE_PRESET.color.toUpperCase());
     return () => {
       if (previous === null) localStorage.removeItem(SAVED_APPEARANCE_KEY);
       else localStorage.setItem(SAVED_APPEARANCE_KEY, previous);
@@ -143,11 +142,10 @@ export const SavedPresetRestoration: Story = {
     const reload = canvas.getByRole('button', {
       name: 'Reload saved appearance',
     });
-    const blue = BRAND_COLOR_PRESETS.find((preset) => preset.value === 'blue')!;
     await expectRestoredBrandColor(
       canvasElement,
-      blue.color.toUpperCase(),
-      blue.label
+      BLUE_PRESET.color.toUpperCase(),
+      BLUE_PRESET.label
     );
 
     for (const customColor of ['#95bf47', 'rgb(12 34 56)']) {

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectExitBeforeUnmount } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button/button';
 
 import {
@@ -294,11 +295,7 @@ export const FocusManagement: Story = {
 
     await userEvent.click(cancelButton);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
+    await expectExitBeforeUnmount(dialog);
     await waitFor(() => {
       expect(trigger).toHaveFocus();
     });
