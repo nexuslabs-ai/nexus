@@ -45,12 +45,12 @@ export function TopNav() {
           docs
         </span>
       </Link>
-      <div className="nx:flex-1 nx:xl:hidden">
+      <div className="nx:flex-1 nx:lg:hidden">
         <MobileNav />
       </div>
       <nav
         aria-label="Sections"
-        className="nx:hidden nx:xl:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
+        className="nx:hidden nx:lg:flex nx:gap-0.5 nx:flex-1 nx:min-w-0 nx:overflow-x-auto nx:py-1.5"
       >
         {NAV_LINKS.map((link) => {
           const active = isActive(pathname, link.href);

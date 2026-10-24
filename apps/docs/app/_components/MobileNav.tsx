@@ -11,7 +11,6 @@ import type { ManifestSection } from '../_lib/manifest';
 import { isActive, NAV_LINKS } from '../_lib/nav-links';
 import { SITE_NAME } from '../_lib/site';
 
-import { SectionPageList } from './LeftRail';
 import {
   Button,
   Sheet,
@@ -21,9 +20,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from './nxds';
+import { SectionPageList } from './SectionPageList';
 
 const ROW_BASE =
-  'nx:flex nx:w-full nx:min-h-11 nx:items-center nx:justify-between nx:px-2 nx:rounded-sm nx:border-0 nx:bg-transparent nx:text-foreground nx:typography-label-default nx:font-semibold nx:no-underline nx:cursor-pointer nx:hover:bg-container-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
+  'nx:flex nx:w-full nx:min-h-11 nx:items-center nx:justify-between nx:px-2 nx:py-0 nx:rounded-sm nx:border-0 nx:bg-transparent nx:text-foreground nx:typography-label-default nx:font-semibold nx:no-underline nx:cursor-pointer nx:hover:bg-container-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default';
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -41,9 +41,8 @@ export function MobileNav() {
 
   // Focusing the current page also scrolls it into view in a long section.
   const focusCurrentPage = (event: Event) => {
-    const current = contentRef.current?.querySelector<HTMLElement>(
-      '[aria-current="page"]'
-    );
+    const current =
+      contentRef.current?.querySelector<HTMLElement>('[aria-current]');
     if (!current) return;
     event.preventDefault();
     current.focus();
@@ -60,6 +59,7 @@ export function MobileNav() {
       <SheetContent
         ref={contentRef}
         side="left"
+        aria-describedby={undefined}
         onOpenAutoFocus={focusCurrentPage}
       >
         <SheetHeader>
@@ -86,7 +86,7 @@ export function MobileNav() {
                       href={link.href}
                       onClick={close}
                       aria-current={
-                        isActive(pathname, link.href) ? 'page' : undefined
+                        isActive(pathname, link.href) ? 'true' : undefined
                       }
                       className={ROW_BASE}
                     >
