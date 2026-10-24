@@ -6,6 +6,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
+  expectPlacedBelow,
 } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
@@ -200,9 +201,11 @@ export const OpenCloseInteraction: Story = {
 
     await waitFor(() => expect(content).toBeVisible());
     await expectInterruptibleOverlayMotion(panel);
+    await expectPlacedBelow(panel, trigger);
 
     await userEvent.keyboard('{Escape}');
     await expectExitBeforeUnmount(panel);
+    await expect(trigger).toHaveFocus();
   },
 };
 

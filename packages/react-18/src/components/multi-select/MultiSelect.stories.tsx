@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -390,6 +392,62 @@ export const ChipKeyboardRemoval: Story = {
 
     await waitFor(() => expect(within(trigger).queryByText('Vue')).toBeNull());
     await expect(within(trigger).getByText('React')).toBeInTheDocument();
+  },
+};
+
+// Removing the last chip swaps the value row for the placeholder.
+export const LastChipRemoval: Story = {
+  render: () => <Frameworks defaultValues={['react']} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Frameworks' });
+
+    await userEvent.click(within(trigger).getByText('React'));
+
+    await expect(
+      await within(trigger).findByText('Select frameworks')
+    ).toBeVisible();
+    await expect(
+      canvasElement.querySelector('[data-slot="multi-select-value"]')
+    ).toBeNull();
+  },
+};
+
+const overflowValueRef = React.createRef<HTMLDivElement>();
+
+// A ref on MultiSelectValue reaches the row, and chips still collapse.
+export const OverflowWithRef: Story = {
+  render: () => (
+    <MultiSelect
+      defaultValues={['react', 'vue', 'svelte', 'angular', 'solid', 'qwik']}
+    >
+      <MultiSelectTrigger aria-label="Frameworks" className="nx:w-64">
+        <MultiSelectValue
+          ref={overflowValueRef}
+          placeholder="Select frameworks"
+          overflowBehavior="cutoff"
+        />
+      </MultiSelectTrigger>
+      <MultiSelectContent
+        searchPlaceholder="Search frameworks…"
+        emptyMessage="No frameworks found."
+      >
+        {FRAMEWORKS.map((option) => (
+          <MultiSelectItem key={option.value} value={option.value}>
+            {option.label}
+          </MultiSelectItem>
+        ))}
+      </MultiSelectContent>
+    </MultiSelect>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(() => expect(canvas.getByText(/^\+\d+$/)).toBeVisible());
+    await expect(overflowValueRef.current).toHaveAttribute(
+      'data-slot',
+      'multi-select-value'
+    );
   },
 };
 

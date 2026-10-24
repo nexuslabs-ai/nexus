@@ -280,6 +280,7 @@ export const OpenCloseInteraction: Story = {
     );
 
     await expectExitBeforeUnmount(document.querySelector('[role="dialog"]'));
+    await expect(trigger).toHaveFocus();
   },
 };
 

@@ -6,6 +6,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
+  expectPlacedBelow,
 } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button/button';
 
@@ -438,6 +439,7 @@ export const OpenCloseInteraction: Story = {
     await expect(menu).toBeInTheDocument();
     await expect(menu).toHaveAttribute('data-slot', 'dropdown-menu-content');
     await expectInterruptibleOverlayMotion(menu);
+    await expectPlacedBelow(menu, trigger);
 
     // Items should be visible
     const item1 = within(menu).getByRole('menuitem', { name: 'Item 1' });
@@ -448,6 +450,7 @@ export const OpenCloseInteraction: Story = {
 
     // Wait for menu to be removed from DOM
     await expectExitBeforeUnmount(document.querySelector('[role="menu"]'));
+    await expect(trigger).toHaveFocus();
   },
 };
 
