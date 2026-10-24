@@ -188,7 +188,7 @@ export const Empty: Story = {
     <Command label="Command menu" className={paletteClass}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <QueryAwareEmptyMessage />
         <CommandGroup heading="Suggestions">
           <CommandItem>Calendar</CommandItem>
         </CommandGroup>
@@ -208,39 +208,12 @@ export const Empty: Story = {
     const input = canvas.getByRole('combobox');
 
     // Typing a query that matches nothing surfaces the empty state.
-    await userEvent.type(input, 'zzzzzz');
-    await expect(canvas.getByText('No results found.')).toBeInTheDocument();
-    await expect(
-      canvasElement.querySelector('[data-slot="command-empty"]')
-    ).toBeInTheDocument();
-  },
-};
-
-export const QueryAwareEmpty: Story = {
-  render: () => (
-    <Command label="Command menu" className={paletteClass}>
-      <CommandInput placeholder="Search commands..." />
-      <CommandList>
-        <QueryAwareEmptyMessage />
-        <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
-          <CommandItem>Calculator</CommandItem>
-        </CommandGroup>
-      </CommandList>
-    </Command>
-  ),
-  parameters: {
-    a11y: {
-      options: { rules: { 'aria-required-children': { enabled: false } } },
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox');
-
     await userEvent.type(input, 'roadmap');
     await expect(
       canvas.getByText('No results found for "roadmap".')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="command-empty"]')
     ).toBeInTheDocument();
   },
 };

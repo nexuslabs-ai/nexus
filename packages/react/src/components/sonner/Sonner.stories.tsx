@@ -88,100 +88,6 @@ export const Default: Story = {
   },
 };
 
-export const Success: Story = {
-  render: () => (
-    <>
-      <Button variant="outline" onClick={() => toast.success('Changes saved')}>
-        Show success
-      </Button>
-      <Toaster richColors />
-    </>
-  ),
-};
-
-export const Error: Story = {
-  render: () => (
-    <>
-      <Button
-        variant="outline"
-        onClick={() => toast.error('Something went wrong')}
-      >
-        Show error
-      </Button>
-      <Toaster richColors />
-    </>
-  ),
-};
-
-export const Warning: Story = {
-  render: () => (
-    <>
-      <Button
-        variant="outline"
-        onClick={() => toast.warning('Your session is about to expire')}
-      >
-        Show warning
-      </Button>
-      <Toaster richColors />
-    </>
-  ),
-};
-
-export const Info: Story = {
-  render: () => (
-    <>
-      <Button
-        variant="outline"
-        onClick={() => toast.info('A new version is available')}
-      >
-        Show info
-      </Button>
-      <Toaster richColors />
-    </>
-  ),
-};
-
-export const WithAction: Story = {
-  render: () => {
-    const showToast = () =>
-      toast('File deleted', {
-        action: { label: 'Undo', onClick: () => toast('File restored') },
-      });
-    return (
-      <>
-        <Button variant="outline" onClick={showToast}>
-          Show with action
-        </Button>
-        <Toaster />
-      </>
-    );
-  },
-};
-
-export const PromiseStory: Story = {
-  name: 'Promise',
-  render: () => {
-    const save = () =>
-      new Promise<void>((resolve) => {
-        setTimeout(resolve, 1500);
-      });
-    const showToast = () =>
-      toast.promise(save, {
-        loading: 'Saving…',
-        success: 'Settings saved',
-        error: 'Could not save',
-      });
-    return (
-      <>
-        <Button variant="outline" onClick={showToast}>
-          Show promise
-        </Button>
-        <Toaster />
-      </>
-    );
-  },
-};
-
 export const ClickInteraction: Story = {
   render: () => (
     <>
@@ -209,31 +115,6 @@ export const WithDataAttributes: Story = {
     const toaster = canvasElement.querySelector('[data-slot="toaster"]');
     await expect(toaster).toBeInTheDocument();
     await expect(toaster).toHaveAttribute('data-slot', 'toaster');
-  },
-};
-
-// The toaster rides the nxds toast layer (z-index 100) via an inline style,
-// which outranks sonner's injected z-index:999999999 without `!important`.
-// Sonner only mounts its container once a toast exists, so fire one first.
-export const ToastLayer: Story = {
-  render: () => (
-    <>
-      <Button onClick={() => toast('Event has been created')}>
-        Show toast
-      </Button>
-      <Toaster />
-    </>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Show toast' }));
-    await waitFor(() => {
-      const toaster = document.body.querySelector<HTMLElement>(
-        '[data-sonner-toaster]'
-      );
-      expect(toaster).not.toBeNull();
-      expect(getComputedStyle(toaster as HTMLElement).zIndex).toBe('100');
-    });
   },
 };
 

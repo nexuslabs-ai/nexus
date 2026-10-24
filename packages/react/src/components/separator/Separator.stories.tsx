@@ -24,9 +24,6 @@ type Story = StoryObj<typeof Separator>;
 // BASIC STORIES
 // ============================================
 
-// Horizontal is the default orientation — a full-width 1px rule.
-export const Default: Story = {};
-
 export const InContext: Story = {
   tags: ['docs'],
   render: () => (

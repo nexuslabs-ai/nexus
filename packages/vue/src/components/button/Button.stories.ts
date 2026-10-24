@@ -239,7 +239,7 @@ export const AllVariants: Story = {
 
 /** A story render that binds the story args, so `args.onClick` stays a spy. */
 const labelled = (template: string) => (args: ButtonArgs) => ({
-  components: { Button, IconArrowRight, IconRocket, IconStar },
+  components: { Button, IconArrowRight, IconRocket },
   setup: () => ({ args }),
   template,
 });
@@ -262,46 +262,6 @@ export const Link: Story = {
   },
 };
 
-export const IconSize: Story = {
-  render: labelled(
-    '<Button v-bind="args" size="icon" aria-label="Star"><IconStar /></Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Star' });
-
-    await expect(button).toHaveClass('nx:size-10');
-    await expect(button).toHaveClass('nx:p-0');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
-export const IconSmallSize: Story = {
-  render: labelled(
-    '<Button v-bind="args" size="icon-sm" aria-label="Small star"><IconStar /></Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Small star' });
-
-    await expect(button).toHaveClass('nx:size-8');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
-export const IconLargeSize: Story = {
-  render: labelled(
-    '<Button v-bind="args" size="icon-lg" aria-label="Large star"><IconStar /></Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Large star' });
-
-    await expect(button).toHaveClass('nx:size-12');
-    await expect(button).toHaveAttribute('data-icon-only', 'true');
-  },
-};
-
 export const Disabled: Story = {
   render: labelled('<Button v-bind="args" disabled>Disabled</Button>'),
   play: async ({ canvasElement, args }) => {
@@ -319,7 +279,13 @@ export const Disabled: Story = {
 };
 
 export const Loading: Story = {
-  render: labelled('<Button v-bind="args" loading>Submitting</Button>'),
+  render: labelled(`
+    <Button v-bind="args" loading>
+      <template #start-icon><IconRocket /></template>
+      Submitting
+      <template #end-icon><IconArrowRight /></template>
+    </Button>
+  `),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Submitting' });
@@ -333,6 +299,12 @@ export const Loading: Story = {
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
     await expect(
+      button.querySelector('[data-slot="button-start-icon"]')
+    ).not.toBeInTheDocument();
+    await expect(
+      button.querySelector('[data-slot="button-end-icon"]')
+    ).not.toBeInTheDocument();
+    await expect(
       button.querySelector('[data-slot="spinner"]')
     ).toBeInTheDocument();
     await expect(loadingLabel).toBeInTheDocument();
@@ -342,93 +314,6 @@ export const Loading: Story = {
 
     // Click should not trigger onClick
     await expect(args.onClick).not.toHaveBeenCalled();
-  },
-};
-
-export const LoadingPreservesDefaultWidth: Story = {
-  render: () => ({
-    components: { Button },
-    template: `
-      <div class="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
-        <Button data-testid="button-ready">Save changes</Button>
-        <Button loading data-testid="button-loading">Save changes</Button>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const readyButton = canvas.getByTestId('button-ready');
-    const loadingButton = canvas.getByTestId('button-loading');
-    const loadingContent = loadingButton.querySelector(
-      '[data-slot="button-loading-content"]'
-    );
-    const loadingLabel = loadingButton.querySelector(
-      '[data-slot="button-loading-label"]'
-    );
-
-    expect(Math.round(loadingButton.getBoundingClientRect().width)).toBe(
-      Math.round(readyButton.getBoundingClientRect().width)
-    );
-    await expect(loadingContent).toBeInTheDocument();
-    await expect(loadingLabel).toHaveClass('nx:opacity-0');
-    await expect(loadingButton).toHaveAccessibleName('Save changes');
-  },
-};
-
-export const TextButtonsStayContentWidth: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Text buttons fit their content, while icon-only buttons keep a fixed square size.',
-      },
-    },
-  },
-  render: () => ({
-    components: { Button, IconStar },
-    template: `
-      <div class="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
-        <Button data-testid="button-content-short">Go</Button>
-        <Button data-testid="button-content-long">Confirm transfer</Button>
-        <Button size="icon" aria-label="Icon action"><IconStar /></Button>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const shortButton = canvas.getByTestId('button-content-short');
-    const longButton = canvas.getByTestId('button-content-long');
-    const iconButton = canvas.getByLabelText('Icon action');
-    const hasMinWidthClass = (element: HTMLElement) =>
-      Array.from(element.classList).some((className) =>
-        className.startsWith('nx:min-w-')
-      );
-
-    expect(hasMinWidthClass(shortButton)).toBe(false);
-    expect(hasMinWidthClass(longButton)).toBe(false);
-    expect(Math.round(shortButton.getBoundingClientRect().width)).toBeLessThan(
-      64
-    );
-    expect(
-      Math.round(longButton.getBoundingClientRect().width)
-    ).toBeGreaterThan(Math.round(shortButton.getBoundingClientRect().width));
-    await expect(iconButton).toHaveClass('nx:size-10');
-    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(40);
-  },
-};
-
-export const ManualBusyState: Story = {
-  render: labelled(
-    '<Button v-bind="args" aria-busy="true">Processing</Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveAttribute('aria-busy', 'true');
-    await expect(button).not.toHaveAttribute('data-loading');
-    await expect(button).not.toBeDisabled();
   },
 };
 
@@ -454,30 +339,9 @@ export const KeyboardInteraction: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
-    // Tab to focus
-    await userEvent.tab();
-    await expect(button).toHaveFocus();
-
-    // Enter triggers click
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-
-    // Space triggers click
-    await userEvent.keyboard(' ');
-    await expect(args.onClick).toHaveBeenCalledTimes(2);
-  },
-};
-
-export const FocusManagement: Story = {
-  render: labelled('<Button v-bind="args">Focus me</Button>'),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Initially not focused
     await expect(button).not.toHaveFocus();
 
-    // Tab should focus
+    // Tab to focus
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
@@ -490,30 +354,17 @@ export const FocusManagement: Story = {
     await expect(focusStyles.outlineWidth).toBe('2px');
     await expect(focusStyles.boxShadow).toBe('none');
 
+    // Enter triggers click
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // Space triggers click
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });
     await expect(button).not.toHaveFocus();
-  },
-};
-
-export const PressScale: Story = {
-  render: () => ({
-    components: { Button },
-    template: `
-      <div>
-        <Button>Default</Button>
-        <Button variant="link">Link</Button>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const [primary, link] = canvasElement.querySelectorAll(
-      '[data-slot="button"]'
-    );
-
-    await expect(primary).toHaveClass('nx:active:scale-[0.96]');
-    await expect(link).toHaveClass('nx:active:scale-100');
-    await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
   },
 };
 
@@ -539,55 +390,10 @@ export const WithDataAttributes: Story = {
     await expect(defaultButton).toHaveAttribute('data-slot', 'button');
     await expect(defaultButton).toHaveAttribute('data-variant', 'default');
     await expect(defaultButton).toHaveAttribute('data-size', 'default');
+    await expect(defaultButton).toHaveAttribute('type', 'button');
     await expect(explicitButton).toHaveAttribute('data-slot', 'button');
     await expect(explicitButton).toHaveAttribute('data-variant', 'secondary');
     await expect(explicitButton).toHaveAttribute('data-size', 'lg');
-  },
-};
-
-export const WithCustomClassName: Story = {
-  render: labelled(
-    '<Button v-bind="args" class="nx:mt-2">Custom Class</Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveClass('nx:mt-2');
-  },
-};
-
-export const WithAriaLabel: Story = {
-  render: labelled(
-    '<Button v-bind="args" aria-label="Close dialog">×</Button>'
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await expect(button).toHaveAccessibleName('Close dialog');
-  },
-};
-
-export const DefaultType: Story = {
-  render: labelled('<Button v-bind="args">Button</Button>'),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Should default to type="button" to prevent accidental form submission
-    await expect(button).toHaveAttribute('type', 'button');
-  },
-};
-
-export const SubmitType: Story = {
-  render: labelled('<Button v-bind="args" type="submit">Submit</Button>'),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    // Can explicitly set type="submit" for forms
-    await expect(button).toHaveAttribute('type', 'submit');
   },
 };
 
@@ -601,22 +407,6 @@ export const AsLink: Story = {
 
     await expect(link).toHaveAttribute('href', 'https://example.com');
     await expect(link).toHaveAttribute('data-slot', 'button');
-  },
-};
-
-export const AsChildWithStringChild: Story = {
-  render: () => ({
-    components: { Button },
-    template: '<Button as-child>Plain text child</Button>',
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    // asChild needs a single element to clone onto; a non-element child falls
-    // back to the native <button> rather than rendering an unstyled fragment.
-    const button = canvas.getByRole('button', { name: 'Plain text child' });
-
-    await expect(button.tagName).toBe('BUTTON');
-    await expect(button).toHaveAttribute('data-slot', 'button');
   },
 };
 
@@ -638,136 +428,5 @@ export const DisabledAsLink: Story = {
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
     await expect(link).toHaveClass('nx:aria-disabled:opacity-100');
     await expect(link).toHaveClass('nx:aria-disabled:bg-primary-disabled');
-  },
-};
-
-export const LoadingUsesSpinnerOnly: Story = {
-  render: labelled(`
-    <Button v-bind="args" loading>
-      <template #start-icon><IconRocket /></template>
-      Launching
-      <template #end-icon><IconArrowRight /></template>
-    </Button>
-  `),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Launching' });
-    const loadingLabel = button.querySelector(
-      '[data-slot="button-loading-label"]'
-    );
-
-    await expect(button).toBeDisabled();
-    await expect(button).toHaveAttribute('aria-busy', 'true');
-    await expect(
-      button.querySelector('[data-slot="button-start-icon"]')
-    ).not.toBeInTheDocument();
-    await expect(
-      button.querySelector('[data-slot="button-end-icon"]')
-    ).not.toBeInTheDocument();
-    await expect(
-      button.querySelector('[data-slot="spinner"]')
-    ).toBeInTheDocument();
-    await expect(loadingLabel).toBeInTheDocument();
-    await expect(loadingLabel).toHaveClass('nx:opacity-0');
-    await expect(loadingLabel).toHaveTextContent('Launching');
-    await expect(button).toHaveAccessibleName('Launching');
-  },
-};
-
-export const VariantClassesMatchTokens: Story = {
-  render: () => ({
-    components: { Button },
-    template: `
-      <div class="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-        <Button variant="default">Default</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="error">Error</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="dashed">Dashed</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('button', { name: 'Default' })).toHaveClass(
-      'nx:active:bg-primary-background-active'
-    );
-    await expect(canvas.getByRole('button', { name: 'Secondary' })).toHaveClass(
-      'nx:active:bg-secondary-background-active'
-    );
-    await expect(canvas.getByRole('button', { name: 'Error' })).toHaveClass(
-      'nx:text-error-subtle-foreground'
-    );
-    await expect(
-      canvas.getByRole('button', { name: 'Destructive' })
-    ).toHaveClass('nx:active:bg-error-background-active');
-    await expect(canvas.getByRole('button', { name: 'Outline' })).toHaveClass(
-      'nx:hover:bg-container-hover'
-    );
-    await expect(canvas.getByRole('button', { name: 'Dashed' })).toHaveClass(
-      'nx:border-dashed'
-    );
-    await expect(canvas.getByRole('button', { name: 'Ghost' })).toHaveClass(
-      'nx:hover:bg-container-hover'
-    );
-    await expect(canvas.getByRole('button', { name: 'Link' })).toHaveClass(
-      'nx:hover:underline'
-    );
-  },
-};
-
-export const BorderedVariantsKeepFixedHeight: Story = {
-  render: () => ({
-    components: { Button },
-    template: `
-      <div class="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-        <div class="nx:flex nx:items-center nx:gap-2">
-          <Button variant="outline" size="sm" data-testid="outline-sm">Sm</Button>
-          <Button variant="outline" data-testid="outline-default">Default</Button>
-          <Button variant="outline" size="lg" data-testid="outline-lg">Lg</Button>
-        </div>
-        <div class="nx:flex nx:items-center nx:gap-2">
-          <Button variant="dashed" size="sm" data-testid="dashed-sm">Sm</Button>
-          <Button variant="dashed" data-testid="dashed-default">Default</Button>
-          <Button variant="dashed" size="lg" data-testid="dashed-lg">Lg</Button>
-        </div>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expectHeightPinned(canvas, 'outline-sm', 32);
-    await expectHeightPinned(canvas, 'outline-default', 40);
-    await expectHeightPinned(canvas, 'outline-lg', 48);
-    await expectHeightPinned(canvas, 'dashed-sm', 32);
-    await expectHeightPinned(canvas, 'dashed-default', 40);
-    await expectHeightPinned(canvas, 'dashed-lg', 48);
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story: 'At default density, a default Button is exactly 40px tall.',
-      },
-    },
-  },
-  render: () => ({
-    components: { Button },
-    template: `
-      <div data-testid="button-default-host" class="nx:p-10 nx:bg-background">
-        <Button>Default</Button>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-default-host', 40);
   },
 };

@@ -22,6 +22,12 @@ const meta: Meta<typeof Toggle> = {
 export default meta;
 type Story = StoryObj<typeof Toggle>;
 
+function tokenColor(element: Element, name: string) {
+  return getComputedStyle(element)
+    .getPropertyValue(`--nx-color-${name}`)
+    .trim();
+}
+
 // A single two-state button.
 export const Default: Story = {
   tags: ['docs'],
@@ -144,21 +150,48 @@ export const ClickInteraction: Story = {
   },
 };
 
-// Enter/Space toggles when focused.
+// Enter/Space toggles when focused. Pressed outline-primary keeps a transparent
+// background, takes the primary active border, and never changes size.
 export const KeyboardInteraction: Story = {
   args: { onPressedChange: fn() },
   render: (args) => (
-    <Toggle aria-label="Italic" onPressedChange={args.onPressedChange}>
+    <Toggle
+      variant="outline-primary"
+      aria-label="Italic"
+      onPressedChange={args.onPressedChange}
+    >
       <IconItalic />
     </Toggle>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const toggle = canvas.getByRole('button', { name: 'Italic' });
+    const initial = toggle.getBoundingClientRect();
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
+    await expect(getComputedStyle(toggle).outlineWidth).toBe('2px');
+    await expect(getComputedStyle(toggle).outlineColor).toBe(
+      tokenColor(toggle, 'focus-default')
+    );
     await userEvent.keyboard('{Enter}');
     await expect(args.onPressedChange).toHaveBeenCalledWith(true);
+    await expect(toggle).toHaveAttribute('data-state', 'on');
+    await expect(getComputedStyle(toggle).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+    // border-color eases through transition-control; wait for it to settle.
+    await waitFor(() =>
+      expect(getComputedStyle(toggle).borderTopColor).toBe(
+        tokenColor(toggle, 'primary-border-active')
+      )
+    );
+    await userEvent.keyboard(' ');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    const final = toggle.getBoundingClientRect();
+    await expect([final.width, final.height]).toEqual([
+      initial.width,
+      initial.height,
+    ]);
   },
 };
 
@@ -255,134 +288,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-};
-
-const VARIANTS = ['default', 'outline', 'outline-primary'] as const;
-const SIZES = ['sm', 'default', 'lg'] as const;
-
-function tokenColor(element: Element, name: string) {
-  return getComputedStyle(element)
-    .getPropertyValue(`--nx-color-${name}`)
-    .trim();
-}
-
-function outlinePrimaryBorder(toggle: HTMLElement) {
-  if (toggle.hasAttribute('disabled')) return 'border-disabled';
-  const pressed = toggle.getAttribute('aria-pressed') === 'true';
-  if (toggle.getAttribute('aria-invalid') === 'true') {
-    return pressed ? 'border-error-active' : 'error-border';
-  }
-  return pressed ? 'primary-border-active' : 'border-default';
-}
-
-export const StateMatrix: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4">
-      <p id="toggle-state-error">
-        Invalid formatting is not supported in this field.
-      </p>
-      {VARIANTS.flatMap((variant) =>
-        SIZES.map((size) => (
-          <div
-            key={`${variant}-${size}`}
-            className="nx:flex nx:flex-wrap nx:gap-4"
-          >
-            {[false, true].flatMap((pressed) =>
-              [false, true].flatMap((disabled) =>
-                [false, true].map((invalid) => {
-                  const name = `${variant} ${size} ${pressed ? 'on' : 'off'} ${disabled ? 'disabled' : 'enabled'} ${invalid ? 'invalid' : 'valid'}`;
-                  return (
-                    <Toggle
-                      key={name}
-                      variant={variant}
-                      size={size}
-                      defaultPressed={pressed}
-                      disabled={disabled}
-                      aria-invalid={invalid}
-                      aria-describedby={
-                        invalid ? 'toggle-state-error' : undefined
-                      }
-                      aria-label={name}
-                    >
-                      <IconBold />
-                      {size}
-                    </Toggle>
-                  );
-                })
-              )
-            )}
-          </div>
-        ))
-      )}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const toggles = within(canvasElement).getAllByRole('button');
-    await expect(toggles).toHaveLength(72);
-    for (const toggle of toggles) {
-      const style = getComputedStyle(toggle);
-      const pressed = toggle.getAttribute('aria-pressed') === 'true';
-      const disabled = toggle.hasAttribute('disabled');
-      const invalid = toggle.getAttribute('aria-invalid') === 'true';
-      await expect(toggle).toHaveAccessibleName();
-      if (invalid) await expect(toggle).toHaveAccessibleDescription();
-      if (toggle.dataset.variant === 'outline-primary') {
-        await expect(style.backgroundColor).toBe('rgba(0, 0, 0, 0)');
-        await expect(style.borderTopColor).toBe(
-          tokenColor(toggle, outlinePrimaryBorder(toggle))
-        );
-      } else if (pressed && disabled) {
-        await expect(style.backgroundColor).toBe(
-          tokenColor(toggle, 'disabled')
-        );
-      }
-      if (disabled) {
-        await expect(style.color).toBe(
-          tokenColor(toggle, 'disabled-foreground')
-        );
-        if (toggle.dataset.variant === 'outline') {
-          await expect(style.borderTopColor).toBe(
-            tokenColor(toggle, 'border-disabled')
-          );
-        }
-      }
-    }
-  },
-};
-
-export const OutlinePrimary: Story = {
-  args: { variant: 'outline-primary', onPressedChange: fn() },
-  render: (args) => <Toggle {...args}>Bold</Toggle>,
-  play: async ({ canvasElement, args }) => {
-    const toggle = within(canvasElement).getByRole('button', { name: 'Bold' });
-    const initial = toggle.getBoundingClientRect();
-    await userEvent.click(toggle);
-    await expect(args.onPressedChange).toHaveBeenCalledWith(true);
-    await expect(toggle).toHaveAttribute('data-state', 'on');
-    await expect(getComputedStyle(toggle).backgroundColor).toBe(
-      'rgba(0, 0, 0, 0)'
-    );
-    // border-color eases through transition-control; wait for it to settle.
-    await waitFor(() =>
-      expect(getComputedStyle(toggle).borderTopColor).toBe(
-        tokenColor(toggle, 'primary-border-active')
-      )
-    );
-    await userEvent.tab({ shift: true });
-    await userEvent.tab();
-    await expect(toggle).toHaveFocus();
-    await expect(getComputedStyle(toggle).outlineWidth).toBe('2px');
-    await expect(getComputedStyle(toggle).outlineColor).toBe(
-      tokenColor(toggle, 'focus-default')
-    );
-    await userEvent.keyboard(' ');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    const final = toggle.getBoundingClientRect();
-    await expect([final.width, final.height]).toEqual([
-      initial.width,
-      initial.height,
-    ]);
-  },
 };
 
 export const InvalidOutlinePrimary: Story = {

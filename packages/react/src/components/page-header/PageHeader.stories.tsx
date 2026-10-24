@@ -200,6 +200,9 @@ export const ContainerLayouts: Story = {
       <section style={{ width: 280 }} data-testid="narrow">
         <ReportHeader />
       </section>
+      <section style={{ width: 280 }} data-testid="narrow-long">
+        <LongContentHeader />
+      </section>
       <section style={{ width: 460 }} data-testid="medium">
         <LongContentHeader />
       </section>
@@ -224,6 +227,13 @@ export const ContainerLayouts: Story = {
       narrow.clientWidth + 1
     );
 
+    const narrowLongHeader = canvas
+      .getByTestId('narrow-long')
+      .querySelector('header')!;
+    await expect(narrowLongHeader.scrollWidth).toBeLessThanOrEqual(
+      narrowLongHeader.clientWidth + 1
+    );
+
     const medium = canvas.getByTestId('medium');
     const mediumContent = within(medium)
       .getByText(longDescription)
@@ -245,19 +255,6 @@ export const ContainerLayouts: Story = {
       .getBoundingClientRect();
     await expect(wideAction.left).toBeGreaterThanOrEqual(wideContent.right);
     await expect(wide.scrollWidth).toBeLessThanOrEqual(wide.clientWidth + 1);
-  },
-};
-export const LongContent: Story = {
-  render: () => (
-    <section style={{ width: 280 }}>
-      <LongContentHeader />
-    </section>
-  ),
-  play: async ({ canvasElement }) => {
-    const header = canvasElement.querySelector('header')!;
-    await expect(header.scrollWidth).toBeLessThanOrEqual(
-      header.clientWidth + 1
-    );
   },
 };
 const onSave = fn();

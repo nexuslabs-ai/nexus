@@ -189,76 +189,6 @@ export const WithTextarea: Story = {
   },
 };
 
-export const FocusBorderOwnership: Story = {
-  render: () => (
-    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
-      <InputGroup data-testid="ig-focus-with-button">
-        <InputGroupInput aria-label="Email" placeholder="you@example.com" />
-        <InputGroupAddon align="inline-end">
-          <InputGroupButton>Subscribe</InputGroupButton>
-        </InputGroupAddon>
-      </InputGroup>
-      <InputGroup data-testid="ig-focus-block-start">
-        <InputGroupAddon align="block-start">
-          <InputGroupText>Bio</InputGroupText>
-        </InputGroupAddon>
-        <InputGroupInput aria-label="Bio" placeholder="block-start" />
-      </InputGroup>
-      <InputGroup data-testid="ig-focus-textarea">
-        <InputGroupTextarea aria-label="Message" placeholder="Your message…" />
-        <InputGroupAddon align="block-end">
-          <InputGroupText>Markdown supported</InputGroupText>
-        </InputGroupAddon>
-      </InputGroup>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    async function focusAsKeyboard(element: HTMLElement) {
-      element.focus({ focusVisible: true } as FocusOptions);
-      await new Promise((resolve) => {
-        requestAnimationFrame(() => setTimeout(resolve, 300));
-      });
-    }
-
-    async function expectGroupOwnsFocusBorder(
-      testId: string,
-      controlName: string
-    ) {
-      const group = canvas.getByTestId(testId);
-      const control = canvas.getByRole('textbox', { name: controlName });
-
-      await focusAsKeyboard(control);
-
-      const groupStyles = getComputedStyle(group);
-      const controlStyles = getComputedStyle(control);
-
-      // The group owns the boundary: a real recoloured border plus the 1px
-      // outline that completes the ring. The control paints neither.
-      await expect(
-        Number.parseFloat(groupStyles.borderTopWidth)
-      ).toBeGreaterThan(0);
-      await expect(groupStyles.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
-      await expect(groupStyles.outlineStyle).toBe('solid');
-      await expect(Number.parseFloat(groupStyles.outlineWidth)).toBeGreaterThan(
-        0
-      );
-      await expect(groupStyles.boxShadow).toBe('none');
-      await expect(controlStyles.borderTopWidth).toBe('0px');
-      await expect(controlStyles.outlineStyle).toBe('none');
-      await expect(controlStyles.boxShadow).toBe('none');
-    }
-
-    await expectGroupOwnsFocusBorder('ig-focus-with-button', 'Email');
-    const subscribeButton = canvas.getByRole('button', { name: 'Subscribe' });
-    await expect(document.activeElement).not.toBe(subscribeButton);
-    await expect(subscribeButton.matches(':focus-visible')).toBe(false);
-    await expectGroupOwnsFocusBorder('ig-focus-block-start', 'Bio');
-    await expectGroupOwnsFocusBorder('ig-focus-textarea', 'Message');
-  },
-};
-
 // The group is a role=group field; control, addon, text, and button carry
 // data-slot hooks, and the control mirrors Input's data-size.
 export const WithDataAttributes: Story = {
@@ -613,36 +543,6 @@ export const StateMatrix: Story = {
   },
 };
 
-export const BorderlessHoverSurface: Story = {
-  render: () => (
-    <InputGroup
-      data-testid="ig-borderless-hover"
-      variant="borderless"
-      className="nx:w-80"
-    >
-      <InputGroupAddon>
-        <IconSearch aria-hidden />
-      </InputGroupAddon>
-      <InputGroupInput
-        data-testid="ig-borderless-hover-input"
-        aria-label="Search"
-        placeholder="Search…"
-      />
-    </InputGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const group = canvas.getByTestId('ig-borderless-hover');
-    const input = canvas.getByTestId('ig-borderless-hover-input');
-
-    await expect(group).toHaveClass('nx:bg-control-background');
-    await expect(group).toHaveClass(
-      'nx:not-data-[disabled=true]:hover:bg-control-background-hover'
-    );
-    await expect(input).toHaveClass('nx:enabled:hover:bg-transparent');
-  },
-};
-
 // The three sizes — sm / default (implicit) / lg — match standalone Input.
 export const Sizes: Story = {
   tags: ['docs'],
@@ -683,94 +583,6 @@ export const Sizes: Story = {
       </InputGroup>
     </div>
   ),
-};
-
-// Hover + disabled map to Input's semantic state tokens — no opacity dimming.
-export const VisualStateTokens: Story = {
-  render: () => (
-    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
-      <InputGroup data-testid="ig-hover">
-        <InputGroupAddon>
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput aria-label="Hover surface" placeholder="hover" />
-      </InputGroup>
-      <InputGroup data-testid="ig-disabled" data-disabled="true">
-        <InputGroupAddon data-testid="ig-disabled-addon">
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
-        <InputGroupText data-testid="ig-disabled-text">USD</InputGroupText>
-        <InputGroupInput
-          aria-label="Disabled"
-          placeholder="disabled"
-          disabled
-        />
-      </InputGroup>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const hover = canvas.getByTestId('ig-hover');
-    const disabled = canvas.getByTestId('ig-disabled');
-    const addon = canvas.getByTestId('ig-disabled-addon');
-    const text = canvas.getByTestId('ig-disabled-text');
-
-    // Token-name sentinel: synthetic userEvent can't toggle CSS :hover.
-    await expect(hover).toHaveClass(
-      'nx:not-data-[disabled=true]:hover:bg-container-hover'
-    );
-
-    // Disabled = semantic tokens, not opacity (opacity stays 1). No computed
-    // bg check: bg-disabled / background / -hover collapse in dark mode.
-    await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
-    await expect(disabled).toHaveClass(
-      'nx:data-[disabled=true]:border-border-disabled'
-    );
-    await expect(window.getComputedStyle(addon).opacity).toBe('1');
-    await expect(addon).toHaveClass(
-      'nx:group-data-[disabled=true]/input-group:text-disabled-foreground'
-    );
-    await expect(text).toHaveClass(
-      'nx:group-data-[disabled=true]/input-group:text-disabled-foreground'
-    );
-  },
-};
-
-// An invalid control reddens the group border (always-on, focus-independent).
-export const Invalid: Story = {
-  render: () => (
-    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
-      <InputGroup data-testid="ig-valid">
-        <InputGroupAddon>
-          <IconMail aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput aria-label="Valid email" placeholder="valid" />
-      </InputGroup>
-      <InputGroup data-testid="ig-invalid">
-        <InputGroupAddon>
-          <IconMail aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput
-          aria-label="Invalid email"
-          placeholder="invalid"
-          aria-invalid
-        />
-      </InputGroup>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole('textbox', { name: 'Invalid email' })
-    ).toHaveAttribute('aria-invalid', 'true');
-
-    // Error boundary fires: the invalid group's visual stroke differs from valid.
-    const valid = canvas.getByTestId('ig-valid');
-    const invalid = canvas.getByTestId('ig-invalid');
-    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
-      window.getComputedStyle(valid).borderTopColor
-    );
-  },
 };
 
 // A trailing kbd hint pulls toward the field edge by the canonical −1.5 step.

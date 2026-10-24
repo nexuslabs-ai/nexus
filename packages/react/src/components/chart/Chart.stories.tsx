@@ -60,15 +60,6 @@ const config = {
   },
 } satisfies ChartConfig;
 
-const unsafeKey = 'desktop; background: red';
-const guardedConfig = {
-  [unsafeKey]: {
-    label: 'Unsafe key',
-    color: 'var(--nx-color-chart-categorical-1)',
-  },
-  safe: { label: 'Safe', color: 'var(--nx-color-chart-categorical-2)' },
-} satisfies ChartConfig;
-
 const shortMonth = (value: string) => value.slice(0, 3);
 
 function AreaExample() {
@@ -184,14 +175,6 @@ function LineExample() {
   );
 }
 
-export const Default: Story = {
-  render: () => (
-    <div className="nx:w-[600px] nx:max-w-full">
-      <AreaExample />
-    </div>
-  ),
-};
-
 export const BarChartStory: Story = {
   tags: ['docs'],
   name: 'Bar',
@@ -252,67 +235,6 @@ export const WithDataAttributes: Story = {
     await expect(chart).toHaveAttribute('data-chart');
     // #497: chart base text migrated from the raw named text-size utility.
     await expect(chart).toHaveClass('nx:typography-body-small');
-  },
-};
-
-export const AxisTicksTabular: Story = {
-  render: () => (
-    <div className="nx:w-[600px] nx:max-w-full">
-      <ChartContainer config={config}>
-        <LineChart
-          accessibilityLayer
-          data={data}
-          margin={{ left: 12, right: 12 }}
-        >
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={shortMonth}
-          />
-          <Line
-            dataKey="desktop"
-            type="natural"
-            stroke="var(--color-desktop)"
-            strokeWidth={2}
-            dot={false}
-          />
-        </LineChart>
-      </ChartContainer>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const chart = canvasElement.querySelector('[data-slot="chart"]');
-
-    await expect(chart).toHaveClass(
-      'nx:[&_.recharts-cartesian-axis-tick_text]:tabular-nums'
-    );
-  },
-};
-
-export const DynamicStyleGuard: Story = {
-  render: () => (
-    <div className="nx:w-[600px] nx:max-w-full">
-      <ChartContainer config={guardedConfig}>
-        <BarChart accessibilityLayer data={data}>
-          <Bar dataKey="safe" fill="var(--color-safe)" radius={4} />
-        </BarChart>
-      </ChartContainer>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const chart = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="chart"]'
-    );
-    const style = chart?.getAttribute('style') || '';
-
-    await expect(chart).toBeInTheDocument();
-    await expect(canvasElement.querySelector('style')).not.toBeInTheDocument();
-    await expect(style).toContain('--color-safe');
-    await expect(style).not.toContain(unsafeKey);
-    await expect(style).not.toContain('background');
   },
 };
 

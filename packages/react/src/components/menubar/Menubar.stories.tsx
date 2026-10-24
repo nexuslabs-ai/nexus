@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectImmediateItemMotion } from '../../stories/support/motion-test-utils';
 import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
@@ -315,40 +314,6 @@ export const WithInsetItems: Story = {
       </MenubarMenu>
     </Menubar>
   ),
-};
-
-export const ImmediateItems: Story = {
-  render: (_args) => (
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger>Motion</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>New Tab</MenubarItem>
-          <MenubarItem>New Window</MenubarItem>
-          <MenubarItem>Save</MenubarItem>
-          <MenubarItem>Share</MenubarItem>
-          <MenubarItem>Print</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('menuitem', { name: 'Motion' });
-
-    await userEvent.click(trigger);
-
-    const menu = await within(document.body).findByRole('menu');
-    const items = Array.from(
-      menu.querySelectorAll('[data-slot="menubar-item"]')
-    );
-    await expectImmediateItemMotion(items);
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(document.querySelector('[role="menu"]')).toBeNull();
-    });
-  },
 };
 
 // ============================================

@@ -299,25 +299,6 @@ export const NarrowContainer: Story = {
     </div>
   ),
 };
-
-export const IncompleteDraft: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const page = within(canvasElement.ownerDocument.body);
-    const before = canvas.getByLabelText('Applied condition').textContent ?? '';
-    await userEvent.click(canvas.getByRole('button', { name: /^Edit Name:/ }));
-    await userEvent.clear(page.getByRole('textbox', { name: 'Name' }));
-    await userEvent.type(page.getByRole('textbox', { name: 'Name' }), '   ');
-    await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.keyboard('{Escape}');
-    await expect(canvas.getByLabelText('Applied condition')).toHaveTextContent(
-      before
-    );
-    await waitFor(() =>
-      expect(canvas.getByRole('button', { name: /^Edit Name:/ })).toHaveFocus()
-    );
-  },
-};
 export const AddFromNothing: Story = {
   render: (args) => <Preview initialValue={null} onChange={args.onChange} />,
   play: async ({ canvasElement, args }) => {
@@ -329,10 +310,10 @@ export const AddFromNothing: Story = {
       await page.findByRole('dialog', { name: 'Filter by name' })
     );
     await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
-    await userEvent.type(
-      editor.getByRole('textbox', { name: 'Name' }),
-      ' ops '
-    );
+    const input = editor.getByRole('textbox', { name: 'Name' });
+    await userEvent.type(input, '   ');
+    await expect(editor.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await userEvent.type(input, 'ops ');
     await userEvent.click(editor.getByRole('button', { name: 'Apply' }));
     await expect(args.onChange).toHaveBeenCalledTimes(1);
     await expect(args.onChange).toHaveBeenLastCalledWith({

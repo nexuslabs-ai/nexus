@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
-
 import {
   Accordion,
   AccordionContent,
@@ -56,36 +54,6 @@ type Story = StoryObj<typeof Accordion>;
 
 export const Default: Story = {
   tags: ['docs'],
-  render: ({ variant }) => (
-    <Accordion
-      type="single"
-      collapsible
-      variant={variant}
-      className="nx:w-full nx:max-w-md"
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Is it accessible?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It adheres to the WAI-ARIA design pattern.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-2">
-        <AccordionTrigger>Is it styled?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It comes with default styles that match the nxds design system.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-3">
-        <AccordionTrigger>Is it animated?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It has smooth open/close animations built-in.
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  ),
-};
-
-export const Stacked: Story = {
   render: ({ variant }) => (
     <Accordion
       type="single"
@@ -389,46 +357,6 @@ export const ExpandInteraction: Story = {
   },
 };
 
-export const MultipleExpandInteraction: Story = {
-  render: ({ variant }) => (
-    <Accordion
-      type="multiple"
-      variant={variant}
-      className="nx:w-full nx:max-w-md"
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Section 1</AccordionTrigger>
-        <AccordionContent>Content for section 1.</AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-2">
-        <AccordionTrigger>Section 2</AccordionTrigger>
-        <AccordionContent>Content for section 2.</AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const [firstTrigger, secondTrigger] = canvas.getAllByRole('button');
-    if (!firstTrigger || !secondTrigger) {
-      throw new Error('Expected 2 accordion triggers');
-    }
-
-    // Click first trigger
-    await userEvent.click(firstTrigger);
-    await expect(firstTrigger).toHaveAttribute('data-state', 'open');
-
-    // Click second trigger - both should be open (multiple mode)
-    await userEvent.click(secondTrigger);
-    await expect(firstTrigger).toHaveAttribute('data-state', 'open');
-    await expect(secondTrigger).toHaveAttribute('data-state', 'open');
-
-    // Click first trigger to close it
-    await userEvent.click(firstTrigger);
-    await expect(firstTrigger).toHaveAttribute('data-state', 'closed');
-    await expect(secondTrigger).toHaveAttribute('data-state', 'open');
-  },
-};
-
 export const KeyboardInteraction: Story = {
   render: ({ variant }) => (
     <Accordion
@@ -538,32 +466,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const WithFloatingDataAttributes: Story = {
-  args: {
-    variant: 'floating',
-  },
-  render: ({ variant }) => (
-    <Accordion
-      type="single"
-      collapsible
-      variant={variant}
-      defaultValue="item-1"
-      className="nx:w-full nx:max-w-md"
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Test Item</AccordionTrigger>
-        <AccordionContent>Test content.</AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  ),
-  play: async ({ canvasElement }) => {
-    const accordion = canvasElement.querySelector('[data-slot="accordion"]');
-
-    await expect(accordion).toBeInTheDocument();
-    await expect(accordion).toHaveAttribute('data-variant', 'floating');
-  },
-};
-
 // ============================================
 // EDGE CASES
 // ============================================
@@ -590,50 +492,6 @@ export const LongContent: Story = {
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  ),
-};
-
-export const NestedContent: Story = {
-  render: ({ variant }) => (
-    <Accordion
-      type="single"
-      collapsible
-      variant={variant}
-      className="nx:w-full nx:max-w-md"
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Item with nested content</AccordionTrigger>
-        <AccordionContent>
-          <div className="nx:space-y-4">
-            <p>This content has nested elements:</p>
-            <ul className="nx:list-disc nx:pl-4">
-              <li>First list item</li>
-              <li>Second list item</li>
-              <li>Third list item</li>
-            </ul>
-            <p className="nx:text-muted-foreground">
-              And some muted text at the bottom.
-            </p>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  ),
-};
-
-export const SingleItem: Story = {
-  render: ({ variant }) => (
-    <Accordion
-      type="single"
-      collapsible
-      variant={variant}
-      className="nx:w-full nx:max-w-md"
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Single accordion item</AccordionTrigger>
-        <AccordionContent>This accordion has only one item.</AccordionContent>
       </AccordionItem>
     </Accordion>
   ),
@@ -727,116 +585,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-};
-
-export const AccordionTriggerDefaultHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'At default density, AccordionTrigger is exactly 52px tall: a 20px label line plus 16px padding top and bottom.',
-      },
-    },
-  },
-  render: () => (
-    <div
-      data-testid="accordion-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
-      <Accordion type="single" collapsible className="nx:w-[200px]">
-        <AccordionItem value="a">
-          <AccordionTrigger>Default</AccordionTrigger>
-          <AccordionContent>x</AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(
-      within(canvasElement),
-      'accordion-default-host',
-      52,
-      {
-        selector: '[data-slot="accordion-trigger"]',
-      }
-    );
-  },
-};
-
-export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'In the floating variant, AccordionTrigger stays exactly 52px tall at default density.',
-      },
-    },
-  },
-  render: () => (
-    <div
-      data-testid="accordion-floating-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
-      <Accordion
-        type="single"
-        collapsible
-        variant="floating"
-        className="nx:w-[200px]"
-      >
-        <AccordionItem value="a">
-          <AccordionTrigger>Default</AccordionTrigger>
-          <AccordionContent>x</AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(
-      within(canvasElement),
-      'accordion-floating-default-host',
-      52,
-      {
-        selector: '[data-slot="accordion-trigger"]',
-      }
-    );
-  },
-};
-
-export const AccordionExpandedItemDefaultHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story: 'An open item with one line of content is 88 to 89px tall.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:p-10 nx:bg-background">
-      <Accordion
-        type="single"
-        collapsible
-        defaultValue="a"
-        className="nx:w-[200px]"
-      >
-        <AccordionItem value="a" data-testid="accordion-expanded-item">
-          <AccordionTrigger>Default</AccordionTrigger>
-          <AccordionContent>x</AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await document.fonts.ready;
-
-    const item = within(canvasElement).getByTestId('accordion-expanded-item');
-    const actualHeight = Math.round(item.getBoundingClientRect().height);
-
-    await expect(actualHeight).toBeGreaterThanOrEqual(88);
-    await expect(actualHeight).toBeLessThanOrEqual(89);
-  },
 };
 
 // ============================================

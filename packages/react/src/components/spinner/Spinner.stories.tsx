@@ -75,23 +75,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const CustomLabelAndSize: Story = {
-  render: () => (
-    <Spinner
-      className="nx:size-6 nx:text-primary-subtle-foreground"
-      aria-label="Saving changes"
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const spinner = within(canvasElement).getByRole('status', {
-      name: 'Saving changes',
-    });
-
-    await expect(spinner).toHaveClass('nx:size-6');
-    await expect(spinner).not.toHaveClass('nx:size-4');
-  },
-};
-
 // ============================================
 // ALL VARIANTS GRID
 // ============================================

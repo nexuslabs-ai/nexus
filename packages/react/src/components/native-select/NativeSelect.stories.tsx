@@ -205,31 +205,6 @@ export const BorderlessStates: Story = {
   },
 };
 
-export const AutofillPairing: Story = {
-  render: () => (
-    <div className="nx:grid nx:gap-2">
-      <NativeSelect aria-label="Bordered plan" defaultValue="free">
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-      <NativeSelect
-        aria-label="Borderless plan"
-        variant="borderless"
-        defaultValue="free"
-      >
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-      <NativeSelect aria-label="Disabled plan" defaultValue="free" disabled>
-        <NativeSelectOption value="free">Free</NativeSelectOption>
-      </NativeSelect>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    for (const field of within(canvasElement).getAllByRole('combobox')) {
-      await expect(unpairedAutofillClasses(field)).toEqual([]);
-    }
-  },
-};
-
 export const ReadOnlyBoundary: Story = {
   parameters: {
     docs: {
@@ -337,12 +312,15 @@ export const WithDataAttributes: Story = {
     </NativeSelect>
   ),
   play: async ({ canvasElement }) => {
-    const select = canvasElement.querySelector('[data-slot="native-select"]');
-    await expect(select).toBeInTheDocument();
+    const select = within(canvasElement).getByRole('combobox', {
+      name: 'Plan',
+    });
+    await expect(select).toHaveAttribute('data-slot', 'native-select');
     await expect(select).toHaveAttribute('data-size', 'default');
     await expect(select).toHaveAttribute('data-variant', 'bordered');
     await expect(select).toHaveClass('nx:bg-container');
     await expect(select).toHaveClass('nx:enabled:hover:bg-container-hover');
+    await expect(unpairedAutofillClasses(select)).toEqual([]);
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();

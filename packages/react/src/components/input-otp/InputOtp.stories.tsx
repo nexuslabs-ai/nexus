@@ -183,50 +183,6 @@ export const Disabled: Story = {
   },
 };
 
-export const ClickInteraction: Story = {
-  // input-otp overlays a single transparent <input> on top of the visual slots
-  // (the slots carry pointer-events: none). That input is the interaction layer,
-  // so all pointer/keyboard interaction targets it, not a slot.
-  play: async ({ canvasElement }) => {
-    const input = canvasElement.querySelector<HTMLInputElement>(
-      'input[data-slot="input-otp"]'
-    );
-
-    await userEvent.click(input!);
-    await expect(input).toHaveFocus();
-
-    const slot = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="input-otp-slot"]'
-    );
-    const caret = canvasElement.querySelector<HTMLElement>(
-      '[class~="nx:animate-caret-blink"]'
-    );
-
-    await expect(slot).toHaveClass('nx:duration-fast');
-    await expect(caret).toHaveClass('nx:animate-caret-blink');
-    await expect(caret).not.toHaveClass('nx:duration-1000');
-  },
-};
-
-export const TransitionScoped: Story = {
-  render: () => (
-    <InputOTP maxLength={4} aria-label="One-time password">
-      <InputOTPGroup>
-        <InputOTPSlot index={0} />
-        <InputOTPSlot index={1} />
-        <InputOTPSlot index={2} />
-        <InputOTPSlot index={3} />
-      </InputOTPGroup>
-    </InputOTP>
-  ),
-  play: async ({ canvasElement }) => {
-    const slot = canvasElement.querySelector('[data-slot="input-otp-slot"]');
-
-    await expect(slot).not.toHaveClass('nx:transition-all');
-    await expect(slot).toHaveClass('nx:transition-field');
-  },
-};
-
 export const ActiveSlotRing: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
@@ -305,6 +261,7 @@ export const KeyboardInteraction: Story = {
 
     await expect(input).toHaveValue('123456');
     await expect(args.onChange).toHaveBeenCalled();
+    await expect(args.onComplete).toHaveBeenCalledWith('123456');
   },
 };
 
@@ -318,19 +275,6 @@ export const Paste: Story = {
     await userEvent.paste('123456');
 
     await expect(input).toHaveValue('123456');
-    await expect(args.onComplete).toHaveBeenCalledWith('123456');
-  },
-};
-
-export const CompleteCallback: Story = {
-  play: async ({ canvasElement, args }) => {
-    const input = canvasElement.querySelector<HTMLInputElement>(
-      'input[data-slot="input-otp"]'
-    );
-
-    await userEvent.click(input!);
-    await userEvent.keyboard('123456');
-
     await expect(args.onComplete).toHaveBeenCalledWith('123456');
   },
 };

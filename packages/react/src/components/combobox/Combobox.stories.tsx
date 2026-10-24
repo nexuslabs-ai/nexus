@@ -223,10 +223,6 @@ export const Default: Story = {
   render: () => <ComboboxExample />,
 };
 
-export const WithSelection: Story = {
-  render: () => <ComboboxExample defaultValue="next" />,
-};
-
 export const Sizes: Story = {
   tags: ['docs'],
   parameters: {

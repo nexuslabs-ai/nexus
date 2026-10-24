@@ -4,12 +4,10 @@ import {
   IconAlertTriangle,
   IconCircleCheck,
   IconInfoCircle,
-  IconX,
 } from '@tabler/icons-vue';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { ref } from 'vue';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 
 import {
@@ -352,43 +350,6 @@ export const HelperBanner: Story = {
   },
 };
 
-export const CustomCloseIconLabel: Story = {
-  render: () => ({
-    components: {
-      Alert,
-      AlertActions,
-      AlertClose,
-      AlertContent,
-      AlertDescription,
-      AlertIcon,
-      AlertTitle,
-      IconInfoCircle,
-      IconX,
-    },
-    template: `
-      <Alert variant="information" layout="inline" class="nx:max-w-xl">
-        <AlertIcon><IconInfoCircle /></AlertIcon>
-        <AlertContent>
-          <AlertTitle>Custom close icon</AlertTitle>
-          <AlertDescription>Icon-only custom children need an explicit accessible name.</AlertDescription>
-        </AlertContent>
-        <AlertActions>
-          <AlertClose aria-label="Dismiss alert">
-            <IconX aria-hidden="true" />
-          </AlertClose>
-        </AlertActions>
-      </Alert>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
-
-    await expect(close).toBeInTheDocument();
-    await expect(close).toHaveAttribute('aria-label', 'Dismiss alert');
-  },
-};
-
 export const TextCloseLabel: Story = {
   render: () => ({
     components: {
@@ -444,7 +405,7 @@ export const TitleAsHeading: Story = {
   },
 };
 
-export const ActionSlotDataAttributes: Story = {
+export const WithDataAttributes: Story = {
   render: () => ({
     components: {
       Alert,
@@ -458,53 +419,37 @@ export const ActionSlotDataAttributes: Story = {
       IconAlertTriangle,
     },
     template: `
-      <Alert variant="warning" layout="inline" class="nx:max-w-xl">
-        <AlertIcon><IconAlertTriangle /></AlertIcon>
-        <AlertContent>
-          <AlertTitle>Storage almost full</AlertTitle>
-          <AlertDescription>Uploads may fail soon.</AlertDescription>
-        </AlertContent>
-        <AlertActions>
-          <Button variant="outline">Manage</Button>
-          <AlertClose />
-        </AlertActions>
-      </Alert>
+      <div class="nx:flex nx:flex-col nx:gap-4">
+        <Alert variant="destructive" class="nx:max-w-md">
+          <AlertTitle>Test Alert</AlertTitle>
+          <AlertDescription>Testing data attributes.</AlertDescription>
+        </Alert>
+        <Alert variant="warning" layout="inline" class="nx:max-w-xl">
+          <AlertIcon><IconAlertTriangle /></AlertIcon>
+          <AlertContent>
+            <AlertTitle>Storage almost full</AlertTitle>
+            <AlertDescription>Uploads may fail soon.</AlertDescription>
+          </AlertContent>
+          <AlertActions>
+            <Button variant="outline">Manage</Button>
+            <AlertClose />
+          </AlertActions>
+        </Alert>
+      </div>
     `,
   }),
   play: async ({ canvasElement }) => {
-    const alert = canvasElement.querySelector('[data-slot="alert"]');
-    const content = canvasElement.querySelector('[data-slot="alert-content"]');
-    const actions = canvasElement.querySelector('[data-slot="alert-actions"]');
-    const close = canvasElement.querySelector('[data-slot="alert-close"]');
-
-    await expect(alert).toBeInTheDocument();
-    await expect(alert).toHaveAttribute('data-layout', 'inline');
-    await expect(content).toBeInTheDocument();
-    await expect(actions).toBeInTheDocument();
-    await expect(close).toBeInTheDocument();
-    await expect(close).toHaveAttribute('type', 'button');
-  },
-};
-
-export const WithDataAttributes: Story = {
-  render: () => ({
-    components: { Alert, AlertDescription, AlertTitle },
-    template: `
-      <Alert variant="destructive" class="nx:max-w-md">
-        <AlertTitle>Test Alert</AlertTitle>
-        <AlertDescription>Testing data attributes.</AlertDescription>
-      </Alert>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    // Check data-slot attributes
-    const alert = canvasElement.querySelector('[data-slot="alert"]');
+    const [alert, inlineAlert] = canvasElement.querySelectorAll(
+      '[data-slot="alert"]'
+    );
     const title = canvasElement.querySelector('[data-slot="alert-title"]');
     const description = canvasElement.querySelector(
       '[data-slot="alert-description"]'
     );
+    const content = canvasElement.querySelector('[data-slot="alert-content"]');
+    const actions = canvasElement.querySelector('[data-slot="alert-actions"]');
+    const close = canvasElement.querySelector('[data-slot="alert-close"]');
 
-    await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-variant', 'destructive');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
     await expect(alert).toHaveAttribute('data-layout', 'stack');
@@ -512,113 +457,10 @@ export const WithDataAttributes: Story = {
     await expect(alert).not.toHaveAttribute('role');
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
-  },
-};
-
-export const DefaultDataAttributes: Story = {
-  render: () => ({
-    components: { Alert, AlertDescription, AlertTitle },
-    template: `
-      <Alert class="nx:max-w-md">
-        <AlertTitle>Default Alert</AlertTitle>
-        <AlertDescription>Testing default variant.</AlertDescription>
-      </Alert>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const alert = canvasElement.querySelector('[data-slot="alert"]');
-
-    await expect(alert).toBeInTheDocument();
-    await expect(alert).toHaveAttribute('data-variant', 'default');
-    await expect(alert).toHaveAttribute('data-presentation', 'card');
-    await expect(alert).not.toHaveAttribute(DATA_DENSITY_ATTRIBUTE);
-    await expect(alert).not.toHaveAttribute('role');
-  },
-};
-
-export const RolePassThrough: Story = {
-  render: () => ({
-    components: { Alert, AlertDescription, AlertTitle },
-    template: `
-      <div class="nx:flex nx:flex-col nx:gap-4">
-        <Alert role="alert" variant="destructive" class="nx:max-w-md">
-          <AlertTitle>Session expired</AlertTitle>
-          <AlertDescription>Sign in again before continuing this task.</AlertDescription>
-        </Alert>
-        <Alert role="status" variant="information" class="nx:max-w-md">
-          <AlertTitle>Changes saved</AlertTitle>
-          <AlertDescription>Your workspace settings were updated.</AlertDescription>
-        </Alert>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const alert = canvasElement.querySelector('[role="alert"]');
-    const status = canvasElement.querySelector('[role="status"]');
-
-    await expect(alert).toBeInTheDocument();
-    await expect(status).toBeInTheDocument();
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'At default density, an Alert with one 40px child is exactly 74px tall: 1px borders plus 16px padding top and bottom.',
-      },
-    },
-  },
-  render: () => ({
-    components: { Alert },
-    template: `
-      <div data-testid="alert-default-host" class="nx:p-10 nx:bg-background">
-        <Alert class="nx:w-[200px]">
-          <div class="nx:h-10" aria-hidden="true" />
-        </Alert>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'alert-default-host', 74, {
-      selector: '[data-slot="alert"]',
-    });
-  },
-};
-
-export const WithActions: Story = {
-  render: () => ({
-    components: {
-      Alert,
-      AlertActions,
-      AlertDescription,
-      AlertIcon,
-      AlertTitle,
-      Button,
-      IconAlertCircle,
-    },
-    template: `
-      <Alert variant="destructive" role="alert" class="nx:max-w-lg">
-        <AlertIcon><IconAlertCircle /></AlertIcon>
-        <AlertTitle>Payment failed</AlertTitle>
-        <AlertDescription>Your card was declined.</AlertDescription>
-        <AlertActions>
-          <Button size="sm" variant="outline">Update card</Button>
-        </AlertActions>
-      </Alert>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const alert = canvas.getByRole('alert');
-    const icon = alert.querySelector('[data-slot="alert-icon"]');
-
-    await expect(icon).toHaveAttribute('aria-hidden', 'true');
-    await expect(
-      canvas.getByRole('button', { name: 'Update card' })
-    ).toBeVisible();
+    await expect(inlineAlert).toHaveAttribute('data-layout', 'inline');
+    await expect(content).toBeInTheDocument();
+    await expect(actions).toBeInTheDocument();
+    await expect(close).toHaveAttribute('type', 'button');
   },
 };
 

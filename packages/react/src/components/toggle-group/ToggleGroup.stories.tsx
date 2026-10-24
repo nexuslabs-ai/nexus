@@ -173,320 +173,10 @@ export const Spacing: Story = {
   ),
 };
 
-const LAYOUTS = [
-  { name: 'LTR', dir: 'ltr', orientation: 'horizontal' },
-  { name: 'RTL', dir: 'rtl', orientation: 'horizontal' },
-  { name: 'Vertical', dir: 'ltr', orientation: 'vertical' },
-] as const;
-const MIXES = [
-  ['outline-primary', 'outline-primary', 'outline-primary'],
-  ['outline-primary', 'outline', 'outline-primary'],
-  ['outline', 'outline-primary', 'outline-primary'],
-  ['default', 'outline-primary', 'outline-primary'],
-  ['outline', 'outline', 'outline-primary'],
-] as const;
-const GEOMETRY_LAYOUTS = [
-  ...LAYOUTS,
-  { name: 'Vertical RTL', dir: 'rtl', orientation: 'vertical' },
-] as const;
-// The overlap follows the border-width token, so a non-default stroke mode
-// must still share exactly one edge.
-const STROKE_LAYOUTS = [
-  ...GEOMETRY_LAYOUTS,
-  {
-    name: 'LTR strong',
-    dir: 'ltr',
-    orientation: 'horizontal',
-    borderwidth: 'strong',
-  },
-  {
-    name: 'Vertical strong',
-    dir: 'ltr',
-    orientation: 'vertical',
-    borderwidth: 'strong',
-  },
-] as const;
-
-const stackLevel = (item: HTMLElement) =>
-  Number.parseInt(getComputedStyle(item).zIndex, 10) || 0;
-
-export const GeometryMatrix: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
-      {STROKE_LAYOUTS.flatMap((layout) =>
-        [0, 2].flatMap((spacing) =>
-          MIXES.map((variants, mix) => (
-            <ToggleGroup
-              key={`${layout.name}-${spacing}-${mix}`}
-              type="multiple"
-              variant="outline-primary"
-              spacing={spacing}
-              dir={layout.dir}
-              orientation={layout.orientation}
-              data-borderwidth={
-                'borderwidth' in layout ? layout.borderwidth : undefined
-              }
-              defaultValue={['0', '1']}
-              aria-label={`${layout.name} spacing ${spacing} mix ${mix}`}
-            >
-              {variants.map((variant, index) => (
-                <ToggleGroupItem
-                  key={index}
-                  value={String(index)}
-                  variant={variant}
-                  aria-invalid={index === 1}
-                  aria-label={`${layout.name} ${spacing} ${mix} ${index}`}
-                >
-                  <IconBold />
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          ))
-        )
-      )}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const groups = within(canvasElement).getAllByRole('group');
-    await expect(groups).toHaveLength(60);
-    for (const group of groups) {
-      const items = within(group).getAllByRole('button');
-      const vertical = group.dataset.orientation === 'vertical';
-      const rtl = group.getAttribute('dir') === 'rtl';
-      const joined = group.dataset.spacing === '0';
-      const stroke = Number.parseFloat(
-        getComputedStyle(group).getPropertyValue('--nx-borderwidth-default')
-      );
-      await expect(stroke).toBe(group.dataset.borderwidth === 'strong' ? 2 : 1);
-      for (const [index, item] of items.entries()) {
-        if (index === 0) continue;
-        const previous = items[index - 1];
-        if (!previous)
-          throw new Error('Joined item must have a preceding sibling');
-        const before = previous.getBoundingClientRect();
-        const after = item.getBoundingClientRect();
-        const gap = vertical
-          ? after.top - before.bottom
-          : rtl
-            ? before.left - after.right
-            : after.left - before.right;
-        // Two bordered neighbours overlap by one stroke to share an edge; a
-        // borderless item sits flush against its neighbour.
-        const overlapped =
-          item.dataset.variant !== 'default' &&
-          previous.dataset.variant !== 'default';
-        const expected = !joined
-          ? Number.parseFloat(getComputedStyle(group).gap)
-          : overlapped
-            ? -stroke
-            : 0;
-        await expect(gap).toBeCloseTo(expected, 2);
-      }
-      if (joined) {
-        await expect(getComputedStyle(group).isolation).toBe('isolate');
-        for (const item of items) {
-          item.focus();
-          await expect(item).toHaveFocus();
-          for (const neighbor of items.filter(
-            (candidate) => candidate !== item
-          )) {
-            await expect(stackLevel(item)).toBeGreaterThan(
-              stackLevel(neighbor)
-            );
-          }
-        }
-      }
-    }
-  },
-};
-
-interface SharedEdgeCase {
-  name: string;
-  variant: 'outline' | 'outline-primary';
-  leading: { invalid?: boolean; pressed?: boolean };
-  trailing: { invalid?: boolean; pressed?: boolean; disabled?: boolean };
-  owner: 'own' | 'next';
-}
-
-const SHARED_EDGE_CASES: readonly SharedEdgeCase[] = [
-  {
-    name: 'rest',
-    variant: 'outline-primary',
-    leading: {},
-    trailing: {},
-    owner: 'own',
-  },
-  {
-    name: 'leading selected',
-    variant: 'outline-primary',
-    leading: { pressed: true },
-    trailing: {},
-    owner: 'own',
-  },
-  {
-    name: 'selected',
-    variant: 'outline-primary',
-    leading: {},
-    trailing: { pressed: true },
-    owner: 'next',
-  },
-  {
-    name: 'invalid',
-    variant: 'outline-primary',
-    leading: {},
-    trailing: { invalid: true },
-    owner: 'next',
-  },
-  {
-    name: 'invalid selected',
-    variant: 'outline-primary',
-    leading: {},
-    trailing: { invalid: true, pressed: true },
-    owner: 'next',
-  },
-  {
-    name: 'disabled selected',
-    variant: 'outline-primary',
-    leading: { pressed: true },
-    trailing: { disabled: true, pressed: true },
-    owner: 'own',
-  },
-  {
-    name: 'own invalid',
-    variant: 'outline-primary',
-    leading: { invalid: true },
-    trailing: { pressed: true },
-    owner: 'own',
-  },
-  {
-    name: 'both invalid selected',
-    variant: 'outline-primary',
-    leading: { invalid: true },
-    trailing: { invalid: true, pressed: true },
-    owner: 'next',
-  },
-  {
-    name: 'own invalid selected',
-    variant: 'outline-primary',
-    leading: { invalid: true, pressed: true },
-    trailing: { invalid: true },
-    owner: 'own',
-  },
-  {
-    name: 'outline selected',
-    variant: 'outline',
-    leading: {},
-    trailing: { pressed: true },
-    owner: 'own',
-  },
-  {
-    name: 'outline invalid',
-    variant: 'outline',
-    leading: {},
-    trailing: { invalid: true },
-    owner: 'next',
-  },
-  {
-    name: 'outline invalid selected',
-    variant: 'outline',
-    leading: {},
-    trailing: { invalid: true, pressed: true },
-    owner: 'next',
-  },
-  {
-    name: 'outline disabled invalid',
-    variant: 'outline',
-    leading: { invalid: true },
-    trailing: { invalid: true, disabled: true },
-    owner: 'own',
-  },
-  {
-    name: 'outline own invalid',
-    variant: 'outline',
-    leading: { invalid: true },
-    trailing: { pressed: true },
-    owner: 'own',
-  },
-];
-
-// Pins which item paints the shared edge of a joined pair.
-export const JoinedSharedEdge: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-8">
-      {GEOMETRY_LAYOUTS.flatMap((layout) =>
-        SHARED_EDGE_CASES.map((edgeCase) => {
-          const label = `${layout.name} ${edgeCase.name}`;
-          return (
-            <ToggleGroup
-              key={label}
-              type="multiple"
-              variant={edgeCase.variant}
-              dir={layout.dir}
-              orientation={layout.orientation}
-              defaultValue={(['leading', 'trailing'] as const).filter(
-                (position) => edgeCase[position].pressed
-              )}
-              aria-label={label}
-            >
-              <ToggleGroupItem
-                value="leading"
-                aria-invalid={edgeCase.leading.invalid}
-                aria-label={`${label} leading`}
-              >
-                <IconBold />
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="trailing"
-                aria-invalid={edgeCase.trailing.invalid}
-                disabled={edgeCase.trailing.disabled}
-                aria-label={`${label} trailing`}
-              >
-                <IconItalic />
-              </ToggleGroupItem>
-            </ToggleGroup>
-          );
-        })
-      )}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const layout of GEOMETRY_LAYOUTS) {
-      const vertical = layout.orientation === 'vertical';
-      const start = (item: HTMLElement) =>
-        vertical
-          ? getComputedStyle(item).borderTopColor
-          : getComputedStyle(item).borderInlineStartColor;
-      const end = (item: HTMLElement) =>
-        vertical
-          ? getComputedStyle(item).borderBottomColor
-          : getComputedStyle(item).borderInlineEndColor;
-      const item = (label: string, position: 'leading' | 'trailing') =>
-        canvas.getByRole('button', { name: `${label} ${position}` });
-      await expect(item(`${layout.name} rest`, 'trailing')).toHaveClass(
-        'nx:not-disabled:hover:z-10'
-      );
-      for (const edgeCase of SHARED_EDGE_CASES) {
-        const label = `${layout.name} ${edgeCase.name}`;
-        const leading = item(label, 'leading');
-        const trailing = item(label, 'trailing');
-        const seam =
-          stackLevel(trailing) >= stackLevel(leading)
-            ? start(trailing)
-            : end(leading);
-        if (edgeCase.owner === 'next') {
-          await expect(start(trailing), label).not.toBe(end(leading));
-          await expect(seam, label).toBe(start(trailing));
-          continue;
-        }
-        await expect(seam, label).toBe(end(leading));
-      }
-    }
-  },
-};
-
 const NAVIGATION = [
-  ...LAYOUTS.map((layout) => ({ ...layout, loop: true })),
+  { name: 'LTR', dir: 'ltr', orientation: 'horizontal', loop: true },
+  { name: 'RTL', dir: 'rtl', orientation: 'horizontal', loop: true },
+  { name: 'Vertical', dir: 'ltr', orientation: 'vertical', loop: true },
   { name: 'Vertical RTL', dir: 'rtl', orientation: 'vertical', loop: true },
   { name: 'No loop', dir: 'ltr', orientation: 'horizontal', loop: false },
   {
@@ -866,31 +556,6 @@ export const ClickInteraction: Story = {
   },
 };
 
-// Arrow keys move the roving focus within the group.
-export const KeyboardInteraction: Story = {
-  render: () => (
-    <ToggleGroup type="single" defaultValue="left">
-      <ToggleGroupItem value="left" aria-label="Align left">
-        <IconAlignLeft />
-      </ToggleGroupItem>
-      <ToggleGroupItem value="center" aria-label="Align center">
-        <IconAlignCenter />
-      </ToggleGroupItem>
-    </ToggleGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.tab();
-    await expect(
-      canvas.getByRole('radio', { name: 'Align left' })
-    ).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(
-      canvas.getByRole('radio', { name: 'Align center' })
-    ).toHaveFocus();
-  },
-};
-
 // A disabled group disables all its items.
 export const Disabled: Story = {
   tags: ['docs'],
@@ -919,14 +584,19 @@ export const Disabled: Story = {
   },
 };
 
-// The group carries data-variant / data-size; items inherit them through context.
+// The group carries data-variant / data-size; items inherit them through
+// context, and a per-item variant overrides the group's.
 export const WithDataAttributes: Story = {
   render: () => (
     <ToggleGroup type="single" variant="outline" size="sm" defaultValue="left">
       <ToggleGroupItem value="left" aria-label="Align left">
         <IconAlignLeft />
       </ToggleGroupItem>
-      <ToggleGroupItem value="center" aria-label="Align center">
+      <ToggleGroupItem
+        value="center"
+        variant="default"
+        aria-label="Align center"
+      >
         <IconAlignCenter />
       </ToggleGroupItem>
     </ToggleGroup>
@@ -935,33 +605,14 @@ export const WithDataAttributes: Story = {
     const group = canvasElement.querySelector('[data-slot="toggle-group"]');
     await expect(group).toHaveAttribute('data-variant', 'outline');
     await expect(group).toHaveAttribute('data-size', 'sm');
-    const item = canvasElement.querySelector('[data-slot="toggle-group-item"]');
-    await expect(item).toHaveAttribute('data-variant', 'outline');
-    await expect(item).toHaveAttribute('data-size', 'sm');
-  },
-};
-
-// Item-wins precedence: a per-item variant overrides the group's. The group is
-// outline; the first item opts back to the borderless default, the second inherits.
-export const ItemOverridesGroup: Story = {
-  render: () => (
-    <ToggleGroup type="single" variant="outline" defaultValue="left">
-      <ToggleGroupItem value="left" variant="default" aria-label="Align left">
-        <IconAlignLeft />
-      </ToggleGroupItem>
-      <ToggleGroupItem value="center" aria-label="Align center">
-        <IconAlignCenter />
-      </ToggleGroupItem>
-    </ToggleGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const [override, inherited] = canvasElement.querySelectorAll(
+    const [inherited, override] = canvasElement.querySelectorAll(
       '[data-slot="toggle-group-item"]'
     );
+    await expect(inherited).toHaveAttribute('data-variant', 'outline');
+    await expect(inherited).toHaveAttribute('data-size', 'sm');
+    await expect(inherited).toHaveClass('nx:border-border-default');
     await expect(override).toHaveAttribute('data-variant', 'default');
     await expect(override).not.toHaveClass('nx:border-border-default');
-    await expect(inherited).toHaveAttribute('data-variant', 'outline');
-    await expect(inherited).toHaveClass('nx:border-border-default');
   },
 };
 

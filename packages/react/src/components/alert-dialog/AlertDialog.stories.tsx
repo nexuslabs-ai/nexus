@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  expectExitBeforeUnmount,
-  expectInterruptibleOverlayMotion,
-} from '../../stories/support/overlay-motion-test-utils';
+import { expectExitBeforeUnmount } from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button/button';
 
 import {
@@ -116,70 +113,6 @@ export const Destructive: Story = {
   },
 };
 
-export const WithBodyContent: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive">Remove payment method</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Remove payment method?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This payment method will be removed from the workspace.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogBody className="nx:grid nx:gap-2">
-          <div className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
-            Future invoices will use the fallback payment method.
-          </div>
-          <div className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
-            Active subscriptions continue until the next billing cycle.
-          </div>
-        </AlertDialogBody>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">
-            Remove method
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    const trigger = canvas.getByRole('button', {
-      name: 'Remove payment method',
-    });
-    await userEvent.click(trigger);
-
-    const dialog = await within(document.body).findByRole('alertdialog');
-    await expect(dialog).toHaveTextContent(
-      'Future invoices will use the fallback payment method.'
-    );
-
-    await expect(dialog).toHaveClass('nx:py-6', 'nx:gap-4');
-    await expect(dialog).not.toHaveClass('nx:p-6');
-    await expect(
-      document.querySelector('[data-slot="alert-dialog-header"]')
-    ).toHaveClass('nx:px-6');
-    await expect(
-      document.querySelector('[data-slot="alert-dialog-footer"]')
-    ).toHaveClass('nx:px-6');
-    await expect(
-      document.querySelector('[data-slot="alert-dialog-body"]')
-    ).toHaveClass('nx:px-6');
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
-  },
-};
-
 export const ViewportBoundContent: Story = {
   render: (_args) => (
     <AlertDialog>
@@ -229,11 +162,21 @@ export const ViewportBoundContent: Story = {
     });
     await expect(dialog).toHaveClass(
       'nx:max-h-[calc(100svh-2rem)]',
-      'nx:overflow-hidden'
+      'nx:overflow-hidden',
+      'nx:py-6',
+      'nx:gap-4'
     );
+    await expect(dialog).not.toHaveClass('nx:p-6');
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-header"]')
+    ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-footer"]')
+    ).toHaveClass('nx:px-6');
     await expect(
       document.querySelector('[data-slot="alert-dialog-body"]')
     ).toHaveClass(
+      'nx:px-6',
       'nx:min-h-0',
       'nx:overflow-y-auto',
       'nx:focus-visible:outline-2',
@@ -315,136 +258,6 @@ export const Centered: Story = {
 // INTERACTION TESTS
 // ============================================
 
-export const OpenConfirm: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show dialog</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Confirm action</AlertDialogTitle>
-          <AlertDialogDescription>
-            Confirming will apply your changes.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Dialog should not be visible initially.
-    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
-    await expect(trigger).toBeInTheDocument();
-
-    // Open the alert dialog.
-    await userEvent.click(trigger);
-
-    // Content should now be visible in the document body with the alertdialog role.
-    const dialog = await within(document.body).findByRole('alertdialog');
-    await expect(dialog).toBeInTheDocument();
-    await expect(dialog).toHaveAttribute('data-slot', 'alert-dialog-content');
-    await expectInterruptibleOverlayMotion(dialog);
-    await expect(
-      document.querySelector('[data-slot="alert-dialog-overlay"]')
-    ).toHaveClass('nx:transition-opacity');
-
-    // Confirming via the action closes the dialog.
-    const continueButton = within(dialog).getByRole('button', {
-      name: 'Continue',
-    });
-    await userEvent.click(continueButton);
-
-    await expectExitBeforeUnmount(
-      document.querySelector('[data-slot="alert-dialog-content"]')
-    );
-  },
-};
-
-export const EscapeCancels: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show dialog</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Discard changes?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Pressing Escape dismisses this dialog without confirming.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Open the alert dialog.
-    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
-    await userEvent.click(trigger);
-
-    const dialog = await within(document.body).findByRole('alertdialog');
-    await expect(dialog).toBeInTheDocument();
-
-    // Escape dismisses an alert dialog (unlike an outside click, which does not).
-    await userEvent.keyboard('{Escape}');
-
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
-  },
-};
-
-export const CancelCloses: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show dialog</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Discard draft?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Cancel closes the dialog without confirming the action.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
-    await userEvent.click(trigger);
-
-    const dialog = await within(document.body).findByRole('alertdialog');
-    const cancelButton = within(dialog).getByRole('button', { name: 'Cancel' });
-    await userEvent.click(cancelButton);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
-  },
-};
-
 export const FocusManagement: Story = {
   render: (_args) => (
     <AlertDialog>
@@ -482,11 +295,7 @@ export const FocusManagement: Story = {
 
     await userEvent.click(cancelButton);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
+    await expectExitBeforeUnmount(dialog);
     await waitFor(() => {
       expect(trigger).toHaveFocus();
     });

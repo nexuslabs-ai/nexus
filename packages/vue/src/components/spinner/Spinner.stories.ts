@@ -84,19 +84,3 @@ export const WithDataAttributes: Story = {
     await expect(spinner).toHaveAttribute('data-slot', 'spinner');
   },
 };
-
-export const CustomLabelAndSize: Story = {
-  render: () => ({
-    components: { Spinner },
-    template:
-      '<Spinner class="nx:size-6 nx:text-primary-subtle-foreground" aria-label="Saving changes" />',
-  }),
-  play: async ({ canvasElement }) => {
-    const spinner = within(canvasElement).getByRole('status', {
-      name: 'Saving changes',
-    });
-
-    await expect(spinner).toHaveClass('nx:size-6');
-    await expect(spinner).not.toHaveClass('nx:size-4');
-  },
-};

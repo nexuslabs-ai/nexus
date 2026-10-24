@@ -494,6 +494,13 @@ export const InvalidExternalValues: Story = {
             operator: 'is',
             value: '1e999',
           },
+          {
+            kind: 'rule',
+            id: 'stale',
+            field: 'status',
+            operator: 'is',
+            value: 'deleted',
+          },
         ],
       }}
     />
@@ -503,6 +510,14 @@ export const InvalidExternalValues: Story = {
     await expect(canvas.getByText('Choose an available field.')).toBeVisible();
     await expect(canvas.getByText('Enter a valid date.')).toBeVisible();
     await expect(canvas.getAllByText('Enter a valid number.')).toHaveLength(2);
+    await expect(canvas.getByText('Choose an available option.')).toBeVisible();
+    // The stale rule is appended last.
+    const statusValues = canvas.getAllByRole('combobox', {
+      name: 'Status value',
+    });
+    await expect(statusValues[statusValues.length - 1]).toHaveTextContent(
+      'Unavailable selection'
+    );
     await expect(
       canvas.getByText('Use at most 0 levels of nested groups.')
     ).toBeVisible();
@@ -602,30 +617,5 @@ export const RestrictedOperators: Story = {
     );
     await expect(page.getAllByRole('option')).toHaveLength(2);
     await userEvent.keyboard('{Escape}');
-  },
-};
-export const UnavailableChoice: Story = {
-  render: () => (
-    <Demo
-      initial={{
-        ...simple,
-        children: [
-          {
-            kind: 'rule',
-            id: 'stale',
-            field: 'status',
-            operator: 'is',
-            value: 'deleted',
-          },
-        ],
-      }}
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByText('Choose an available option.')).toBeVisible();
-    await expect(
-      canvas.getByRole('combobox', { name: 'Status value' })
-    ).toHaveTextContent('Unavailable selection');
   },
 };

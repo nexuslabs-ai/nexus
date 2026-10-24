@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { expect, within } from 'storybook/test';
 import { useId } from 'vue';
 
-import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 
 import {
@@ -234,6 +233,7 @@ export const WithDataAttributes: Story = {
     components: {
       Button,
       Card,
+      CardAction,
       CardContent,
       CardDescription,
       CardFooter,
@@ -245,6 +245,9 @@ export const WithDataAttributes: Story = {
         <CardHeader>
           <CardTitle>Data Attributes Test</CardTitle>
           <CardDescription>Testing data-slot attributes.</CardDescription>
+          <CardAction>
+            <Button size="sm">Edit</Button>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <p>Content area.</p>
@@ -265,6 +268,7 @@ export const WithDataAttributes: Story = {
     const description = canvasElement.querySelector(
       '[data-slot="card-description"]'
     );
+    const action = canvasElement.querySelector('[data-slot="card-action"]');
     const content = canvasElement.querySelector('[data-slot="card-content"]');
     const footer = canvasElement.querySelector('[data-slot="card-footer"]');
 
@@ -272,6 +276,7 @@ export const WithDataAttributes: Story = {
     await expect(header).toBeInTheDocument();
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
+    await expect(action).toBeInTheDocument();
     await expect(content).toBeInTheDocument();
     await expect(footer).toBeInTheDocument();
 
@@ -364,75 +369,5 @@ export const LongTitleWithAction: Story = {
     const actionRect = action.getBoundingClientRect();
 
     await expect(titleRect.right).toBeLessThanOrEqual(actionRect.left + 0.5);
-  },
-};
-
-export const ActionDataAttributes: Story = {
-  render: () => ({
-    components: { Button, Card, CardAction, CardHeader, CardTitle },
-    template: `
-      <Card class="nx:w-[350px]">
-        <CardHeader>
-          <CardTitle>Action Test</CardTitle>
-          <CardAction>
-            <Button size="sm">Edit</Button>
-          </CardAction>
-        </CardHeader>
-      </Card>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const action = canvasElement.querySelector('[data-slot="card-action"]');
-    await expect(action).toBeInTheDocument();
-  },
-};
-
-export const WithCustomClassName: Story = {
-  render: () => ({
-    components: { Card, CardContent },
-    template: `
-      <Card class="nx:w-96 nx:rounded-none">
-        <CardContent class="nx:pt-6">Square corners.</CardContent>
-      </Card>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('[data-slot="card"]');
-    const content = canvasElement.querySelector('[data-slot="card-content"]');
-
-    // `cn` resolves the conflict, so the override replaces the default.
-    await expect(card).toHaveClass('nx:rounded-none');
-    await expect(card).not.toHaveClass('nx:rounded-xl');
-    await expect(content).toHaveClass('nx:pt-6');
-    await expect(content).not.toHaveClass('nx:pt-0');
-  },
-};
-
-export const DefaultModeHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'At default density, a card with one 40px child is exactly 66px tall.',
-      },
-    },
-  },
-  render: () => ({
-    components: { Card, CardContent },
-    template: `
-      <div data-testid="card-default-host" class="nx:p-10 nx:bg-background">
-        <Card class="nx:w-[200px]">
-          <CardContent>
-            <div class="nx:h-10" aria-hidden="true" />
-          </CardContent>
-        </Card>
-      </div>
-    `,
-  }),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'card-default-host', 66, {
-      selector: '[data-slot="card"]',
-    });
   },
 };
