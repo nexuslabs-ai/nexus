@@ -321,6 +321,13 @@ export default tseslint.config(
     rules: { '@nxds/no-jsdoc-data-tags': 'error' },
   },
 
+  // packages/react-18 is generated from packages/react by adding forwardRef
+  // and nothing else, so packages/react can't use what React 18 lacks.
+  {
+    files: ['packages/react/src/**/*.{ts,tsx}'],
+    rules: { '@nxds/no-react-19-only': 'error' },
+  },
+
   nxdsTailwindClassesConfig({
     files: ['packages/react/src/**/*.{ts,tsx}'],
     entryPoint: repoPath('packages/react/.storybook/preview.css'),

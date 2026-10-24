@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
+
 import { IconCheck, IconChevronDown, IconX } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import { Badge } from '../badge/badge';
@@ -200,6 +202,32 @@ function MultiSelectTrigger({
   );
 }
 
+/**
+ * Hides chips from the end of `container` until the row stops overflowing,
+ * and returns how many it hid.
+ */
+function hideOverflowingChips(container: HTMLDivElement) {
+  const chips = container.querySelectorAll<HTMLElement>('[data-selected-item]');
+
+  // Reset to the fully-expanded state first; the count becomes the `+N` badge,
+  // whose visibility is driven from that count in render (single source).
+  chips.forEach((chip) => chip.style.removeProperty('display'));
+
+  let amount = 0;
+
+  for (let i = chips.length - 1; i >= 0; i--) {
+    const chip = chips[i];
+
+    if (!chip) continue;
+    if (container.scrollWidth <= container.clientWidth) break;
+
+    amount = chips.length - i;
+    chip.style.display = 'none';
+  }
+
+  return amount;
+}
+
 interface MultiSelectValueProps extends Omit<
   React.ComponentProps<'div'>,
   'children'
@@ -230,67 +258,37 @@ function MultiSelectValue({
   placeholder = 'Select options',
   clickToRemove = true,
   overflowBehavior = 'wrap-when-open',
+  ref,
   ...props
 }: MultiSelectValueProps) {
   const { selectedValues, labels, open, toggle } = useMultiSelect();
   const [overflowAmount, setOverflowAmount] = React.useState(0);
-  const valueRef = React.useRef<HTMLDivElement>(null);
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
+  const composedRef = useComposedRefs(ref, setContainer);
 
   const shouldWrap =
     overflowBehavior === 'wrap' ||
     (overflowBehavior === 'wrap-when-open' && open);
 
-  const checkOverflow = React.useCallback(() => {
-    const container = valueRef.current;
-
+  React.useEffect(() => {
     if (!container) return;
 
-    const chips = container.querySelectorAll<HTMLElement>(
-      '[data-selected-item]'
-    );
+    const check = () => setOverflowAmount(hideOverflowingChips(container));
+    const mutationObserver = new MutationObserver(check);
+    const resizeObserver = new ResizeObserver(debounce(check, 100));
 
-    // Reset to the fully-expanded state, then hide chips from the end until the
-    // row stops overflowing — the count of hidden chips becomes the `+N` badge,
-    // whose visibility is driven from that count in render (single source).
-    chips.forEach((chip) => chip.style.removeProperty('display'));
+    mutationObserver.observe(container, {
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class', 'style'],
+    });
+    resizeObserver.observe(container);
 
-    let amount = 0;
-
-    for (let i = chips.length - 1; i >= 0; i--) {
-      const chip = chips[i];
-
-      if (!chip) continue;
-      if (container.scrollWidth <= container.clientWidth) break;
-
-      amount = chips.length - i;
-      chip.style.display = 'none';
-    }
-
-    setOverflowAmount(amount);
-  }, []);
-
-  const handleResize = React.useCallback(
-    (node: HTMLDivElement) => {
-      valueRef.current = node;
-
-      const mutationObserver = new MutationObserver(checkOverflow);
-      const resizeObserver = new ResizeObserver(debounce(checkOverflow, 100));
-
-      mutationObserver.observe(node, {
-        childList: true,
-        attributes: true,
-        attributeFilter: ['class', 'style'],
-      });
-      resizeObserver.observe(node);
-
-      return () => {
-        mutationObserver.disconnect();
-        resizeObserver.disconnect();
-        valueRef.current = null;
-      };
-    },
-    [checkOverflow]
-  );
+    return () => {
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, [container]);
 
   if (selectedValues.size === 0)
     return (
@@ -312,7 +310,7 @@ function MultiSelectValue({
   return (
     <div
       data-slot="multi-select-value"
-      ref={handleResize}
+      ref={composedRef}
       className={cn(
         'nx:flex nx:min-w-0 nx:flex-1 nx:items-center nx:gap-1.5 nx:overflow-hidden',
         shouldWrap && 'nx:h-full nx:flex-wrap',

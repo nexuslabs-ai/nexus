@@ -41,7 +41,7 @@ export function useConditionEditor<
   const [pending, setPending] = React.useState<
     AppliedCondition<Condition>['operator'] | null
   >(null);
-  const addRef = React.useRef<HTMLButtonElement>(null);
+  const addRef = React.useRef<HTMLButtonElement | null>(null);
   const operatorRef = React.useRef<HTMLButtonElement>(null);
   const restoreAdd = React.useRef(false);
   const nextSnapshot = JSON.stringify([value, disabled]);
