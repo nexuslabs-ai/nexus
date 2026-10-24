@@ -24,10 +24,10 @@ type ReactModule = StoryModule<ReactMeta, ReactStory>;
 type VueModule = StoryModule<VueMeta, VueStory>;
 
 const reactModules = import.meta.glob<ReactModule>(
-  '../../packages/react/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.tsx'
+  '../../packages/react/src/components/*/*.stories.tsx'
 );
 const vueModules = import.meta.glob<VueModule>(
-  '../../packages/vue/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.ts'
+  '../../packages/vue/src/components/*/*.stories.ts'
 );
 
 /** Components whose content portals into `document.body` once opened. */
@@ -184,12 +184,12 @@ async function renderTree(
 
 describe('rendered docs stories', () => {
   it('reads one story file per shared component in each framework', () => {
-    expect(Object.keys(reactModules).map(slugOf).sort()).toEqual(
-      [...shared].sort()
+    const count = (modules: Record<string, unknown>, slug: string) =>
+      Object.keys(modules).filter((file) => slugOf(file) === slug).length;
+    const unread = shared.filter(
+      (slug) => count(reactModules, slug) !== 1 || count(vueModules, slug) !== 1
     );
-    expect(Object.keys(vueModules).map(slugOf).sort()).toEqual(
-      [...shared].sort()
-    );
+    expect(unread).toEqual([]);
   });
 
   it('allows only rendered differences that belong to a shared component', () => {
