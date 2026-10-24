@@ -11,7 +11,7 @@ const PAGE_LINK_BASE =
 
 type PageGroup = { label?: string; pages: ManifestPage[] };
 
-/** Consecutive pages that share a `group` sit under one heading. */
+/** Consecutive pages that share a `group` sit under one label. */
 function pageGroups(pages: readonly ManifestPage[]): PageGroup[] {
   const groups: PageGroup[] = [];
   for (const page of pages) {

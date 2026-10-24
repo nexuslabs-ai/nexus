@@ -73,7 +73,7 @@ export function RightRail() {
     >
       <h3
         id={TOC_HEADING_ID}
-        className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mb-2"
+        className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mt-0 nx:mb-2"
       >
         On this page
       </h3>
