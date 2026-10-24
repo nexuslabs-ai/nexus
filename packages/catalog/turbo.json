@@ -13,6 +13,8 @@
         "$TURBO_ROOT$/packages/react/src/**",
         "$TURBO_ROOT$/packages/react/package.json",
         "$TURBO_ROOT$/packages/react/tsconfig.json",
+        "$TURBO_ROOT$/packages/react-18/src/**",
+        "$TURBO_ROOT$/packages/react-18/package.json",
         "$TURBO_ROOT$/packages/vue/src/**",
         "$TURBO_ROOT$/packages/vue/package.json",
         "$TURBO_ROOT$/packages/vue/tsconfig.json"

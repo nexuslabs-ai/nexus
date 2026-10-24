@@ -78,6 +78,35 @@ export default defineConfig({
           ],
         },
       },
+      // The same stories on React 18, run against packages/react-18. Its own
+      // node_modules has React 18; dedupe resolves every `react` import from
+      // there, Radix's in the root node_modules included.
+      {
+        extends: true,
+        plugins: [
+          storybookTest({
+            configDir: path.resolve(__dirname, 'packages/react-18/.storybook'),
+            storybookScript: 'pnpm --filter @nxds/react-18 storybook --no-open',
+          }),
+        ],
+        root: path.resolve(__dirname, 'packages/react-18'),
+        resolve: { dedupe: ['react', 'react-dom'] },
+        test: {
+          name: 'storybook-react18',
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: 'chromium' }],
+          },
+          setupFiles: [
+            path.resolve(
+              __dirname,
+              'packages/react-18/.storybook/vitest.setup.ts'
+            ),
+          ],
+        },
+      },
       // Vue story tests - the same play-function and axe checks for @nxds/vue
       {
         extends: true,

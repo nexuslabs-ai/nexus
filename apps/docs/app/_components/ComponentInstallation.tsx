@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react';
 
+import type { ReactMajor } from '@nxds/catalog';
 import Link from 'next/link';
 
-import { cliInstalls, loadInstallPlan } from '../_lib/catalog';
+import { cliInstalls, hasReact18Plan, loadInstallPlan } from '../_lib/catalog';
 import type { Framework } from '../_lib/frameworks';
 import { requirePage } from '../_lib/manifest';
 
 import { CodeSample, CodeSampleCard } from './CodeSample';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './nxds';
+import { ReactVersionTabs } from './ReactVersionTabs';
 
 type Step = { title: string; body?: ReactNode };
 
@@ -25,23 +27,29 @@ const COPY_TARGET: Record<Framework, ReactNode> = {
   ),
 };
 
-/**
- * The Installation section of a component page: Command and Manual tabs, or
- * only the manual steps for a framework the CLI doesn't install.
- */
-export function ComponentInstallation({
+/** Where each framework's copied paths are relative to, and React 18's. */
+function sourceRoot(framework: Framework, react: ReactMajor) {
+  return framework === 'react' && react === 18
+    ? 'packages/react-18/src/'
+    : `packages/${framework}/src/`;
+}
+
+/** The numbered manual steps that install `slug` by hand. */
+function ManualSteps({
   slug,
-  framework = 'react',
+  framework,
+  react,
 }: {
   slug: string;
-  framework?: Framework;
+  framework: Framework;
+  react: ReactMajor;
 }) {
   const {
     components,
     packages,
     files: sources,
     styles,
-  } = loadInstallPlan(slug, framework);
+  } = loadInstallPlan(slug, framework, react);
 
   const steps: Step[] = [];
   if (components.length > 0) {
@@ -76,14 +84,14 @@ export function ComponentInstallation({
     title: 'Keep each file at the path shown above it.',
     body: (
       <p className="nx:typography-body-default nx:text-muted-foreground">
-        Paths are relative to <code>packages/{framework}/src/</code>.{' '}
+        Paths are relative to <code>{sourceRoot(framework, react)}</code>.{' '}
         {COPY_TARGET[framework]}, and the imports between files work without
         edits.
       </p>
     ),
   });
 
-  const manual = (
+  return (
     <ol className="nx:mt-4 nx:flex nx:flex-col nx:gap-6">
       {steps.map((step, index) => (
         <li key={step.title} className="nx:flex nx:gap-4">
@@ -103,6 +111,30 @@ export function ComponentInstallation({
       ))}
     </ol>
   );
+}
+
+/**
+ * The Installation section of a component page: Command and Manual tabs, or
+ * only the manual steps for a framework the CLI doesn't install. A React
+ * component whose files differ on React 18 shows both versions.
+ */
+export function ComponentInstallation({
+  slug,
+  framework = 'react',
+}: {
+  slug: string;
+  framework?: Framework;
+}) {
+  const react19 = <ManualSteps slug={slug} framework={framework} react={19} />;
+  const manual =
+    framework === 'react' && hasReact18Plan(slug) ? (
+      <ReactVersionTabs
+        react19={react19}
+        react18={<ManualSteps slug={slug} framework={framework} react={18} />}
+      />
+    ) : (
+      react19
+    );
 
   if (!cliInstalls(framework)) return <div className="nx:mb-4">{manual}</div>;
 

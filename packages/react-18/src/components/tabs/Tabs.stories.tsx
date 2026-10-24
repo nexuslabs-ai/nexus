@@ -1,0 +1,751 @@
+import * as React from 'react';
+
+import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../card/card';
+import { Input } from '../input/input';
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+
+const meta: Meta<typeof Tabs> = {
+  title: 'Components/Tabs',
+  component: Tabs,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Tabs switch between panels of related content in one place. Use them to split a view into sections that users visit one at a time.',
+      },
+    },
+    layout: 'padded',
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof Tabs>;
+
+function getTabsIndicator(root: HTMLElement) {
+  const indicator = root.querySelector<HTMLElement>(
+    '[data-slot="tabs-indicator"]'
+  );
+
+  if (!indicator) {
+    throw new Error('Expected Tabs indicator to be rendered');
+  }
+
+  return indicator;
+}
+
+async function waitForIndicatorReady(indicator: HTMLElement) {
+  await waitFor(() => expect(indicator.style.opacity).toBe('1'));
+}
+
+// ============================================
+// BASIC STORIES
+// ============================================
+
+export const Default: Story = {
+  tags: ['docs'],
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Make changes to your account here. Click save when you&apos;re done.
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Change your password here. After saving, you&apos;ll be logged out.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabsList = canvas.getByRole('tablist');
+    const tab = canvas.getByRole('tab', { name: 'Account' });
+
+    await expect(tabsList).toHaveAttribute('data-variant', 'default');
+    await expect(tabsList).toHaveAttribute('data-size', 'default');
+    await expect(tab).toHaveAttribute('data-variant', 'default');
+    await expect(tab).toHaveAttribute('data-size', 'default');
+  },
+};
+
+// ============================================
+// VARIANT STORIES
+// ============================================
+
+export const UnderlineVariant: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Set `variant="underline"` on TabsList for a line under the active tab.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList variant="underline">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Account settings with underline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Password settings with underline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="settings">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          General settings with underline variant tabs.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const accountTab = canvas.getByRole('tab', { name: 'Account' });
+    const passwordTab = canvas.getByRole('tab', { name: 'Password' });
+    const indicator = getTabsIndicator(canvasElement);
+
+    await expect(accountTab).toHaveAttribute('data-state', 'active');
+    await waitForIndicatorReady(indicator);
+    await expect(indicator).toHaveAttribute('data-variant', 'underline');
+
+    const before = indicator.style.transform;
+
+    await userEvent.click(passwordTab);
+    await expect(passwordTab).toHaveAttribute('data-state', 'active');
+    await waitFor(() => expect(indicator.style.transform).not.toBe(before));
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const passwordRect = passwordTab.getBoundingClientRect();
+      expect(Math.round(indicatorRect.bottom)).toBe(
+        Math.round(passwordRect.bottom)
+      );
+      expect(Math.round(indicatorRect.left)).toBe(
+        Math.round(passwordRect.left)
+      );
+      expect(indicatorRect.height).toBeGreaterThan(0);
+      expect(Math.round(indicatorRect.height)).toBe(
+        Math.round(parseFloat(getComputedStyle(passwordTab).borderBottomWidth))
+      );
+    });
+    await expect(
+      canvas.getByText('Password settings with underline variant tabs.')
+    ).toBeVisible();
+  },
+};
+
+// ============================================
+// SIZE STORIES
+// ============================================
+
+export const SmallSize: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="sm"` on TabsList for compact tabs.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList size="sm">
+        <TabsTrigger value="tab1">Small Tab</TabsTrigger>
+        <TabsTrigger value="tab2">Another</TabsTrigger>
+        <TabsTrigger value="tab3">Third</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Small size tabs content.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tab = canvas.getByRole('tab', { name: 'Small Tab' });
+
+    await expect(tab).toHaveClass(
+      'nx:typography-label-small',
+      'nx:px-2',
+      'nx:py-1'
+    );
+    await expect(getComputedStyle(tab).fontSize).toBe('12px');
+  },
+};
+
+export const LargeSize: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Set `size="lg"` on TabsList for roomier tabs.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[500px]">
+      <TabsList size="lg">
+        <TabsTrigger value="tab1">Large Tab</TabsTrigger>
+        <TabsTrigger value="tab2">Another</TabsTrigger>
+        <TabsTrigger value="tab3">Third</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Large size tabs content.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+export const WithCards: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList className="nx:grid nx:w-full nx:grid-cols-2">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account</CardTitle>
+            <CardDescription>
+              Make changes to your account here. Click save when you&apos;re
+              done.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="nx:space-y-2">
+            <div className="nx:space-y-1">
+              <label
+                htmlFor="name"
+                className="nx:typography-label-default nx:leading-none"
+              >
+                Name
+              </label>
+              <Input id="name" defaultValue="Pedro Duarte" />
+            </div>
+            <div className="nx:space-y-1">
+              <label
+                htmlFor="username"
+                className="nx:typography-label-default nx:leading-none"
+              >
+                Username
+              </label>
+              <Input id="username" defaultValue="@peduarte" />
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+      <TabsContent value="password">
+        <Card>
+          <CardHeader>
+            <CardTitle>Password</CardTitle>
+            <CardDescription>
+              Change your password here. After saving, you&apos;ll be logged
+              out.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="nx:space-y-2">
+            <div className="nx:space-y-1">
+              <label
+                htmlFor="current"
+                className="nx:typography-label-default nx:leading-none"
+              >
+                Current password
+              </label>
+              <Input id="current" type="password" />
+            </div>
+            <div className="nx:space-y-1">
+              <label
+                htmlFor="new"
+                className="nx:typography-label-default nx:leading-none"
+              >
+                New password
+              </label>
+              <Input id="new" type="password" />
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+export const WithDisabledTab: Story = {
+  tags: ['docs'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disable a TabsTrigger so users can see the tab but not open it.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsTrigger value="settings" disabled>
+          Settings
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Account content
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Password content
+        </p>
+      </TabsContent>
+      <TabsContent value="settings">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Settings content
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const disabledTab = canvas.getByRole('tab', { name: 'Settings' });
+
+    await expect(disabledTab).toBeDisabled();
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(disabledTab).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(disabledTab).opacity).toBe('1');
+  },
+};
+
+// ============================================
+// INTERACTION TESTS
+// ============================================
+
+export const ClickInteraction: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+
+    await expect(tab1).toHaveAttribute('data-state', 'active');
+    await expect(tab2).toHaveAttribute('data-state', 'inactive');
+    await expect(canvas.getByText('Content 1')).toBeVisible();
+
+    await userEvent.click(tab2);
+
+    await expect(tab1).toHaveAttribute('data-state', 'inactive');
+    await expect(tab2).toHaveAttribute('data-state', 'active');
+    await expect(canvas.getByText('Content 2')).toBeVisible();
+  },
+};
+
+export const KeyboardInteraction: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+      <TabsContent value="tab3">
+        <p>Content 3</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Focus the first tab
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    await userEvent.click(tab1);
+    await expect(tab1).toHaveFocus();
+
+    // Navigate right with arrow key
+    await userEvent.keyboard('{ArrowRight}');
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    await expect(tab2).toHaveFocus();
+
+    // Navigate right again
+    await userEvent.keyboard('{ArrowRight}');
+    const tab3 = canvas.getByRole('tab', { name: 'Tab 3' });
+    await expect(tab3).toHaveFocus();
+
+    // Navigate left
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(tab2).toHaveFocus();
+  },
+};
+
+export const DisabledTabInteraction: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2" disabled>
+          Tab 2 (Disabled)
+        </TabsTrigger>
+        <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+      <TabsContent value="tab3">
+        <p>Content 3</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const disabledTab = canvas.getByRole('tab', { name: 'Tab 2 (Disabled)' });
+    await expect(disabledTab).toBeDisabled();
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    const indicator = getTabsIndicator(canvasElement);
+
+    await expect(tab1).toHaveAttribute('data-state', 'active');
+    await waitForIndicatorReady(indicator);
+    await expect(canvas.getByText('Content 1')).toBeVisible();
+
+    await userEvent.click(tab1);
+    await userEvent.keyboard('{ArrowRight}');
+
+    const tab3 = canvas.getByRole('tab', { name: 'Tab 3' });
+    await expect(tab3).toHaveFocus();
+    await expect(tab1).toHaveAttribute('data-state', 'inactive');
+    await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
+    await expect(tab3).toHaveAttribute('data-state', 'active');
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const tab3Rect = tab3.getBoundingClientRect();
+      expect(Math.round(indicatorRect.left)).toBe(Math.round(tab3Rect.left));
+      expect(Math.round(indicatorRect.width)).toBe(Math.round(tab3Rect.width));
+    });
+    await expect(canvas.getByText('Content 3')).toBeVisible();
+  },
+};
+
+export const VerticalIndicatorFollowsActiveTab: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:gap-8">
+      <Tabs
+        defaultValue="account"
+        orientation="vertical"
+        className="nx:flex nx:gap-4"
+      >
+        <TabsList aria-label="Personal settings">
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">Change your name and email.</TabsContent>
+        <TabsContent value="billing">
+          Manage your plan and invoices.
+        </TabsContent>
+      </Tabs>
+      <Tabs
+        defaultValue="account"
+        orientation="vertical"
+        className="nx:flex nx:gap-4"
+      >
+        <TabsList variant="underline" aria-label="Workspace settings">
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">Rename your workspace.</TabsContent>
+        <TabsContent value="billing">Manage seats and invoices.</TabsContent>
+      </Tabs>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('tablist', { name: 'Personal settings' });
+    const underlineList = canvas.getByRole('tablist', {
+      name: 'Workspace settings',
+    });
+    const billing = within(list).getByRole('tab', { name: 'Billing' });
+    const underlineBilling = within(underlineList).getByRole('tab', {
+      name: 'Billing',
+    });
+    const indicator = getTabsIndicator(list);
+    const underlineIndicator = getTabsIndicator(underlineList);
+
+    await waitForIndicatorReady(indicator);
+    await userEvent.click(billing);
+    await waitFor(() => {
+      const indicatorRect = indicator.getBoundingClientRect();
+      const billingRect = billing.getBoundingClientRect();
+      expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
+      expect(Math.round(indicatorRect.height)).toBe(
+        Math.round(billingRect.height)
+      );
+    });
+
+    await waitForIndicatorReady(underlineIndicator);
+    await userEvent.click(underlineBilling);
+    await waitFor(() => {
+      const indicatorRect = underlineIndicator.getBoundingClientRect();
+      const billingRect = underlineBilling.getBoundingClientRect();
+      expect(Math.round(indicatorRect.top)).toBe(Math.round(billingRect.top));
+      expect(Math.round(indicatorRect.right)).toBe(
+        Math.round(billingRect.right)
+      );
+      expect(indicatorRect.width).toBeGreaterThan(0);
+      expect(Math.round(indicatorRect.width)).toBe(
+        Math.round(
+          parseFloat(getComputedStyle(underlineBilling).borderRightWidth)
+        )
+      );
+    });
+  },
+};
+
+export const WithDataAttributes: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList variant="underline" size="lg">
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Check data-slot attributes
+    const tabsList = canvas.getByRole('tablist');
+    await expect(tabsList).toHaveAttribute('data-slot', 'tabs-list');
+    await expect(tabsList).toHaveAttribute('data-variant', 'underline');
+    await expect(tabsList).toHaveAttribute('data-size', 'lg');
+
+    const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
+    await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab1).toHaveAttribute('data-variant', 'underline');
+    await expect(tab1).toHaveAttribute('data-size', 'lg');
+
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    await expect(tab2).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab2).toHaveAttribute('data-variant', 'underline');
+    await expect(tab2).toHaveAttribute('data-size', 'lg');
+
+    // Check tabpanel has data-slot
+    const tabPanel = canvas.getByRole('tabpanel');
+    await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
+
+    await expect(tab2).toHaveClass(
+      'nx:typography-label-default',
+      'nx:px-4',
+      'nx:py-2'
+    );
+    await expect(getComputedStyle(tab2).fontSize).toBe('14px');
+  },
+};
+
+const listRef = React.createRef<HTMLDivElement>();
+
+// A ref on TabsList reaches the list, beside the ref the indicator measures.
+export const ListRef: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList ref={listRef}>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('tablist');
+
+    const indicator = list.querySelector<HTMLElement>(
+      '[data-slot="tabs-indicator"]'
+    )!;
+    const active = canvas.getByRole('tab', { name: 'Tab 1' });
+
+    await expect(listRef.current).toBe(list);
+    await waitFor(() => expect(indicator.style.opacity).toBe('1'));
+    await expect(indicator.style.width).toBe(`${active.offsetWidth}px`);
+  },
+};
+
+// ============================================
+// ALL VARIANTS GRID
+// ============================================
+
+export const AllVariants: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:flex-col nx:gap-8">
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Default Variant
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList>
+            <TabsTrigger value="tab1">Account</TabsTrigger>
+            <TabsTrigger value="tab2">Password</TabsTrigger>
+            <TabsTrigger value="tab3">Settings</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Default variant (pill style)
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Underline Variant
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList variant="underline">
+            <TabsTrigger value="tab1">Account</TabsTrigger>
+            <TabsTrigger value="tab2">Password</TabsTrigger>
+            <TabsTrigger value="tab3">Settings</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Underline variant (border-bottom style)
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Sizes (Small, Default, Large)
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList size="sm">
+              <TabsTrigger value="tab1">Small</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList size="default">
+              <TabsTrigger value="tab1">Default</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList size="lg">
+              <TabsTrigger value="tab1">Large</TabsTrigger>
+              <TabsTrigger value="tab2">Tabs</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          With Disabled Tab
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList>
+            <TabsTrigger value="tab1">Active</TabsTrigger>
+            <TabsTrigger value="tab2" disabled>
+              Disabled
+            </TabsTrigger>
+            <TabsTrigger value="tab3">Another</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Active content
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Grid Layout
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList className="nx:grid nx:w-full nx:grid-cols-2">
+            <TabsTrigger value="tab1">First</TabsTrigger>
+            <TabsTrigger value="tab2">Second</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Grid layout content
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  ),
+};
+
+// ============================================
+// A11Y is tested automatically on ALL stories
+// via addon-a11y with test: 'error'
+// ============================================

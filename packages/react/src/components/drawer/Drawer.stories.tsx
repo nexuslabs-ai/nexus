@@ -360,6 +360,7 @@ export const OpenCloseInteraction: Story = {
 
     await expectExitBeforeUnmount(overlay);
     await waitForDrawerToClose();
+    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };
 

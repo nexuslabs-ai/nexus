@@ -21,7 +21,7 @@ export function ReactHookFormExample({
   initialValues,
   onSave,
 }: SettingsFormProps) {
-  const nameRef = React.useRef<HTMLInputElement>(null);
+  const nameRef = React.useRef<HTMLInputElement | null>(null);
   const [message, setMessage] = React.useState('');
   const [pending, setPending] = React.useState(false);
   const form = useForm<SettingsValues>({

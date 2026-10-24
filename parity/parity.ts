@@ -112,6 +112,8 @@ export const vueOnlyApi: Record<string, string> = {
 };
 
 const V_MODEL = 'v-model binding, a Vue idiom with no React counterpart';
+const REACT_REF =
+  "checks a React ref reaches the DOM node, which packages/react-18's forwardRef wrapping must keep; Vue has template refs";
 
 /** Play stories only one framework has, as `{slug}/{Story}`. */
 export const behaviourOnlyIn: Record<
@@ -121,6 +123,8 @@ export const behaviourOnlyIn: Record<
   react: {
     'dialog/NestedOverlayStacking':
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
+    'button/RefForwarding': REACT_REF,
+    'tabs/ListRef': REACT_REF,
   },
   vue: {
     'checkbox/VModel': V_MODEL,

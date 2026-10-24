@@ -2,7 +2,9 @@ import {
   CATALOG_SCHEMA,
   catalogSchema,
   issueLines,
+  type ReactMajor,
   type Variant,
+  variantForReact,
 } from '@nxds/catalog';
 import catalogJson from '@nxds/catalog/catalog.json';
 
@@ -53,9 +55,10 @@ function variantOf(name: string, framework: Framework): Variant {
  */
 export function loadInstallPlan(
   name: string,
-  framework: Framework = 'react'
+  framework: Framework = 'react',
+  react: ReactMajor = 19
 ): InstallPlan {
-  const variant = variantOf(name, framework);
+  const variant = variantForReact(variantOf(name, framework), react);
   return {
     components: variant.items.filter((item) => item !== SETUP),
     packages: Object.entries(variant.packages.npm).map(
@@ -67,4 +70,9 @@ export function loadInstallPlan(
     })),
     styles: variant.css,
   };
+}
+
+/** Whether an app on React 18 installs other files or packages for `name`. */
+export function hasReact18Plan(name: string) {
+  return Boolean(items.get(name)?.variants.react?.react18);
 }

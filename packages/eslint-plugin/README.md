@@ -32,6 +32,22 @@ Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`
 
 Enforces `.claude/rules/code-comments.md`: JSDoc blocks must not carry `@default` or `@example` tags. The docs read prop defaults from code and usage from `docs` stories, so a tag is a second copy that can drift. Line comments and plain block comments are not checked. Wired in the root `eslint.config.js` for `packages/react/src` and `packages/vue/src`.
 
+### `@nxds/no-react-19-only`
+
+Reports React 19-only APIs in `packages/react`, the source `packages/react-18` is generated from. The generator adds `forwardRef` and changes nothing else, so a React 19-only call would compile there and then break on React 18. It reports:
+
+| Pattern                                                                                                   | Use instead                                             |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `use`, `useActionState`, `useOptimistic`, `useEffectEvent`, `Activity`, `captureOwnerStack` from `react`  | An API React 18.3 has                                   |
+| `useFormStatus`, `requestFormReset`, `preload*`, `preinit*`, `preconnect`, `prefetchDNS` from `react-dom` | An API React 18.3 has                                   |
+| `<SomeContext value={…}>`                                                                                 | `<SomeContext.Provider value={…}>`                      |
+| A ref callback that returns a cleanup                                                                     | The node in state, with setup and teardown in an effect |
+| `useDeferredValue(value, initialValue)`                                                                   | One argument                                            |
+| A function passed to `action` or `formAction`                                                             | `onSubmit` or `onClick`                                 |
+| `<title>` outside an `<svg>`, `<meta>`, `<link>`, `<style precedence>`                                    | Metadata the app's framework renders                    |
+
+Wired in the root `eslint.config.js` for `packages/react/src` only. It is not in `nxdsComponentConfig`, because a React 19 app may use these APIs.
+
 ## Source of truth
 
 The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.

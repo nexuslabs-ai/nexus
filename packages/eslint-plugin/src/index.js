@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import canonicalSpacingSteps from './rules/canonical-spacing-steps.js';
 import noJsdocDataTags from './rules/no-jsdoc-data-tags.js';
 import noMultiStatementJsxHandler from './rules/no-multi-statement-jsx-handler.js';
+import noReact19Only from './rules/no-react-19-only.js';
 import noRenderPropTypes from './rules/no-render-prop-types.js';
 import nxClassConventions from './rules/nx-class-conventions.js';
 
@@ -18,6 +19,7 @@ const plugin = {
     'no-render-prop-types': noRenderPropTypes,
     'no-multi-statement-jsx-handler': noMultiStatementJsxHandler,
     'no-jsdoc-data-tags': noJsdocDataTags,
+    'no-react-19-only': noReact19Only,
   },
 };
 

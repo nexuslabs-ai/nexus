@@ -13,7 +13,8 @@ npx nxds-cli@latest init
 ```
 
 `init` sets up a Next.js App Router app or a Vite + React app that uses
-TypeScript. It does every step in [Install by hand](#install-by-hand):
+TypeScript and React 18.3 or 19. It does every step in
+[Install by hand](#install-by-hand):
 
 | Step                | What `init` does                                                                      |
 | ------------------- | ------------------------------------------------------------------------------------- |
@@ -62,14 +63,36 @@ before you resolve every conflict, `update` changes no files, keeps `nxds.json`
 on your release and exits `3`. To replace an edited file with the release's
 copy, pass `--overwrite`.
 
+## Use React 18
+
+nxds runs on React 18.3 and React 19. `init` reads the React your app uses and
+records it in `nxds.json`, so `add` and `update` copy the files for it.
+
+On React 18, each component that takes a `ref` is wrapped in `forwardRef`,
+because React 18 drops `ref` from a function component's props. You pass `ref`
+the same way on both.
+
+After you upgrade to React 19, run `update`:
+
+```bash
+npx nxds-cli@latest update
+```
+
+`update` switches the files to React 19 and merges the release's changes into
+files you edited. Until you run it, `add` stops and `doctor` reports the
+mismatch.
+
+To install by hand on React 18, copy the files from the **React 18** tab in a
+component page's Manual steps.
+
 ## Find setup problems
 
 ```bash
 npx nxds-cli@latest doctor
 ```
 
-`doctor` checks the provider, the CSS entry, the files and the packages, and
-says how to fix each problem.
+`doctor` checks the provider, the CSS entry, the files, the packages and React,
+and says how to fix each problem.
 
 ## Options
 

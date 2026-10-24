@@ -1,0 +1,252 @@
+import * as React from 'react';
+
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '../../lib/utils';
+
+const badgeVariants = cva(
+  'nx:inline-flex nx:box-border nx:h-6 nx:w-fit nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-colors',
+  {
+    variants: {
+      variant: {
+        default: '',
+        secondary: '',
+        error: '',
+        warning: '',
+        success: '',
+        information: '',
+      },
+      fill: {
+        solid: '',
+        light: '',
+        outline: '',
+      },
+    },
+    compoundVariants: [
+      // Solid fill variants
+      {
+        variant: 'default',
+        fill: 'solid',
+        className: 'nx:bg-primary-background nx:text-primary-foreground',
+      },
+      {
+        variant: 'secondary',
+        fill: 'solid',
+        className: 'nx:bg-secondary-background nx:text-secondary-foreground',
+      },
+      {
+        variant: 'error',
+        fill: 'solid',
+        className: 'nx:bg-error-background nx:text-error-foreground',
+      },
+      {
+        variant: 'warning',
+        fill: 'solid',
+        className: 'nx:bg-warning-background nx:text-warning-foreground',
+      },
+      {
+        variant: 'success',
+        fill: 'solid',
+        className: 'nx:bg-success-background nx:text-success-foreground',
+      },
+      {
+        variant: 'information',
+        fill: 'solid',
+        className:
+          'nx:bg-information-background nx:text-information-foreground',
+      },
+      // Light fill variants
+      {
+        variant: 'default',
+        fill: 'light',
+        className: 'nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+      },
+      {
+        variant: 'secondary',
+        fill: 'light',
+        className: 'nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+      },
+      {
+        variant: 'error',
+        fill: 'light',
+        className: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
+      },
+      {
+        variant: 'warning',
+        fill: 'light',
+        className: 'nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+      },
+      {
+        variant: 'success',
+        fill: 'light',
+        className: 'nx:bg-success-subtle nx:text-success-subtle-foreground',
+      },
+      {
+        variant: 'information',
+        fill: 'light',
+        className:
+          'nx:bg-information-subtle nx:text-information-subtle-foreground',
+      },
+      // Outline fill variants
+      {
+        variant: 'default',
+        fill: 'outline',
+        className:
+          'nx:border-primary-border nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+      },
+      {
+        variant: 'secondary',
+        fill: 'outline',
+        className:
+          'nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+      },
+      {
+        variant: 'error',
+        fill: 'outline',
+        className:
+          'nx:border-error-border nx:bg-error-subtle nx:text-error-subtle-foreground',
+      },
+      {
+        variant: 'warning',
+        fill: 'outline',
+        className:
+          'nx:border-warning-border nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+      },
+      {
+        variant: 'success',
+        fill: 'outline',
+        className:
+          'nx:border-success-border nx:bg-success-subtle nx:text-success-subtle-foreground',
+      },
+      {
+        variant: 'information',
+        fill: 'outline',
+        className:
+          'nx:border-information-border nx:bg-information-subtle nx:text-information-subtle-foreground',
+      },
+    ],
+    defaultVariants: {
+      variant: 'default',
+      fill: 'solid',
+    },
+  }
+);
+
+const badgeIconClasses =
+  'nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5';
+
+function badgeShapeClasses(
+  isNumber: boolean,
+  isIconOnly: boolean,
+  isCaps: boolean
+) {
+  if (isNumber)
+    return 'nx:min-w-6 nx:rounded-full nx:px-1.5 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:w-6 nx:p-0';
+  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2';
+  return 'nx:typography-label-default nx:px-2.5';
+}
+
+function hasRenderableChildren(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (typeof child === 'string') return child.trim().length > 0;
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child))
+      return true;
+    if (child.type !== React.Fragment) return true;
+    return hasRenderableChildren(child.props.children);
+  });
+}
+
+interface BadgeProps
+  extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
+  /**
+   * Uppercase text with wider letter spacing.
+   */
+  isCaps?: boolean;
+
+  /**
+   * Renders a round count badge from its children and ignores icons.
+   * Add an `aria-label` such as "8 unread", because a bare number lacks context.
+   */
+  isNumber?: boolean;
+
+  /**
+   * Icon before the label, sized to 14px. Without children, it shows alone.
+   */
+  leftIcon?: React.ReactNode;
+
+  /**
+   * Icon after the label, sized to 14px. Without children or `leftIcon`, it shows alone.
+   */
+  rightIcon?: React.ReactNode;
+}
+
+/**
+ * Non-interactive status or label chip.
+ *
+ * Pair a status `variant` with text or an icon, because color alone doesn't carry meaning.
+ * Icon-only badges need `aria-label`, `aria-labelledby` or `title`.
+ * If the badge updates, wrap it in `aria-live="polite"` so screen readers hear the change.
+ */
+const Badge = React.forwardRef<
+  HTMLSpanElement,
+  React.PropsWithoutRef<BadgeProps>
+>(function Badge(propsWithoutRef, forwardedRef) {
+  const {
+    className,
+    variant,
+    fill,
+    isCaps = true,
+    isNumber = false,
+    leftIcon,
+    rightIcon,
+    children,
+    ...props
+  }: React.PropsWithoutRef<BadgeProps> & {
+    ref?: React.ForwardedRef<HTMLSpanElement>;
+  } = forwardedRef === null
+    ? propsWithoutRef
+    : { ...propsWithoutRef, ref: forwardedRef };
+  const isIconOnly =
+    !isNumber &&
+    !hasRenderableChildren(children) &&
+    Boolean(leftIcon || rightIcon);
+  const iconOnlyIcon = leftIcon ?? rightIcon;
+  const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
+  const showRightIcon = rightIcon && !isNumber && !isIconOnly;
+
+  const classes = cn(
+    badgeVariants({ variant, fill }),
+    badgeShapeClasses(isNumber, isIconOnly, isCaps),
+    className
+  );
+
+  return (
+    <span
+      data-slot="badge"
+      data-variant={variant ?? 'default'}
+      data-fill={fill ?? 'solid'}
+      data-caps={isCaps}
+      data-number={isNumber || undefined}
+      data-icon-only={isIconOnly || undefined}
+      role={isIconOnly ? 'img' : undefined}
+      className={classes}
+      {...props}
+    >
+      {isIconOnly && <span className={badgeIconClasses}>{iconOnlyIcon}</span>}
+      {showLeftIcon && (
+        <span aria-hidden className={badgeIconClasses}>
+          {leftIcon}
+        </span>
+      )}
+      {children}
+      {showRightIcon && (
+        <span aria-hidden className={badgeIconClasses}>
+          {rightIcon}
+        </span>
+      )}
+    </span>
+  );
+});
+
+export { Badge, type BadgeProps, badgeVariants };

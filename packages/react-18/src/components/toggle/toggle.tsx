@@ -1,0 +1,71 @@
+import * as React from 'react';
+
+import * as TogglePrimitive from '@radix-ui/react-toggle';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '../../lib/utils';
+
+const toggleVariants = cva(
+  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:border-0 nx:py-0 nx:whitespace-nowrap nx:text-inherit nx:transition-control nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-invalid:border-error-border nx:aria-invalid:focus-visible:outline-focus-error nx:data-[state=on]:bg-control-background nx:data-[state=on]:text-foreground nx:data-[state=on]:hover:bg-control-background-hover nx:data-[state=on]:disabled:bg-disabled nx:data-[state=on]:disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0 nx:[&_svg]:size-4',
+  {
+    variants: {
+      variant: {
+        default: 'nx:bg-transparent',
+        outline:
+          'nx:border-default nx:border-border-default nx:bg-transparent nx:disabled:border-border-disabled nx:aria-invalid:disabled:border-border-disabled',
+        'outline-primary': [
+          'nx:border-default nx:border-border-default nx:bg-transparent nx:hover:bg-transparent nx:data-[state=on]:bg-transparent nx:data-[state=on]:hover:bg-transparent nx:data-[state=on]:disabled:bg-transparent',
+          'nx:data-[state=off]:not-aria-invalid:hover:border-primary-border nx:not-disabled:data-[state=on]:border-primary-border-active nx:not-disabled:aria-invalid:data-[state=on]:border-border-error-active',
+          'nx:disabled:border-border-disabled nx:aria-invalid:disabled:border-border-disabled',
+        ],
+      },
+      size: {
+        default: 'nx:px-4 nx:py-2 nx:gap-2 nx:typography-label-default',
+        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:typography-label-small',
+        lg: 'nx:px-8 nx:py-3 nx:gap-2.5 nx:typography-label-default',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+/**
+ * Props for Toggle.
+ */
+type ToggleProps = React.ComponentProps<typeof TogglePrimitive.Root> &
+  VariantProps<typeof toggleVariants>;
+
+/**
+ * Button that stays on or off, such as Bold. For a set of related toggles, use
+ * `ToggleGroup`.
+ */
+const Toggle = React.forwardRef<
+  HTMLButtonElement,
+  React.PropsWithoutRef<ToggleProps>
+>(function Toggle(propsWithoutRef, forwardedRef) {
+  const {
+    className,
+    variant,
+    size,
+    ...props
+  }: React.PropsWithoutRef<ToggleProps> & {
+    ref?: React.ForwardedRef<HTMLButtonElement>;
+  } =
+    forwardedRef === null
+      ? propsWithoutRef
+      : { ...propsWithoutRef, ref: forwardedRef };
+  return (
+    <TogglePrimitive.Root
+      data-slot="toggle"
+      data-variant={variant ?? 'default'}
+      data-size={size ?? 'default'}
+      className={cn(toggleVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+});
+
+export { Toggle, type ToggleProps, toggleVariants };

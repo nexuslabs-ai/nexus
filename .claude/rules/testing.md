@@ -16,7 +16,7 @@ A test earns its place only when it pins behaviour a consumer of the design syst
 | **Parity**            | `parity/**/*.test.ts`                            | Each `@nxds/vue` component matching its `@nxds/react` reference, and the files Vue copies from React staying identical. A check compares the two packages with each other, never with a frozen copy                                                                              |
 | **CLI**               | `packages/cli/__tests__/*.test.ts`               | `nxds-cli` run against a throwaway app and a local registry built from a committed release: files written, kept and merged, conflict markers, exit codes, `--json` output. Assert on file contents and results, never a frozen tree                                              |
 
-Components are tested through stories — see [testing-react.md](testing-react.md) — and the parity tests hold each Vue component to its React reference. The other five run under Vitest's `unit` project and import from `vitest` directly, except the rendered parity check in `parity/browser/`, which runs in the `parity` browser project.
+Components are tested through stories — see [testing-react.md](testing-react.md) — and the parity tests hold each Vue component to its React reference. The same React stories also run on React 18 against the generated `packages/react-18` — see [react-18.md](react-18.md). The other five run under Vitest's `unit` project and import from `vitest` directly, except the rendered parity check in `parity/browser/`, which runs in the `parity` browser project.
 
 ## What We Don't Test
 

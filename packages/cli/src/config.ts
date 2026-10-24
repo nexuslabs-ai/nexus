@@ -1,4 +1,9 @@
-import { issueLines, relativePathSchema, versionSchema } from '@nxds/catalog';
+import {
+  issueLines,
+  reactMajorSchema,
+  relativePathSchema,
+  versionSchema,
+} from '@nxds/catalog';
 import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
@@ -12,6 +17,8 @@ export const CONFIG_FILE = 'nxds.json';
 const configSchema = z.looseObject({
   /** The CLI installs React only. */
   framework: z.literal('react'),
+  /** The React major the installed files are for. Apps set up before React 18 support have React 19 files. */
+  react: reactMajorSchema.default(19),
   /** The nxds release every installed file comes from. */
   version: versionSchema,
   /** The nxds folder, relative to the project root. */

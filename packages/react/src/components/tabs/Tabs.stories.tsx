@@ -597,6 +597,39 @@ export const WithDataAttributes: Story = {
   },
 };
 
+const listRef = React.createRef<HTMLDivElement>();
+
+// A ref on TabsList reaches the list, beside the ref the indicator measures.
+export const ListRef: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList ref={listRef}>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p>Content 1</p>
+      </TabsContent>
+      <TabsContent value="tab2">
+        <p>Content 2</p>
+      </TabsContent>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('tablist');
+
+    const indicator = list.querySelector<HTMLElement>(
+      '[data-slot="tabs-indicator"]'
+    )!;
+    const active = canvas.getByRole('tab', { name: 'Tab 1' });
+
+    await expect(listRef.current).toBe(list);
+    await waitFor(() => expect(indicator.style.opacity).toBe('1'));
+    await expect(indicator.style.width).toBe(`${active.offsetWidth}px`);
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================

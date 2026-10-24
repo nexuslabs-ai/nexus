@@ -4,9 +4,12 @@ import {
   type CatalogItem,
   catalogSchema,
   type Framework,
+  hasReact18,
   issueLines,
+  type ReactMajor,
   type SetupVariant,
   type Variant,
+  variantForReact,
 } from '@nxds/catalog';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -20,9 +23,13 @@ export type {
   CatalogFile,
   CatalogItem,
   Framework,
+  ReactMajor,
   SetupStep,
   Variant,
 } from '@nxds/catalog';
+
+/** Which files an app gets: its framework, and for React, its major. */
+export type Target = { framework: Framework; react: ReactMajor };
 
 export const SETUP = 'setup';
 
@@ -171,15 +178,28 @@ export function variantOf<V extends Variant>(
   throw new CliError(`${item.title} is not available for ${framework} yet.`);
 }
 
-export function setupVariant(
-  catalog: Catalog,
-  framework: Framework
-): SetupVariant {
+/** `item`'s variant with the files and packages an app on `target` installs. */
+export function variantFor<V extends Variant>(
+  item: { title: string; variants: Partial<Record<Framework, V>> },
+  target: Target
+): V {
+  return variantForReact(variantOf(item, target.framework), target.react);
+}
+
+/** Fails when `catalog` is a release from before React 18 support and the app is on 18. */
+export function assertSupportsReact(catalog: Catalog, react: ReactMajor) {
+  if (react === 19 || hasReact18(catalog)) return;
+  throw new CliError(
+    `nxds ${catalog.version} has no React 18 files. Upgrade the app to React 19, or run \`${CLI_COMMAND} update\` to move to a release with React 18 support.`
+  );
+}
+
+export function setupVariant(catalog: Catalog, target: Target): SetupVariant {
   const setup = catalog.items.find((item) => item.name === SETUP);
   if (setup?.kind !== 'setup') {
     throw new Error(`nxds ${catalog.version} has no "${SETUP}" setup item.`);
   }
-  return variantOf(setup, framework);
+  return variantFor(setup, target);
 }
 
 /** `names` and every item they need, each listed after what it needs. */
@@ -203,14 +223,16 @@ export function resolveItems(
   return ordered;
 }
 
-/** Every file a release installs for `framework`, by path. */
-export function releaseFiles(catalog: Catalog, framework: Framework) {
+/** Every file a release installs for `target`, by path. */
+export function releaseFiles(catalog: Catalog, target: Target) {
   return new Map(
-    catalog.items.flatMap((item) =>
-      (item.variants[framework]?.files ?? []).map(
-        (file) => [file.path, file.content] as const
+    catalog.items
+      .filter((item) => item.variants[target.framework])
+      .flatMap((item) =>
+        variantFor(item, target).files.map(
+          (file) => [file.path, file.content] as const
+        )
       )
-    )
   );
 }
 

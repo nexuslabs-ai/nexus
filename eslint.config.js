@@ -22,6 +22,13 @@ function repoPath(relativePath) {
   return path.join(import.meta.dirname, relativePath);
 }
 
+// packages/react-18 is generated from packages/react and lints the same way.
+function reactSources(...globs) {
+  return ['packages/react', 'packages/react-18'].flatMap((root) =>
+    globs.map((glob) => `${root}/${glob}`)
+  );
+}
+
 const radiusBaseConsumer = String.raw`/rounded(?:-[a-z]{1,2})?-base\b|radius-base/`;
 const radiusBaseMessage =
   'Only Button consumes --nx-radius-base (rounded-base). Use another radius token, or update apps/docs/content/theming/overrides.mdx if this component should follow the base override.';
@@ -130,15 +137,15 @@ export default tseslint.config(
   // eslint-disable comment, so copied source lints clean in apps without
   // jsx-a11y.
   {
-    files: [
-      'packages/react/src/components/alert-dialog/alert-dialog.tsx',
-      'packages/react/src/components/attachment/attachment.tsx',
-      'packages/react/src/components/breadcrumb/breadcrumb.tsx',
-      'packages/react/src/components/dialog/dialog.tsx',
-      'packages/react/src/components/drawer/drawer.tsx',
-      'packages/react/src/components/sheet/sheet.tsx',
-      'packages/react/src/components/table/table.tsx',
-    ],
+    files: reactSources(
+      'src/components/alert-dialog/alert-dialog.tsx',
+      'src/components/attachment/attachment.tsx',
+      'src/components/breadcrumb/breadcrumb.tsx',
+      'src/components/dialog/dialog.tsx',
+      'src/components/drawer/drawer.tsx',
+      'src/components/sheet/sheet.tsx',
+      'src/components/table/table.tsx'
+    ),
     rules: { 'jsx-a11y/no-noninteractive-tabindex': 'off' },
   },
 
@@ -292,7 +299,7 @@ export default tseslint.config(
 
   // UI components: an empty interface extending ComponentProps is the documented props pattern
   {
-    files: ['packages/react/src/components/**/*.{ts,tsx}'],
+    files: reactSources('src/components/**/*.{ts,tsx}'),
     rules: {
       '@typescript-eslint/no-empty-object-type': [
         'error',
@@ -307,7 +314,7 @@ export default tseslint.config(
   // (React package + apps). Hand-written stories are linted too; any
   // `__generated__` output stays excluded via the global ignore.
   {
-    files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
+    files: [...reactSources('src/**/*.{ts,tsx}'), 'apps/**/*.{ts,tsx}'],
     ...nxdsComponentConfig(),
   },
 
@@ -315,15 +322,26 @@ export default tseslint.config(
   // published source carries no `@default` or `@example` copies of them.
   {
     files: [
-      'packages/react/src/**/*.{ts,tsx}',
+      ...reactSources('src/**/*.{ts,tsx}'),
       'packages/vue/src/**/*.{ts,vue}',
     ],
     rules: { '@nxds/no-jsdoc-data-tags': 'error' },
   },
 
+  // packages/react-18 is generated from packages/react by adding forwardRef
+  // and nothing else, so packages/react can't use what React 18 lacks.
+  {
+    files: ['packages/react/src/**/*.{ts,tsx}'],
+    rules: { '@nxds/no-react-19-only': 'error' },
+  },
+
   nxdsTailwindClassesConfig({
     files: ['packages/react/src/**/*.{ts,tsx}'],
     entryPoint: repoPath('packages/react/.storybook/preview.css'),
+  }),
+  nxdsTailwindClassesConfig({
+    files: ['packages/react-18/src/**/*.{ts,tsx}'],
+    entryPoint: repoPath('packages/react-18/.storybook/preview.css'),
   }),
   {
     files: ['packages/vue/src/**/*.{ts,vue}'],
@@ -342,10 +360,12 @@ export default tseslint.config(
   // segment follows it (both documented in theming/overrides). The exemption
   // lives here, so copied source carries no disable for a rule apps don't have.
   {
-    files: ['packages/react/src/components/**/*.{ts,tsx}'],
+    files: reactSources('src/components/**/*.{ts,tsx}'),
     ignores: [
-      'packages/react/src/components/button/button.tsx',
-      'packages/react/src/components/filter-condition/filter-condition.tsx',
+      ...reactSources(
+        'src/components/button/button.tsx',
+        'src/components/filter-condition/filter-condition.tsx'
+      ),
       '**/*.stories.tsx',
       '**/*.test.{ts,tsx}',
     ],
