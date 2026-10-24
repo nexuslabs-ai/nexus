@@ -70,12 +70,15 @@ function isOwnSlot(slot: string, slug: string) {
 
 /** One element as a line, so a mismatch prints as a readable line diff. */
 function describeElement(element: Element) {
+  // Reka repeats a native `disabled` as `aria-disabled="true"`; Radix doesn't.
+  const isNativelyDisabled = element.hasAttribute('disabled');
   const attributes = [...element.attributes]
     .filter(({ name }) => /^(?:data-|aria-|role$)/.test(name))
     .filter(({ name }) => !SKIPPED_ATTRIBUTE.test(name))
     .filter(
       ({ name, value }) => !(FALSE_IS_ABSENT.test(name) && value === 'false')
     )
+    .filter(({ name }) => !(name === 'aria-disabled' && isNativelyDisabled))
     .map(({ name, value }) => `${name}="${value}"`)
     .sort();
   const classes = [...element.classList].sort().join(' ');

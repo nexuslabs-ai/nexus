@@ -15,7 +15,6 @@ export const planned = [
   'button-group',
   'carousel',
   'chart',
-  'checkbox',
   'choice-card',
   'choice-row',
   'collapsible',
@@ -34,11 +33,9 @@ export const planned = [
   'filter-chip',
   'filter-condition',
   'hover-card',
-  'input',
   'input-group',
   'input-otp',
   'item',
-  'label',
   'marker',
   'menubar',
   'message',
@@ -74,9 +71,12 @@ export const shared = [
   'badge',
   'button',
   'card',
+  'checkbox',
   'dialog',
   'hide',
+  'input',
   'kbd',
+  'label',
   'progress',
   'separator',
   'show',
@@ -96,6 +96,10 @@ export const vueOnlyApi: Record<string, string> = {
     'native <button> attribute React inherits from its props type; Vue declares it so the spinner state can read it',
   'Button.type':
     "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
+  'Input.modelValue':
+    "v-model value; React's native value prop is inherited from its props type",
+  'Input.defaultValue':
+    "starting value without v-model; React's native defaultValue is inherited from its props type",
   'Switch.thumb':
     'slot for custom thumb content; React renders the thumb itself with no way to compose it',
 };
@@ -110,6 +114,8 @@ export const behaviourOnlyIn: Record<
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
   },
   vue: {
+    'checkbox/VModel': 'v-model binding, a Vue idiom with no React counterpart',
+    'input/VModel': 'v-model binding, a Vue idiom with no React counterpart',
     'switch/VModel': 'v-model binding, a Vue idiom with no React counterpart',
     'switch/ThumbSlot': 'the #thumb slot is Vue-only API (see vueOnlyApi)',
     'tabs/IndicatorFollowsActiveTab':
@@ -117,16 +123,20 @@ export const behaviourOnlyIn: Record<
   },
 };
 
+const DOCS_STORY_SPY =
+  "a Vue docs story renders without args, so it can't spy on the emit";
+
 const TABS_INDICATOR =
   "React waits for its measured indicator's opacity and transform; Reka's indicator has neither, so Vue checks only the geometry";
 
 /** Paired play stories whose steps differ by design, as `{slug}/{Story}`. */
 export const behaviourDifferences: Record<string, string> = {
+  'checkbox/Disabled': DOCS_STORY_SPY,
+  'checkbox/WithLabel': DOCS_STORY_SPY,
+  'switch/Small': DOCS_STORY_SPY,
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
-  'switch/Small':
-    "a Vue docs story renders without args, so it can't spy on the emit; ClickInteraction asserts it",
 };
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
