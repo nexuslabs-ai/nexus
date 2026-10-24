@@ -19,7 +19,7 @@ import {
 } from '@nxds/source-model/roots.mjs';
 import {
   componentProps,
-  createVueChecker,
+  createVueProgram,
   exportedSlugs,
   parseFile,
 } from '@nxds/source-model/vue-sources.ts';
@@ -337,7 +337,7 @@ const demos: Record<string, VueDemo> = {};
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(propsDir, { recursive: true });
 
-const checker = createVueChecker();
+const vueProgram = createVueProgram();
 const propsFiles: PropsFile[] = [];
 
 for (const slug of slugs) {
@@ -348,7 +348,7 @@ for (const slug of slugs) {
   /** Every package installing the component brings, its components' included. */
   const brings = new Set(walked.packages);
 
-  const propsFile = componentProps(checker, slug);
+  const propsFile = componentProps(vueProgram, slug);
   propsFiles.push(propsFile);
   writeFileSync(
     path.join(propsDir, `${slug}.json`),

@@ -29,7 +29,7 @@ import {
 
 const COMPONENT_SPECIFIER = './components/';
 
-export type VueChecker = ReturnType<typeof createVueChecker>;
+export type VueProgram = ReturnType<typeof createVueProgram>;
 
 function fail(message: string): never {
   throw new Error(`vue-sources: ${message}`);
@@ -81,7 +81,7 @@ export function exportedParts(slug: string) {
 }
 
 /** The `vue-component-meta` checker, with the local alias names read from its program. */
-export function createVueChecker() {
+export function createVueProgram() {
   const checker = createChecker(path.join(vueRoot, 'tsconfig.json'), {
     forceUseTs: true,
     schema: true,
@@ -144,11 +144,11 @@ export function isOwnDeclaration(declarations: { file: string }[]) {
 }
 
 /** Each part a component folder exports, with its `vue-component-meta` read once. */
-export function componentParts({ checker }: VueChecker, slug: string) {
+export function componentParts(vueProgram: VueProgram, slug: string) {
   return exportedParts(slug).map(({ name, file }) => ({
     name,
     file,
-    meta: checker.getComponentMeta(file),
+    meta: vueProgram.checker.getComponentMeta(file),
   }));
 }
 
@@ -177,11 +177,14 @@ export function partEntry(
   };
 }
 
-export function componentProps(checker: VueChecker, slug: string): PropsFile {
+export function componentProps(
+  vueProgram: VueProgram,
+  slug: string
+): PropsFile {
   return toPropsFile(
     slug,
-    componentParts(checker, slug).map((part) =>
-      partEntry(part, checker.localAliases)
+    componentParts(vueProgram, slug).map((part) =>
+      partEntry(part, vueProgram.localAliases)
     )
   );
 }
