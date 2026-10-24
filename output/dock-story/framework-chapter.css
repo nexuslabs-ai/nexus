@@ -1,0 +1,276 @@
+.framework-chapter {
+  container: framework / size;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+}
+.framework-flow {
+  --framework-label-size: 16px;
+  --framework-surface: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 4%,
+    var(--nx-color-background)
+  );
+  --framework-column-gap: var(--canvas-gap, 16px);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: var(--story-columns);
+  gap: var(--framework-column-gap);
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  font-size: var(--framework-label-size);
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - var(--story-dock-clearance)),
+    #000a calc(100% - var(--story-dock-clearance) / 2),
+    transparent 100%
+  );
+}
+.framework-token-group,
+.framework-core-column,
+.framework-output-group {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 24px;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.framework-column-label {
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 20px;
+  text-align: center;
+}
+.framework-token-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(12, minmax(0, 1fr));
+  gap: clamp(4px, 0.5cqi, 8px);
+  min-block-size: 0;
+}
+.framework-token {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--canvas-radius, 14px);
+  background: var(--framework-surface);
+  color: var(--nx-color-foreground);
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+}
+.framework-token::after,
+.framework-destination::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inline-size: var(--framework-column-gap);
+  block-size: 1px;
+  background: color-mix(in srgb, var(--nx-color-foreground) 16%, transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.framework-token::after {
+  inset-inline-start: 100%;
+}
+.framework-destination::before {
+  inset-inline-end: 100%;
+}
+.framework-token > svg {
+  inline-size: clamp(16px, 1.5cqi, 24px);
+  block-size: clamp(16px, 1.5cqi, 24px);
+  flex-shrink: 0;
+}
+.framework-core {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  border: 0;
+  border-radius: var(--canvas-radius, 14px);
+  padding: clamp(16px, 2cqi, 40px);
+  text-align: center;
+  background: var(--framework-surface);
+}
+.framework-core > svg {
+  flex-shrink: 0;
+}
+.framework-core > strong {
+  font-size: inherit;
+  line-height: 1.3;
+  font-weight: 500;
+}
+.framework-core p {
+  margin: 0;
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 1.5;
+}
+.framework-destinations {
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  gap: clamp(8px, 1cqi, 16px);
+  min-block-size: 0;
+}
+.framework-destination {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-block-size: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--canvas-radius, 14px);
+  color: var(--nx-color-muted-foreground);
+  background: var(--framework-surface);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color 240ms,
+    background-color 240ms;
+}
+.framework-destination > svg {
+  inline-size: clamp(24px, 3cqi, 40px);
+  block-size: clamp(24px, 3cqi, 40px);
+  flex-shrink: 0;
+}
+.framework-destination[data-active='true'] {
+  color: var(--nx-color-foreground);
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 8%,
+    var(--nx-color-background)
+  );
+}
+.framework-destination:hover {
+  color: var(--nx-color-foreground);
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 7%,
+    var(--nx-color-background)
+  );
+}
+.framework-destination:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+.framework-destination strong {
+  font-size: inherit;
+  line-height: 1.3;
+  text-align: center;
+  font-weight: 500;
+}
+.framework-note {
+  max-inline-size: 320px;
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+@container framework (max-height: 480px) and (min-width: 701px) {
+  .framework-flow {
+    --framework-label-size: 12px;
+  }
+  .framework-token-group,
+  .framework-core-column,
+  .framework-output-group {
+    gap: 12px;
+  }
+  .framework-token-list {
+    gap: 2px;
+  }
+  .framework-token {
+    padding-inline: 12px;
+    flex-direction: row;
+    gap: 6px;
+  }
+  .framework-token > svg {
+    inline-size: 14px;
+    block-size: 14px;
+  }
+  .framework-destination {
+    padding: 0;
+    gap: 4px;
+  }
+  .framework-destination > svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+  .framework-core {
+    gap: 10px;
+    padding: 16px;
+  }
+  .framework-core > svg {
+    inline-size: 28px;
+    block-size: 28px;
+  }
+}
+@container framework (max-width: 700px) {
+  .framework-flow {
+    --framework-label-size: 10px;
+    --framework-column-gap: 8px;
+  }
+  .framework-column-label {
+    display: none;
+  }
+  .framework-token-group,
+  .framework-core-column,
+  .framework-output-group {
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0;
+  }
+  .framework-token-list {
+    gap: 4px;
+  }
+  .framework-token {
+    gap: 4px;
+    padding: 0 4px;
+    border-radius: 6px;
+  }
+  .framework-token > svg {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+  .framework-core {
+    padding: 8px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+  .framework-core > svg {
+    inline-size: 28px;
+    block-size: 28px;
+  }
+  .framework-destinations {
+    gap: 8px;
+  }
+  .framework-destination {
+    gap: 4px;
+    padding: 4px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .framework-destination > svg {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+}
+[data-reduce-motion='true'] .framework-destination {
+  transition: none;
+}

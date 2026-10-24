@@ -1,0 +1,246 @@
+{
+  "appearanceMetrics": [
+    {
+      "bg": "rgb(255, 255, 255)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 400.34375,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "500 20px / 32px Roboto, Helvetica, Arial, sans-serif",
+      "height": 32,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "16px / 23px Roboto, Helvetica, Arial, sans-serif",
+      "height": 40,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "INPUT",
+      "text": "Design team"
+    },
+    {
+      "bg": "rgb(25, 118, 210)",
+      "color": "rgb(255, 255, 255)",
+      "font": "500 14px / 24.5px Roboto, Helvetica, Arial, sans-serif",
+      "height": 36.5,
+      "radius": "4px",
+      "shadow": "rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px",
+      "specimen": "mui",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    },
+    {
+      "bg": "oklch(1 0 0)",
+      "color": "oklch(0.2046 0 0)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 448,
+      "radius": "8px",
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklch(0 0 0 / 0.102) 0px 1px 2px -1px, oklch(0 0 0 / 0.102) 0px 1px 3px 0px",
+      "specimen": "nexus",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "oklch(0.2046 0 0)",
+      "font": "700 18px / 28px ui-sans-serif, system-ui, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "height": 28,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "oklch(0.5645 0.1633 253.271)",
+      "color": "oklch(1 0 0)",
+      "font": "500 14px / 20px Roboto, Helvetica, Arial, sans-serif",
+      "height": 40,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    }
+  ],
+  "adapterMetrics": [
+    {
+      "bg": "rgb(255, 255, 255)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 400.34375,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "500 20px / 32px Roboto, Helvetica, Arial, sans-serif",
+      "height": 32,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "16px / 23px Roboto, Helvetica, Arial, sans-serif",
+      "height": 40,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "INPUT",
+      "text": "Design team"
+    },
+    {
+      "bg": "rgb(25, 118, 210)",
+      "color": "rgb(255, 255, 255)",
+      "font": "500 14px / 24.5px Roboto, Helvetica, Arial, sans-serif",
+      "height": 36.5,
+      "radius": "4px",
+      "shadow": "rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px",
+      "specimen": "mui",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    },
+    {
+      "bg": "rgb(255, 255, 255)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 448.515625,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "500 20px / 32px Roboto, Helvetica, Arial, sans-serif",
+      "height": 32,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "rgb(25, 118, 210)",
+      "color": "rgb(255, 255, 255)",
+      "font": "500 14px / 24.5px Roboto, Helvetica, Arial, sans-serif",
+      "height": 36.5,
+      "radius": "4px",
+      "shadow": "rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px",
+      "specimen": "nexus",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    }
+  ],
+  "darkAdapterMetrics": [
+    {
+      "bg": "rgb(18, 18, 18)",
+      "color": "rgb(255, 255, 255)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 400.34375,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(255, 255, 255)",
+      "font": "500 20px / 32px Roboto, Helvetica, Arial, sans-serif",
+      "height": 32,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(255, 255, 255)",
+      "font": "16px / 23px Roboto, Helvetica, Arial, sans-serif",
+      "height": 40,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "mui",
+      "tag": "INPUT",
+      "text": "Design team"
+    },
+    {
+      "bg": "rgb(144, 202, 249)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "500 14px / 24.5px Roboto, Helvetica, Arial, sans-serif",
+      "height": 36.5,
+      "radius": "4px",
+      "shadow": "rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px",
+      "specimen": "mui",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    },
+    {
+      "bg": "rgb(18, 18, 18)",
+      "color": "rgb(255, 255, 255)",
+      "font": "16px / 24px ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "height": 448.515625,
+      "radius": "4px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "DIV",
+      "text": "Workspace settingsMa"
+    },
+    {
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(255, 255, 255)",
+      "font": "500 20px / 32px Roboto, Helvetica, Arial, sans-serif",
+      "height": 32,
+      "radius": "0px",
+      "shadow": "none",
+      "specimen": "nexus",
+      "tag": "H2",
+      "text": "Workspace settings"
+    },
+    {
+      "bg": "rgb(144, 202, 249)",
+      "color": "rgba(0, 0, 0, 0.87)",
+      "font": "500 14px / 24.5px Roboto, Helvetica, Arial, sans-serif",
+      "height": 36.5,
+      "radius": "4px",
+      "shadow": "rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px",
+      "specimen": "nexus",
+      "tag": "BUTTON",
+      "text": "Save changes"
+    }
+  ],
+  "muiDarkUnchanged": true,
+  "dockBaseline": {
+    "height": 72,
+    "width": 256,
+    "x": 431.5,
+    "y": 1102
+  }
+}

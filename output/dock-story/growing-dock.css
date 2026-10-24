@@ -1,0 +1,381 @@
+.growing-dock {
+  container-type: inline-size;
+}
+.growing-dock .context-panel {
+  width: min(100%, var(--dock-panel-width));
+  left: var(--panel-left, 0px);
+}
+.growing-dock .context-panel-layer {
+  will-change: transform, opacity;
+}
+.growing-dock .context-panel,
+.growing-dock .context-panel-pointer {
+  transition-duration: var(--dock-duration, 0.25s);
+}
+.tactile-dock .context-dock-bar {
+  height: 80px;
+  padding: 7px;
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dock-surface) 96%, white),
+    var(--dock-surface)
+  );
+  box-shadow:
+    0 10px 28px #00000012,
+    inset 0 1px 0 #ffffff0d;
+}
+.tactile-dock .context-dock-bar > button {
+  padding: 0;
+  border-radius: 17px;
+}
+.tactile-dock .context-dock-selection {
+  border-radius: 17px;
+  box-shadow:
+    inset 0 1px 3px #0000000c,
+    0 1px 0 #ffffff08;
+}
+.tactile-dock .context-tool-icon {
+  width: 54px;
+  height: 60px;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 3px 2px #00000020);
+  transform: translateY(-2px);
+  transition: transform var(--dock-duration, 0.25s)
+    cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tactile-dock button:hover .context-tool-icon,
+.tactile-dock button:focus-visible .context-tool-icon {
+  transform: translateY(-7px) rotate(-3deg);
+}
+.tactile-dock button[data-active='true'] .context-tool-icon {
+  transform: translateY(-6px);
+}
+.tactile-dock .context-tool-label {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  padding: 6px 9px;
+  border-radius: 8px;
+  color: var(--nx-color-foreground);
+  background: var(--dock-surface);
+  border: 1px solid var(--nx-color-border-default);
+  font-size: 11px;
+  max-width: none;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms,
+    transform 140ms;
+}
+.tactile-dock button:not([aria-expanded='true']):hover .context-tool-label,
+.tactile-dock
+  button:not([aria-expanded='true']):focus-visible
+  .context-tool-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tactile-object {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 46px;
+  border-radius: 12px;
+  color: #434746;
+  background: linear-gradient(145deg, #ffffff, #efefed 65%, #d5d7d4);
+  border: 1px solid #a7aaa867;
+  box-shadow:
+    inset 1px 1px 1px white,
+    inset -1px -2px 2px #a8adae55,
+    0 3px 0 #a2a5a1;
+  transform: rotate(-5deg);
+}
+.tactile-object-dashboard {
+  transform: rotate(4deg);
+  color: #5f64a4;
+}
+.tactile-object-mail {
+  transform: rotate(-3deg);
+  border-radius: 6px;
+  height: 36px;
+  color: #9b6852;
+}
+.tactile-object-chat {
+  transform: rotate(3deg);
+  color: #4b8983;
+  border-radius: 15px 15px 15px 4px;
+}
+.tactile-object-finances {
+  border-radius: 50%;
+  color: #a17b28;
+  background: linear-gradient(135deg, #fff1c8, #efcd76);
+  border-color: #d0b475;
+  box-shadow:
+    inset 1px 1px 1px #fff6d8,
+    0 3px 0 #bfa56d;
+}
+.tactile-object-crm {
+  transform: rotate(5deg);
+  color: #847094;
+}
+.tactile-object-composition {
+  color: #6b787d;
+  transform: rotate(5deg);
+}
+.tactile-object-source {
+  color: #4c5554;
+  transform: rotate(-3deg);
+}
+.tactile-swatches {
+  position: relative;
+  width: 48px;
+  height: 52px;
+}
+.tactile-swatches i {
+  position: absolute;
+  bottom: 3px;
+  left: 12px;
+  width: 26px;
+  height: 44px;
+  border-radius: 6px;
+  border: 1px solid #00000016;
+  background: linear-gradient(145deg, #bde7de, #72bba9);
+  box-shadow:
+    inset 1px 1px 1px #ffffff77,
+    0 2px 3px #00000026;
+  transform-origin: 50% 85%;
+  transform: rotate(-25deg);
+}
+.tactile-swatches i:nth-child(2) {
+  transform: rotate(0deg);
+  background: linear-gradient(145deg, #ecd7ff, #b5a2db);
+}
+.tactile-swatches i:nth-child(3) {
+  transform: rotate(24deg);
+  background: linear-gradient(145deg, #ffd1a2, #f59b72);
+}
+.tactile-swatches i:last-child::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffffffdd;
+  border: 1px solid #00000030;
+  border-radius: 50%;
+  bottom: 4px;
+  left: 10px;
+}
+.tactile-theme {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff, #cecfcb);
+  border: 1px solid #99999955;
+  box-shadow:
+    inset 1px 1px 2px white,
+    0 2px 0 #aaa;
+}
+.tactile-theme i {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #404343 50%, #fff 50%);
+  box-shadow: inset 0 1px 3px #00000040;
+  transform: rotate(30deg);
+}
+.tactile-type {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 43px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #fff, #dedfda);
+  border: 1px solid #92958e55;
+  color: #3b3d3a;
+  font:
+    500 25px Georgia,
+    serif;
+  letter-spacing: -3px;
+  padding-right: 2px;
+  box-shadow:
+    inset 1px 1px 1px white,
+    0 3px 0 #b5b7b1;
+  transform: rotate(-4deg);
+  text-shadow: 0 1px white;
+}
+.tactile-ruler {
+  width: 25px;
+  height: 53px;
+  position: relative;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  background: linear-gradient(90deg, #d1d2d0, #fff 27%, #e5e6e4 75%, #babdb9);
+  box-shadow:
+    inset 1px 0 1px #ffffffaa,
+    0 2px 0 #a7aaa5;
+  transform: rotate(13deg);
+}
+.tactile-ruler::after {
+  content: '';
+  position: absolute;
+  inset: 7px 3px 7px 12px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #777 0px 1px,
+    transparent 1px 6px
+  );
+}
+.tactile-ruler i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border: 1px solid #999;
+  background: #bbb;
+  border-radius: 50%;
+  left: 5px;
+  top: 5px;
+}
+.tactile-corner {
+  width: 45px;
+  height: 45px;
+  border-radius: 15px;
+  border: 1px solid #bcbdb8;
+  background: linear-gradient(145deg, white, #dedfda);
+  box-shadow:
+    inset 1px 1px 1px white,
+    0 3px 0 #a9ada6;
+  display: grid;
+  place-items: center;
+  transform: rotate(5deg);
+}
+.tactile-corner i {
+  width: 29px;
+  height: 29px;
+  border: 3px solid #9d8cc6;
+  border-radius: 10px;
+  box-shadow: 0 1px 0 white;
+}
+.tactile-sliders {
+  display: flex;
+  gap: 5px;
+  height: 44px;
+  align-items: center;
+}
+.tactile-sliders i {
+  width: 10px;
+  height: 39px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, #aaa, #eee, #bfc2bc);
+  border: 1px solid #92968e;
+  position: relative;
+}
+.tactile-sliders i::after {
+  content: '';
+  width: 16px;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(#fff, #dadcd6);
+  border: 1px solid #b5b9b1;
+  position: absolute;
+  left: -4px;
+  top: 5px;
+  box-shadow: 0 2px 2px #00000026;
+}
+.tactile-sliders i:nth-child(2)::after {
+  top: 21px;
+}
+.tactile-sliders i:nth-child(3)::after {
+  top: 12px;
+}
+.tactile-pencil {
+  width: 22px;
+  height: 53px;
+  position: relative;
+  transform: rotate(9deg);
+}
+.tactile-pencil i {
+  position: absolute;
+  inset: 15px 0 0;
+  border-radius: 0 0 5px 5px;
+  border: 1px solid #aeb2aa;
+  background: linear-gradient(90deg, #d2d4cf, #fff 35%, #e3e5e0 65%, #b9bdb5);
+  box-shadow: inset 2px 0 1px white;
+}
+.tactile-pencil b {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 16px;
+  background: #ef7f65;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.active-label-dock .context-dock-bar {
+  border-radius: 38px;
+  height: 72px;
+  padding: 7px;
+  gap: 4px;
+}
+.active-label-dock .context-dock-bar > button {
+  flex-direction: row;
+  flex: 1 1 0;
+  min-width: 40px;
+  gap: 0;
+  padding: 0 8px;
+  border-radius: 32px;
+  transition:
+    flex-grow var(--dock-duration, 0.25s) cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 120ms;
+}
+.active-label-dock .context-dock-bar > button[data-active='true'] {
+  flex-grow: 3;
+  color: var(--nx-color-background);
+}
+.active-label-dock .context-dock-selection {
+  background: var(--nx-color-foreground);
+  border-radius: 32px;
+}
+.active-label-dock .context-tool-icon {
+  flex-shrink: 0;
+}
+.active-label-dock .context-tool-label {
+  max-width: 0;
+  opacity: 0;
+  margin-left: 0;
+  white-space: nowrap;
+  font-size: 14px;
+  transition:
+    max-width var(--dock-duration, 0.25s),
+    opacity 140ms,
+    margin-left var(--dock-duration, 0.25s);
+}
+.active-label-dock button[data-active='true'] .context-tool-label {
+  max-width: 140px;
+  opacity: 1;
+  margin-left: 8px;
+}
+@container (max-width: 480px) {
+  .tactile-dock .context-tool-icon {
+    transform: translateY(-2px) scale(0.9);
+  }
+  .tactile-dock button[data-active='true'] .context-tool-icon {
+    transform: translateY(-6px) scale(0.9);
+  }
+  .active-label-dock .context-tool-label {
+    font-size: 12px;
+  }
+  .active-label-dock .context-dock-bar > button[data-active='true'] {
+    flex-grow: 4;
+  }
+  .active-label-dock .context-dock-bar {
+    gap: 1px;
+    padding-inline: 5px;
+  }
+}
+[data-reduce-motion='true'] .growing-dock * {
+  animation: none;
+  transition: none;
+}

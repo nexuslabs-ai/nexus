@@ -13,6 +13,11 @@ export const DOCS_APPEARANCE_STORAGE_KEY = 'nxds-docs-appearance';
 export const DOCS_APPEARANCE_DEFAULT_STATE = {
   ...DEFAULT_NXDS_APPEARANCE,
   mode: 'system',
+  prefs: {
+    ...DEFAULT_NXDS_APPEARANCE.prefs,
+    uiFont: '"DM Sans", Arial, sans-serif',
+    codeFont: '"JetBrains Mono", monospace',
+  },
 } satisfies NxdsAppearanceState;
 
 export const THEME_MODE_KEYS = [

@@ -1,0 +1,40 @@
+/* Application layout and token specimens. Nexus owns selection and focus. */
+.nexus-appearance-controls:has(.appearance-choices) {
+  /* Reserve the header, dock and panel chrome; long choices scroll inside. */
+  max-height: calc(100svh - var(--story-header-height) - 224px);
+}
+.appearance-choices {
+  container-type: inline-size;
+}
+.appearance-tone-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.appearance-corner-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+.appearance-tone-sample {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--nx-spacing-7);
+  height: var(--nx-spacing-7);
+  border-radius: var(--nx-radius-full);
+  color: white;
+}
+.appearance-corner-sample {
+  width: var(--nx-spacing-7);
+  height: var(--nx-spacing-7);
+  background: var(--nx-color-secondary-background);
+  border-top: var(--nx-borderwidth-thick) solid currentColor;
+  border-left: var(--nx-borderwidth-thick) solid currentColor;
+  border-top-left-radius: var(--nx-radius-base);
+}
+@container (max-width: 224px) {
+  .appearance-tone-options,
+  .appearance-corner-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

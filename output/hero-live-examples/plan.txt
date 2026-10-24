@@ -1,0 +1,7 @@
+Scroll live examples variant
+
+Scope: retain existing scroll-headlines and customization tiles. Add live-examples in DialKit and query routing. Use a custom-styled existing-app settings panel alongside a real Nexus Button; interactions only change local demo state. Show an executable StatusLabel component example and its rendered result.
+
+Guidance: modern-web-guidance search "responsive component layout container queries"; retrieved responsive-design. Use a container query for the app example's two-column layout. Reuse established viewport-driven hero scroll shell and appearance reduceMotion behavior. No environment feature detection or preference queries added.
+
+Validation: docs typecheck, scoped ESLint, formatting and diff checks pass. Browser verifies all three states, light/dark rendering, save/invite demo interactions, and no horizontal overflow at390px. Original scroll-headlines retains original tile content.

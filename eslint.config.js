@@ -43,6 +43,9 @@ export default tseslint.config(
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
+      'apps/docs/public/coexistence-preview/**',
+      'apps/docs/public/vue-demos/**',
+      'output/dock-story/hero-adoption-built/**',
       '**/.wrangler/**',
       // Standalone consumer examples — self-contained repos with their own
       // toolchains, outside this workspace. Not linted by the monorepo config.
@@ -326,6 +329,12 @@ export default tseslint.config(
   nxdsTailwindClassesConfig({
     files: ['apps/docs/**/*.{ts,tsx}'],
     entryPoint: repoPath('apps/docs/app/globals.css'),
+  }),
+
+  // The isolated host demo uses copied shadcn utilities, without the nx prefix.
+  nxdsTailwindClassesConfig({
+    files: ['apps/docs/coexistence-preview/ui/**/*.{ts,tsx}'],
+    entryPoint: repoPath('apps/docs/coexistence-preview/preview.css'),
   }),
 
   // Button consumes --nx-radius-base, and FilterConditionField's joined

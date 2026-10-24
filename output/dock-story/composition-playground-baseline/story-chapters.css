@@ -1,0 +1,315 @@
+.story-canvas {
+  isolation: isolate;
+}
+.story-chapter-content {
+  animation: story-arrive 300ms ease-out both;
+}
+.story-comparison {
+  position: relative;
+  height: 100%;
+}
+.story-comparison > .story-box-grid,
+.comparison-after {
+  position: absolute;
+  inset: 0;
+}
+.comparison-before {
+  --canvas-radius: 14px;
+  --canvas-border: 1px;
+  --canvas-shadow: 0px;
+  --canvas-tint: 0%;
+}
+.comparison-after {
+  clip-path: inset(0 0 0 var(--comparison-split));
+  background: var(--nx-color-background);
+}
+.comparison-after .story-empty-box {
+  border-color: color-mix(
+    in srgb,
+    var(--canvas-accent) 55%,
+    var(--nx-color-border-default)
+  );
+}
+.comparison-labels {
+  position: absolute;
+  inset: 20px 24px auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--nx-color-muted-foreground);
+  pointer-events: none;
+}
+.comparison-labels span {
+  background: var(--nx-color-background);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.comparison-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--comparison-split);
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--nx-color-foreground) 65%,
+    transparent
+  );
+  pointer-events: none;
+}
+.comparison-divider > span {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--nx-color-foreground);
+  color: var(--nx-color-background);
+  box-shadow: 0 2px 10px #0002;
+}
+.comparison-range {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+.comparison-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 0;
+  height: 100%;
+}
+.comparison-range::-moz-range-thumb {
+  width: 0;
+  height: 100%;
+  border: 0;
+}
+.story-comparison:has(.comparison-range:focus-visible)
+  .comparison-divider
+  > span {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 5px;
+}
+.comparison-caption {
+  position: absolute;
+  bottom: var(--story-dock-clearance);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 6px 10px;
+  background: var(--nx-color-background);
+  border-radius: 6px;
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+  pointer-events: none;
+}
+.stories-chapter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 0;
+  padding-bottom: var(--story-dock-clearance);
+}
+.story-specimen {
+  width: min(100%, 1000px);
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: 16px;
+  max-height: 100%;
+  overflow: auto;
+}
+.story-specimen-header,
+.story-specimen-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+}
+.story-specimen-header {
+  border-bottom: 1px solid var(--nx-color-border-default);
+}
+.story-specimen-header > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: ui-monospace, monospace;
+}
+.story-specimen-footer {
+  border-top: 1px solid var(--nx-color-border-default);
+}
+.story-specimen-footer output {
+  color: var(--nx-color-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.story-specimen-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.story-example {
+  padding: 40px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.story-example h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin: 0;
+  max-width: 260px;
+  text-wrap: balance;
+}
+.story-example-button {
+  padding: 40px 0 28px;
+}
+.story-example p,
+.story-assertions p {
+  margin: 0;
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+.story-example-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+.story-example-actions button {
+  padding: 4px;
+  color: var(--nx-color-muted-foreground);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.story-example-actions button:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+.story-assertions {
+  min-width: 0;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  border-left: 1px solid var(--nx-color-border-default);
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 2%,
+    var(--nx-color-background)
+  );
+}
+.story-assertions > span {
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+}
+.story-assertions pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    12px/1.9 ui-monospace,
+    monospace;
+}
+@container story-canvas (max-height: 540px) {
+  .story-specimen-header,
+  .story-specimen-footer {
+    padding: 12px 20px;
+  }
+  .story-example {
+    padding: 20px;
+  }
+  .story-example h2 {
+    font-size: 20px;
+  }
+  .story-example-button {
+    padding: 20px 0 16px;
+  }
+  .story-assertions {
+    padding: 20px;
+    gap: 12px;
+  }
+  .story-assertions pre {
+    line-height: 1.6;
+  }
+}
+@container story-canvas (max-height: 440px) and (min-width: 701px) {
+  .story-specimen-header,
+  .story-specimen-footer {
+    padding-block: 8px;
+  }
+  .story-example {
+    padding: 16px;
+  }
+  .story-example-button {
+    padding-block: 16px 12px;
+  }
+}
+@container story-canvas (max-width: 700px) {
+  .comparison-labels {
+    inset: 12px 6px auto;
+    gap: 8px;
+  }
+  .comparison-labels span {
+    font-size: 10px;
+    padding: 6px;
+  }
+  .story-specimen-header,
+  .story-specimen-footer {
+    padding: 12px 16px;
+    font-size: 10px;
+  }
+  .story-specimen-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .story-example {
+    padding: 20px 16px 16px;
+  }
+  .story-example h2 {
+    font-size: 18px;
+    max-width: 100%;
+  }
+  .story-example-button {
+    padding: 20px 0 16px;
+  }
+  .story-example p {
+    font-size: 11px;
+  }
+  .story-example-actions {
+    margin-top: 4px;
+  }
+  .story-assertions {
+    padding: 14px 16px;
+    gap: 8px;
+    border-left: 0;
+    border-top: 1px solid var(--nx-color-border-default);
+  }
+  .story-assertions pre {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .story-assertions p {
+    display: none;
+  }
+}

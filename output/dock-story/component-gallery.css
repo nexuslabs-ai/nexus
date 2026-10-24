@@ -1,0 +1,50 @@
+.component-gallery {
+  container: component-gallery / inline-size;
+  block-size: 100%;
+  overflow: auto;
+  scroll-padding-block: 24px 120px;
+  outline-offset: -3px;
+}
+
+.component-gallery-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  max-inline-size: 84rem;
+  margin-inline: auto;
+  padding: 24px 20px 144px;
+  gap: 48px;
+}
+
+.component-gallery-group {
+  min-inline-size: 0;
+}
+
+.component-gallery-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-end: 24px;
+}
+
+@container component-gallery (min-width: 40rem) {
+  .component-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: 24px;
+    column-gap: 40px;
+  }
+}
+
+@container component-gallery (min-width: 64rem) {
+  .component-gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-inline: 32px;
+    column-gap: 56px;
+    row-gap: 56px;
+  }
+}
+
+.customize-gallery-subtitle {
+  margin: -12px 0 24px;
+  color: var(--nx-color-muted-foreground);
+}

@@ -1,0 +1,139 @@
+.journey-wheel .journey-workbench {
+  width: min(100%, 720px);
+  padding: 0;
+}
+.tile-wheel {
+  width: 100%;
+  margin-top: var(--nx-spacing-6);
+}
+.wheel-stage {
+  position: relative;
+  height: 120px;
+  container-type: inline-size;
+  perspective: 700px;
+  isolation: isolate;
+}
+.wheel-rotor {
+  --wheel-radius: min(calc(var(--wheel-depth) + 64px), 38cqw);
+  position: absolute;
+  left: 50%;
+  top: calc(50% - var(--wheel-radius) * 0.309);
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(calc(-1 * var(--wheel-radius))) rotateX(-18deg)
+    rotateY(var(--wheel-rotation));
+  transition: transform 700ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+.wheel-tile {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  border: 0;
+  border-radius: var(--nx-radius-lg);
+  background: var(--paper);
+  color: var(--ink);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  backface-visibility: hidden;
+  transform: rotateY(var(--wheel-angle)) translateZ(var(--wheel-radius));
+  transition:
+    width 320ms ease,
+    margin-left 320ms ease,
+    box-shadow 300ms ease;
+  box-shadow: var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+    var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+    var(--nx-shadow-sm-layer-1-color);
+}
+.wheel-tile svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  transition: scale 300ms ease;
+}
+.wheel-tile:hover svg {
+  scale: 1.12;
+}
+.wheel-label {
+  font:
+    600 13px/1.2 Inter,
+    sans-serif;
+  position: absolute;
+  left: 48px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.wheel-tile[data-front='true'] .wheel-label {
+  position: static;
+  opacity: 1;
+  transition-delay: 180ms;
+}
+.wheel-tile[data-front='true'] {
+  width: 152px;
+  margin-left: -76px;
+  justify-content: center;
+  padding: 0 12px;
+}
+.wheel-tile[data-front='true'] {
+  box-shadow:
+    var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+      var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+      var(--nx-shadow-sm-layer-1-color),
+    inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.wheel-stage[data-dragging='true'] .wheel-rotor {
+  transition: none;
+}
+.wheel-stage {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wheel-stage[data-dragging='true'] {
+  cursor: grabbing;
+}
+.wheel-tile:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 4px;
+}
+.wheel-stage:focus-visible {
+  outline: none;
+}
+.wheel-stage:focus-visible .wheel-tile[data-front='true'] {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 4px;
+}
+.journey-wheel .journey-heading {
+  font-size: calc(var(--nx-typography-size-base) * 1);
+}
+.journey-wheel .journey-sequence {
+  gap: var(--nx-spacing-8);
+}
+.journey-wheel .journey-tools {
+  display: flex;
+  width: auto;
+  gap: var(--nx-spacing-3);
+  margin-top: var(--nx-spacing-4);
+}
+.journey-wheel .journey-tool {
+  width: 48px;
+  height: 48px;
+}
+.journey-wheel .journey-tool svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Backface culling follows the actual animated rotation, not the target index. */
+.wheel-tile[data-behind='true'] {
+  pointer-events: none;
+}

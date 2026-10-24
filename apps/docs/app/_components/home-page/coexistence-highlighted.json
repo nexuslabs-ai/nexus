@@ -1,0 +1,9577 @@
+{
+  "MUI:component": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { TextField, MenuItem } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@mui/material'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onInvite",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSubmit",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{onInvite}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "TextField",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "name",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "required",
+        "color": "#B392F0"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "TextField",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "select",
+        "color": "#B392F0"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Role\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "defaultValue",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Member\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "MenuItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "value",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Member\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">Member</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "MenuItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "MenuItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "value",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Admin\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">Admin</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "MenuItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "TextField",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"submit\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "size",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"sm\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        Send invitation",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  );",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "MUI:appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1976d2\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"subtle\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"Roboto, Helvetica, Arial, sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "MUI:appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1976d2\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"subtle\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"Roboto, Helvetica, Arial, sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:component": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Input, Select } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'antd'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onInvite",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSubmit",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{onInvite}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">Email<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Input",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "name",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "required",
+        "color": "#B392F0"
+      },
+      {
+        "content": " /></",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Select",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "aria-label",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Role\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "defaultValue",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Member\"",
+        "color": "#9ECBFF"
+      }
+    ],
+    [
+      {
+        "content": "        ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "options",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{[",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'Member'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'Admin'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "].",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "map",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "value",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " ({ value }))}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"submit\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "size",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"sm\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        Send invitation",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  );",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1677ff\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1677ff\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:component": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Input } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/ui/input'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Select, SelectTrigger, SelectValue,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  SelectContent, SelectGroup, SelectItem",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/ui/select'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onInvite",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSubmit",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{onInvite}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">Email<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Input",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "name",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"email\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "required",
+        "color": "#B392F0"
+      },
+      {
+        "content": " /></",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "label",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Select",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "defaultValue",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Member\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectTrigger",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "aria-label",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Role\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "><",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectValue",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " /></",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectTrigger",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectContent",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "><",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "value",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Member\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">Member</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "value",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Admin\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">Admin</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "></",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "SelectContent",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Select",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "type",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"submit\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "size",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"sm\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        Send invitation",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "form",
+        "color": "#85E89D"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  );",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#171717\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#171717\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "InviteForm",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "MUI:command": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { useState } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'react'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@mui/material'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { CommandDialog, CommandInput, CommandList,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  CommandEmpty, CommandGroup, CommandItem",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "ProjectSearch",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "projects",
+        "color": "#FFAB70"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " [",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "] ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "useState",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " <>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onClick",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "true",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ")}>Search projects…</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{open} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenChange",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{setOpen}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandInput",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "placeholder",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Find a project…\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">No projects found.</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "heading",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Projects\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          {projects.",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "map",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "project",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "key",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{project.name} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSelect",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(project);",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            }}>Open {project.name}</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          ))}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  </>;",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "MUI:command-appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1976d2\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"subtle\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"Roboto, Helvetica, Arial, sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "MUI:command-appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1976d2\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"subtle\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"Roboto, Helvetica, Arial, sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:command": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { useState } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'react'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'antd'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { CommandDialog, CommandInput, CommandList,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  CommandEmpty, CommandGroup, CommandItem",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "ProjectSearch",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "projects",
+        "color": "#FFAB70"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " [",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "] ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "useState",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " <>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onClick",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "true",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ")}>Search projects…</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{open} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenChange",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{setOpen}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandInput",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "placeholder",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Find a project…\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">No projects found.</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "heading",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Projects\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          {projects.",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "map",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "project",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "key",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{project.name} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSelect",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(project);",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            }}>Open {project.name}</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          ))}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  </>;",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:command-appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1677ff\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "Ant Design:command-appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#1677ff\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:command": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { useState } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'react'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { Button } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/ui/button'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { CommandDialog, CommandInput, CommandList,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  CommandEmpty, CommandGroup, CommandItem",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@/components/nexus-kit'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "export",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "function",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "ProjectSearch",
+        "color": "#B392F0"
+      },
+      {
+        "content": "({ ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "projects",
+        "color": "#FFAB70"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " }) {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " [",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "] ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "useState",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "return",
+        "color": "#F97583"
+      },
+      {
+        "content": " <>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onClick",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "true",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ")}>Search projects…</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "Button",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "open",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{open} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenChange",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{setOpen}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandInput",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "placeholder",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Find a project…\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">No projects found.</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandEmpty",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "heading",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "\"Projects\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          {projects.",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "map",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "project",
+        "color": "#FFAB70"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " (",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "key",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{project.name} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onSelect",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{() ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=>",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "onOpenProject",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(project);",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "              ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "setOpen",
+        "color": "#B392F0"
+      },
+      {
+        "content": "(",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ");",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "            }}>Open {project.name}</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandItem",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "          ))}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "        </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandGroup",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "      </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandList",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    </",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandDialog",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  </>;",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:command-appearance:light": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"light\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#171717\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "shadcn/ui:command-appearance:dark": [
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { DEFAULT_NXDS_APPEARANCE } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/core'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "import",
+        "color": "#F97583"
+      },
+      {
+        "content": " { NxdsAppearanceProvider } ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "from",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "'@nxds/react/appearance'",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "preset",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"mode\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"dark\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"brandColor\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"#171717\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"surfaceTone\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"neutral\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"density\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"default\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"corners\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"smooth\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"elevation\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"flat\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"stroke\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"normal\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"prefs\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFont\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"-apple-system, BlinkMacSystemFont, ",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "Segoe UI",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "\\\"",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ", sans-serif\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "    ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"uiFontSize\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "14",
+        "color": "#79B8FF"
+      }
+    ],
+    [
+      {
+        "content": "  }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "const",
+        "color": "#F97583"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "appearance",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": " {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ",",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset,",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  prefs: { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "DEFAULT_NXDS_APPEARANCE",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ".prefs, ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "...",
+        "color": "#F97583"
+      },
+      {
+        "content": "preset.prefs },",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "};",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// Inside the isolated preview document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Keep your existing library's theme provider too.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "<",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "state",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{appearance}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "storageKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "} ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "cookieWriteKey",
+        "color": "#B392F0"
+      },
+      {
+        "content": "=",
+        "color": "#F97583"
+      },
+      {
+        "content": "{",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "false",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "}>",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  <",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "CommandWorkspace",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " />",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "</",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "NxdsAppearanceProvider",
+        "color": "#79B8FF"
+      },
+      {
+        "content": ">",
+        "color": "#E1E4E8"
+      }
+    ]
+  ],
+  "css-comparison": [
+    [
+      {
+        "content": "// SAME BASELINE IN BOTH PREVIEWS",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// MUI: ThemeProvider + CssBaseline",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Ant Design: ConfigProvider + antd/dist/reset.css",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Settings controls + a native HTML help block.",
+        "color": "#6A737D"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// LEFT: the copied shadcn global stylesheet",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "@import ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"tailwindcss\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": "; ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "// includes Preflight",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "@layer base {",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "*",
+        "color": "#F97583"
+      },
+      {
+        "content": " { @apply border-border outline-ring/",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "50",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  body { @apply bg",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "background text",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "foreground; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "  html { @apply font",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "sans; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "}",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "// Preflight includes:",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "h1, h2, h3, h4, h5, h6 { font",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "size",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": inherit; font",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "weight",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": inherit; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "ol, ul, menu { list",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "-",
+        "color": "#F97583"
+      },
+      {
+        "content": "style",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": none; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "*",
+        "color": "#F97583"
+      },
+      {
+        "content": ", ::before, ::after { ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "margin",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "0",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "; ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "padding",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "0",
+        "color": "#79B8FF"
+      },
+      {
+        "content": "; ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "border",
+        "color": "#B392F0"
+      },
+      {
+        "content": ": ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "0",
+        "color": "#79B8FF"
+      },
+      {
+        "content": " solid; }",
+        "color": "#E1E4E8"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// RIGHT: Nexus styles, without Preflight",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "@import ",
+        "color": "#E1E4E8"
+      },
+      {
+        "content": "\"@nxds/tailwind\"",
+        "color": "#9ECBFF"
+      },
+      {
+        "content": ";",
+        "color": "#E1E4E8"
+      }
+    ],
+    [
+      {
+        "content": "// Use NxdsAppearanceProvider in the isolated document.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// It writes --nx-* tokens and appearance settings.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// Existing host globals and component themes stay in place.",
+        "color": "#6A737D"
+      }
+    ],
+    [],
+    [
+      {
+        "content": "// The table compares computed styles of existing elements.",
+        "color": "#6A737D"
+      }
+    ],
+    [
+      {
+        "content": "// The newly added Invite button is excluded from measurement.",
+        "color": "#6A737D"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,502 @@
+{
+  "cases": [
+    {
+      "mode": "dark",
+      "integration": "before",
+      "probes": [
+        {
+          "background": "oklch(0.12 0.005 285.823)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.274 0.006 286.033)",
+          "changed": false,
+          "color": "oklab(0.7215 -0.0394947 -0.136208)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "16px"
+        },
+        {
+          "background": "oklch(0.2103 0.0059 285.89)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "24px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.705 0.015 286.067)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "4px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.705 0.015 286.067)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "24px"
+        }
+      ]
+    },
+    {
+      "mode": "dark",
+      "integration": "shadcn",
+      "probes": [
+        {
+          "background": "oklch(0.145 0 0)",
+          "changed": true,
+          "color": "oklch(0.985 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.985 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.274 0.006 286.033)",
+          "changed": true,
+          "color": "oklab(0.464273 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "20px"
+        },
+        {
+          "background": "oklch(0.2103 0.0059 285.89)",
+          "changed": true,
+          "color": "oklch(0.985 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "30px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.269 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.269 0 0)",
+          "changed": true,
+          "color": "oklch(0.985 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "5px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.269 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.269 0 0)",
+          "changed": true,
+          "color": "oklch(0.985 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "30px"
+        }
+      ],
+      "select": "Editor"
+    },
+    {
+      "mode": "dark",
+      "integration": "nexus",
+      "probes": [
+        {
+          "background": "oklch(0.12 0.005 285.823)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.274 0.006 286.033)",
+          "changed": false,
+          "color": "oklab(0.7215 -0.0394947 -0.136208)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "16px"
+        },
+        {
+          "background": "oklch(0.2103 0.0059 285.89)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "24px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.705 0.015 286.067)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "4px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.705 0.015 286.067)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "24px"
+        }
+      ],
+      "select": "Editor"
+    },
+    {
+      "mode": "light",
+      "integration": "before",
+      "probes": [
+        {
+          "background": "oklch(0.9702 0 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.94 0.001 286.375)",
+          "changed": false,
+          "color": "oklab(0.49737 -0.0375291 -0.132802)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "16px"
+        },
+        {
+          "background": "oklch(1 0 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "24px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.5517 0.0138 285.94)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "4px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.5517 0.0138 285.94)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "24px"
+        }
+      ]
+    },
+    {
+      "mode": "light",
+      "integration": "shadcn",
+      "probes": [
+        {
+          "background": "oklch(1 0 0)",
+          "changed": true,
+          "color": "oklch(0.145 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.145 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.94 0.001 286.375)",
+          "changed": true,
+          "color": "oklab(0.7225 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "20px"
+        },
+        {
+          "background": "oklch(1 0 0)",
+          "changed": true,
+          "color": "oklch(0.145 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "30px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.97 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.97 0 0)",
+          "changed": true,
+          "color": "oklch(0.145 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "5px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": true,
+          "color": "oklch(0.97 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.97 0 0)",
+          "changed": true,
+          "color": "oklch(0.205 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "30px"
+        }
+      ],
+      "select": "Editor"
+    },
+    {
+      "mode": "light",
+      "integration": "nexus",
+      "probes": [
+        {
+          "background": "oklch(0.9702 0 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "workspace",
+          "radius": "0px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "23px",
+          "id": "title",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.94 0.001 286.375)",
+          "changed": false,
+          "color": "oklab(0.49737 -0.0375291 -0.132802)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "12px",
+          "id": "badge",
+          "radius": "16px"
+        },
+        {
+          "background": "oklch(1 0 0)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "usage",
+          "radius": "24px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.5517 0.0138 285.94)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "description",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.2103 0.0059 285.89)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "progress",
+          "radius": "4px"
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "changed": false,
+          "color": "oklch(0.5517 0.0138 285.94)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "note",
+          "radius": "0px"
+        },
+        {
+          "background": "oklch(0.6204 0.195 253.83)",
+          "changed": false,
+          "color": "oklch(0.9911 0 0)",
+          "fontFamily": "Arial, sans-serif",
+          "fontSize": "14px",
+          "id": "invite",
+          "radius": "24px"
+        }
+      ],
+      "select": "Editor"
+    }
+  ],
+  "wide": {
+    "columns": "424px 424px 424px",
+    "dock": {
+      "bottom": 1774,
+      "height": 72,
+      "left": 32,
+      "right": 2337,
+      "top": 1702,
+      "width": 2305,
+      "x": 32,
+      "y": 1702
+    },
+    "pageWidth": 2369,
+    "study": {
+      "bottom": 1682,
+      "height": 1247.28125,
+      "left": 524.5,
+      "right": 1844.5,
+      "top": 434.71875,
+      "width": 1320,
+      "x": 524.5,
+      "y": 434.71875
+    },
+    "viewport": [2369, 1794]
+  },
+  "keyboard": "Nexus Space/ArrowDown/Enter selected Admin in both frames; shadcn Viewer selection updated both frames"
+}

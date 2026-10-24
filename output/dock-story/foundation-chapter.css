@@ -1,0 +1,154 @@
+.foundation-core {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(12px, 2cqb, 32px);
+  min-block-size: 0;
+  min-inline-size: 0;
+  padding: clamp(20px, 3cqb, 48px) clamp(16px, 2cqi, 40px) 100px;
+  border-radius: var(--canvas-radius, 14px);
+  background: var(--framework-surface);
+  text-align: center;
+}
+.foundation-core-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.foundation-core strong {
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.foundation-core p {
+  margin: 0;
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+.foundation-capabilities {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-block-size: 0;
+}
+.foundation-capability {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-block-size: 0;
+}
+.foundation-capability-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.foundation-capability-title > svg,
+.foundation-core-heading > svg {
+  flex-shrink: 0;
+}
+.foundation-integration {
+  display: grid;
+  gap: 8px;
+}
+.foundation-status {
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 1.3;
+  font-weight: 400;
+}
+.foundation-destination {
+  gap: 6px;
+}
+@container framework (max-height: 640px) and (min-width: 701px) {
+  .foundation-flow {
+    --framework-label-size: 12px;
+    mask-image: linear-gradient(
+      to bottom,
+      #000 calc(100% - 100px),
+      transparent
+    );
+  }
+  .foundation-flow .framework-token-group,
+  .foundation-flow .framework-core-column,
+  .foundation-flow .framework-output-group {
+    gap: 12px;
+  }
+  .foundation-core {
+    padding: 16px 16px 112px;
+    gap: 12px;
+  }
+  .foundation-core-heading > svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+  .foundation-capabilities {
+    gap: 8px;
+  }
+  .foundation-capability {
+    gap: 4px;
+  }
+  .foundation-capability-title {
+    flex-direction: row;
+  }
+  .foundation-capability-title > svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  .foundation-integration {
+    gap: 4px;
+  }
+  .foundation-destination {
+    gap: 2px;
+  }
+  .foundation-destination > svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+}
+@container framework (max-width: 700px) {
+  .foundation-flow {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 80px), transparent);
+  }
+  .foundation-core {
+    padding: 12px 8px 128px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+  .foundation-core-heading {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .foundation-core-heading > svg {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+  .foundation-capabilities {
+    gap: 12px;
+  }
+  .foundation-capability {
+    gap: 4px;
+  }
+  .foundation-capability-title {
+    gap: 4px;
+  }
+  .foundation-capability-title > svg {
+    inline-size: 16px;
+    block-size: 16px;
+  }
+  .foundation-core p {
+    line-height: 1.35;
+  }
+  .foundation-integration {
+    gap: 4px;
+  }
+  .foundation-destination {
+    gap: 4px;
+    padding-inline: 4px;
+  }
+}

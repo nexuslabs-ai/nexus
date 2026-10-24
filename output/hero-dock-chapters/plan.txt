@@ -1,0 +1,5 @@
+Prototype: chapters 1, 2, 4 share a persistent dashboard and a fixed-size dock.
+Guidance: modern-web-guidance search "scroll sticky transitions", retrieved carousel-slide-effects.
+Decision: CSS sticky plus requestAnimationFrame scroll measurement, short transform/opacity entrances. No scroll interception, environment queries, or new scroll-timeline dependency. Existing explicit reduceMotion preference disables transitions.
+Interactions: example selection, color/radius/density/type controls; selected button content/variant/icon/source editing. Dashboard data is illustrative.
+Validation: scoped ESLint and docs typecheck passed. Browser verified persistent edited state, source output, and identical dock bounding boxes across all three chapters. No page errors or horizontal overflow at 390px.

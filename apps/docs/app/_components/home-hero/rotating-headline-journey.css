@@ -1,0 +1,277 @@
+.rotating-headline {
+  position: relative;
+  inline-size: 100%;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+.rotating-headline-lines {
+  display: grid;
+  overflow: hidden;
+  padding-block: 0.15em;
+}
+.rotating-headline-line,
+.rotating-headline-reserve {
+  grid-area: 1 / 1;
+}
+.rotating-headline-reserve {
+  visibility: hidden;
+}
+.rotating-headline-line {
+  animation: headline-line-enter var(--nx-motion-duration-slower)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rotating-headline-journey .workbench-journey .journey-sequence {
+  gap: var(--nx-spacing-2);
+}
+.rotating-headline-journey .journey-title {
+  margin-block: 0;
+}
+.rotating-headline-journey .journey-workbench {
+  row-gap: var(--nx-spacing-2);
+}
+.rotating-headline-journey .journey-grid {
+  min-block-size: calc(
+    var(--lab-tile, calc(var(--nx-spacing-4) * 3.75)) + 24px
+  ) !important;
+}
+.rotating-headline-journey .journey-tile.journey-enter {
+  animation-delay: 0ms;
+  animation-duration: var(--nx-motion-duration-slower);
+}
+.rotating-headline-journey:not([data-slide='0'])
+  .workbench-journey.journey-compact
+  .journey-tile,
+.rotating-headline-journey
+  .workbench-journey.journey-compact
+  .journey-tile[data-active='true'] {
+  width: max-content;
+  min-inline-size: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+}
+.rotating-headline-journey:not([data-slide='0'])
+  .workbench-journey.journey-compact
+  .journey-face,
+.rotating-headline-journey
+  .workbench-journey.journey-compact
+  .journey-tile[data-active='true']
+  .journey-face {
+  position: relative;
+  inset: auto;
+  block-size: 100%;
+  box-sizing: border-box;
+  padding-inline: var(--nx-spacing-5);
+}
+.rotating-headline-journey:not([data-slide='0']) .journey-idle-icon {
+  opacity: 0;
+}
+.rotating-headline-journey:not([data-slide='0']) .journey-face {
+  opacity: 1;
+  transform: none;
+  scale: 1;
+}
+@container tilted (max-width: 40rem) {
+  .rotating-headline-journey .journey-grid {
+    min-block-size: 12rem !important;
+    align-content: center;
+  }
+}
+.rotating-headline-toggle {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+  border-radius: 50%;
+  color: var(--nx-color-muted-foreground);
+  background: var(--nx-color-background);
+  font-size: calc(var(--nx-typography-size-base) * 0.75);
+  cursor: pointer;
+}
+.rotating-headline-toggle:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+@keyframes headline-line-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shared light/dark swatches with hue-matched ink; each pair meets APCA Lc 75. */
+.rotating-headline-journey .journey-tile {
+  background: var(--rotating-paper);
+  color: var(--rotating-ink);
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-0,
+.token-flow.journey-color-0 {
+  --rotating-paper: #c4c9f8;
+  --rotating-ink: #11152b;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-1,
+.token-flow.journey-color-1 {
+  --rotating-paper: #ffc279;
+  --rotating-ink: #281a0c;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-2,
+.token-flow.journey-color-2 {
+  --rotating-paper: #ffbeb0;
+  --rotating-ink: #2b1510;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-3,
+.token-flow.journey-color-3 {
+  --rotating-paper: #79deeb;
+  --rotating-ink: #0c2529;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-4,
+.token-flow.journey-color-4 {
+  --rotating-paper: #f8d75c;
+  --rotating-ink: #27220c;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-5,
+.token-flow.journey-color-5 {
+  --rotating-paper: #cbcfca;
+  --rotating-ink: #1a2019;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-6,
+.token-flow.journey-color-6 {
+  --rotating-paper: #d6c6f1;
+  --rotating-ink: #21172d;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-7,
+.token-flow.journey-color-7 {
+  --rotating-paper: #9cddc0;
+  --rotating-ink: #10271c;
+}
+:is(.rotating-headline-journey, .token-flow) .journey-color-8,
+.token-flow.journey-color-8 {
+  --rotating-paper: #c6e557;
+  --rotating-ink: #20280b;
+}
+
+/* Earlier palette retained for visual comparison, in either website theme. */
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-0 {
+  --rotating-paper: #6674ed;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-1 {
+  --rotating-paper: #ffb45c;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-2 {
+  --rotating-paper: #ff8066;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-3 {
+  --rotating-paper: #63d8e8;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-4 {
+  --rotating-paper: #f8d75c;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-5 {
+  --rotating-paper: #b2b8b0;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-6 {
+  --rotating-paper: #c4adeb;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-7 {
+  --rotating-paper: #61c99b;
+  --rotating-ink: #080b28;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-8 {
+  --rotating-paper: #c6e557;
+  --rotating-ink: #080b28;
+}
+
+/* Original light-mode theme swatches, retained in both page themes. */
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-0 {
+  --rotating-paper: var(--original-paper-0);
+  --rotating-ink: var(--original-ink-0);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-1 {
+  --rotating-paper: var(--original-paper-1);
+  --rotating-ink: var(--original-ink-1);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-2 {
+  --rotating-paper: var(--original-paper-2);
+  --rotating-ink: var(--original-ink-2);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-3 {
+  --rotating-paper: var(--original-paper-3);
+  --rotating-ink: var(--original-ink-3);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-4 {
+  --rotating-paper: var(--original-paper-4);
+  --rotating-ink: var(--original-ink-4);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-5 {
+  --rotating-paper: var(--original-paper-5);
+  --rotating-ink: var(--original-ink-5);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-6 {
+  --rotating-paper: var(--original-paper-6);
+  --rotating-ink: var(--original-ink-6);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-7 {
+  --rotating-paper: var(--original-paper-7);
+  --rotating-ink: var(--original-ink-7);
+}
+[data-tile-palette='original-pastel']
+  .rotating-headline-journey
+  .journey-color-8 {
+  --rotating-paper: var(--original-paper-8);
+  --rotating-ink: var(--original-ink-8);
+}
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-9,
+.token-flow.journey-color-9 {
+  --rotating-paper: #f4acd0;
+  --rotating-ink: #301323;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-9 {
+  --rotating-paper: #ed83b7;
+}
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-10,
+.token-flow.journey-color-10 {
+  --rotating-paper: #94c5f5;
+  --rotating-ink: #102337;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-10 {
+  --rotating-paper: #69adf0;
+}
+
+:is(.rotating-headline-journey, .token-flow) .journey-color-11,
+.token-flow.journey-color-11 {
+  --rotating-paper: #d9b69b;
+  --rotating-ink: #2c1c11;
+}
+[data-tile-palette='pastel'] .rotating-headline-journey .journey-color-11 {
+  --rotating-paper: #c99b78;
+}

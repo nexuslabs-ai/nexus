@@ -1,0 +1,56 @@
+[
+  {
+    "background": "#c4c9f8",
+    "foreground": "#11152b",
+    "before": 36.72232642974462,
+    "after": 75.09082107021719
+  },
+  {
+    "background": "#ffc279",
+    "foreground": "#281a0c",
+    "before": 71.26224590967824,
+    "after": 75.0552564877096
+  },
+  {
+    "background": "#ffbeb0",
+    "foreground": "#2b1510",
+    "before": 55.5400862417752,
+    "after": 75.26942077086471
+  },
+  {
+    "background": "#79deeb",
+    "foreground": "#0c2529",
+    "before": 73.82624165591497,
+    "after": 75.11083651219762
+  },
+  {
+    "background": "#f8d75c",
+    "foreground": "#27220c",
+    "before": 83.32085549059384,
+    "after": 80.69157720392187
+  },
+  {
+    "background": "#cbcfca",
+    "foreground": "#1a2019",
+    "before": 64.0110344406272,
+    "after": 75.01699892033717
+  },
+  {
+    "background": "#d6c6f1",
+    "foreground": "#21172d",
+    "before": 64.74454043357072,
+    "after": 75.00790998910799
+  },
+  {
+    "background": "#9cddc0",
+    "foreground": "#10271c",
+    "before": 64.0630783888917,
+    "after": 75.04474519937669
+  },
+  {
+    "background": "#c6e557",
+    "foreground": "#20280b",
+    "before": 82.84995002549785,
+    "after": 79.59664608779973
+  }
+]

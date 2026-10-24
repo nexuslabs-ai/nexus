@@ -1,0 +1,129 @@
+.straight-dock .context-dock-bar {
+  animation: none;
+}
+.straight-dock .context-dock-bar > button {
+  z-index: 3;
+  transition: color 120ms;
+}
+.straight-dock .context-tool-label {
+  transition: none;
+}
+.straight-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 3px var(--markup-shadow))
+    drop-shadow(0 12px 16px var(--markup-shadow));
+}
+.straight-surface path {
+  fill: var(--markup-face);
+  stroke: var(--markup-rim);
+  stroke-width: 1;
+}
+.straight-dock .straight-content {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+.straight-content > div {
+  width: 100%;
+}
+.straight-dock .context-panel-heading button {
+  background: var(--markup-shell);
+}
+
+.straight-dock .dial-dock-source {
+  overflow-wrap: anywhere;
+}
+.roomy-dock .context-dock-bar {
+  /* Keep tool spacing consistent without changing the query container. */
+  inline-size: min(100%, calc(300px + (var(--dock-tool-count) - 1) * 68px));
+  margin-inline: auto;
+}
+.roomy-dock .context-dock-bar > button[data-active='true'] {
+  flex: 0 1 280px;
+}
+.roomy-dock .straight-content {
+  padding: 20px;
+}
+.roomy-dock .context-panel-content {
+  gap: 8px;
+}
+.bare-dock .context-dock-bar > button::before {
+  border: 0;
+  border-radius: 14px;
+  background: var(--dock-highlight);
+  box-shadow: none;
+  opacity: 0;
+  transform: none;
+  transition: opacity 120ms;
+}
+.bare-dock
+  .context-dock-bar
+  > button[data-active='false']:is(:hover, :focus-visible)::before {
+  opacity: 1;
+  transform: none;
+}
+@container (max-width: 480px) {
+  .straight-dock .straight-content {
+    padding-inline: 10px;
+  }
+  .straight-dock .context-panel-heading {
+    gap: 6px;
+    padding-inline: 0;
+  }
+  .straight-dock .context-panel-heading h2 {
+    min-width: 0;
+    font-size: 13px;
+  }
+  .straight-dock .context-panel-heading button {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+  .straight-dock .dialkit-select-trigger,
+  .straight-dock .dialkit-color-control,
+  .straight-dock .dialkit-toggle {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+    text-align: left;
+  }
+  .straight-dock .dialkit-select-right {
+    min-width: 0;
+    justify-content: space-between;
+  }
+  .straight-dock .dialkit-color-inputs {
+    flex: auto;
+  }
+  .straight-dock .dialkit-color-value {
+    text-align: left;
+    font-size: 11px;
+  }
+  .straight-dock .dialkit-toggle-track {
+    align-self: flex-end;
+  }
+  .straight-dock .dialkit-slider-wrapper {
+    height: 58px;
+  }
+  .straight-dock .dialkit-slider-label {
+    top: 15px;
+    font-size: 12px;
+  }
+  .straight-dock .dialkit-slider-value,
+  .straight-dock .dialkit-slider-input {
+    top: 42px;
+  }
+  .roomy-dock .straight-content {
+    padding: 16px 12px;
+  }
+}

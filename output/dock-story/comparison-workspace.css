@@ -1,0 +1,62 @@
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: transparent;
+}
+body {
+  font-family: system-ui, sans-serif;
+}
+.comparison-demo-root {
+  color: var(--foreground);
+  min-height: 100vh;
+  padding: 24px;
+  container: workspace / inline-size;
+}
+.library-workspace {
+  max-width: 1320px;
+  margin-inline: auto;
+}
+.workspace-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.workspace-heading h2,
+.workspace-heading h3 {
+  margin: 0 0 4px;
+}
+.workspace-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+.workspace-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.workspace-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.workspace-table {
+  overflow-x: auto;
+}
+.shadcn-workspace {
+  font-family: system-ui, sans-serif;
+}
+@container workspace (max-width: 680px) {
+  .workspace-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-heading {
+    align-items: start;
+  }
+}

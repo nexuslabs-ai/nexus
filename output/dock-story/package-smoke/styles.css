@@ -1,0 +1,3 @@
+@import '@nxds/tailwind' source(none);
+@import '@nxds/react/styles.css';
+@source './main.jsx';

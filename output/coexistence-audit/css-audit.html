@@ -1,0 +1,290 @@
+<!doctype html><meta charset="utf-8" /><title>
+  CSS coexistence audit — exact conflicts</title
+><style>
+  body {
+    font: 16px/1.6 system-ui;
+    max-width: 1150px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #161616;
+    color: #ddd;
+  }
+  h1,
+  h2 {
+    color: white;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 12px;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid #444;
+  }
+  code {
+    color: #abd5ff;
+  }
+  a {
+    color: #a6d2ff;
+  }
+  img {
+    width: 100%;
+    border: 1px solid #555;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  small {
+    color: #bbb;
+  }
+</style>
+<h1>CSS coexistence audit</h1>
+<p>
+  19 October 2026. Installed MUI 9.5.0, Ant 6.6.6, copied shadcn radix-nova CSS
+  plus published variant helpers, local Nexus source. Findings apply to this
+  setup and cascade, not every possible consumer configuration.
+</p>
+<h2>Result</h2>
+<p>
+  <b>No default MUI/Ant semantic-token collision with shadcn was found.</b> MUI
+  uses --mui-* and Ant uses --ant-*; their dynamically generated runtime CSS was
+  inspected with CSS-variable mode enabled. A literal name scan of installed
+  host source found no overlap with the generic tokens declared by the tested
+  shadcn CSS. The existing custom-token fixture does collide, but it is not a
+  default MUI/Ant token consumer.
+</p>
+<p>
+  The additional visible differences are caused by Tailwind Preflight filling
+  gaps in host component styling. These are visual regressions, not proof that
+  the controls become unusable. Removing only Preflight eliminates all three new
+  differences below.
+</p>
+<h2>Exact visible conflicts — Nexus preserves these cases</h2>
+<table>
+  <tr>
+    <th>Component / condition</th>
+    <th>Winning CSS and existing dependency</th>
+    <th>Measured result with shadcn integration</th>
+    <th>Nexus / causal control</th>
+  </tr>
+  <tr>
+    <td>Ant Tabs, editable-card, close buttons</td>
+    <td>
+      Preflight universal padding:0 replaces browser button padding. Ant
+      .ant-tabs-tab-remove defines margins, font, border and background but no
+      padding.
+    </td>
+    <td>
+      Close button horizontal padding 6px → 0; width 24px → 12px. Two tab items
+      each shrink 12px. Navigation row 355.234px → 331.234px.
+    </td>
+    <td>
+      Nexus preserves baseline. shadcn without Preflight also preserves it.
+      Line/card variants did not show this size change.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI AccordionSummary with plain text</td>
+    <td>
+      Preflight button {font:inherit} replaces browser button font; no explicit
+      summary typography supplies the missing value.
+    </td>
+    <td>Arial 13.333px → Roboto 16px; content height 15.5px → 24px.</td>
+    <td>
+      Nexus preserves baseline. No-Preflight control preserves baseline. An
+      explicit MUI Typography child keeps the visible text stable.
+    </td>
+  </tr>
+  <tr>
+    <td>Ant Skeleton title</td>
+    <td>
+      Preflight h3 {font-size:inherit;font-weight:inherit}. Existing reset
+      margin-bottom:.5em depends on the resulting font size.
+    </td>
+    <td>
+      Font basis 16.38px → 14px; bottom margin 8.19px → 7px; container height
+      24.1875px → 23px. Small layout shift, not severe breakage.
+    </td>
+    <td>Nexus and no-Preflight control preserve baseline.</td>
+  </tr>
+  <tr>
+    <td>
+      Custom app button/card using --primary, --primary-foreground, --radius
+    </td>
+    <td>
+      Later unscoped shadcn :root/.dark variables reuse the same generic names.
+    </td>
+    <td>Teal becomes neutral; radius 16px → 10px.</td>
+    <td>
+      Nexus --nx-* does not overwrite these names. Conditional custom-app
+      conflict; not a MUI/Ant default collision.
+    </td>
+  </tr>
+  <tr>
+    <td>Native form, link, heading/list/table inside host app</td>
+    <td>Preflight global native-element reset.</td>
+    <td>
+      Native controls lose backgrounds/borders, links lose underline,
+      heading/list/table defaults change.
+    </td>
+    <td>
+      Nexus avoids these resets. Dark provider color-scheme can still alter
+      native colors.
+    </td>
+  </tr>
+</table>
+<h2>CSS conflicts without visible component breakage</h2>
+<table>
+  <tr>
+    <th>Case</th>
+    <th>CSS that changes or matches</th>
+    <th>Why the visible component holds</th>
+  </tr>
+  <tr>
+    <td>MUI Typography h1–h6</td>
+    <td>
+      Global heading reset matches; universal border style/color and outline
+      color change.
+    </td>
+    <td>
+      Explicit MUI typography wins over layered reset. Border width remains
+      zero; no outline is drawn in tested resting state.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI AccordionSummary + Typography child</td>
+    <td>Summary button inherited font changes.</td>
+    <td>
+      Child Typography specifies its own font, so visible label and content
+      height remain unchanged.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI Checkbox / Switch / Radio / Rating</td>
+    <td>Hidden native inputs inherit different fonts/colors.</td>
+    <td>
+      Visible SVGs, tracks and stars are styled separately. Hidden-input
+      differences are not screenshot failures.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI TextField, Ant Input and Select</td>
+    <td>
+      Global input/reset selectors match; some wrapper border/outline values
+      change.
+    </td>
+    <td>
+      Host classes supply explicit typography, padding, visible borders and
+      colors. Tested sizes, error/disabled and appearance variants preserve
+      visible styling.
+    </td>
+  </tr>
+  <tr>
+    <td>Ant Table</td>
+    <td>
+      Outer wrapper inherited color changes under shadcn body text-foreground.
+    </td>
+    <td>
+      Inner table/cells supply their own host color. No cell-text regression
+      established.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI Divider</td>
+    <td>hr color changes to inherit.</td>
+    <td>
+      Rendered divider border has an explicit MUI border color; changed text
+      color does not repaint that border.
+    </td>
+  </tr>
+  <tr>
+    <td>MUI/Ant semantic variables</td>
+    <td>Generic shadcn variables coexist with host prefixed variables.</td>
+    <td>
+      No overlapping default semantic names were found; no automatic cascade of
+      affected consumers can be inferred.
+    </td>
+  </tr>
+</table>
+<h2>Source evidence</h2>
+<ul>
+  <li>
+    Tailwind preflight.css lines 7–15: universal padding/border reset; lines
+    73–80: heading reset; lines 238–251: form font/background reset.
+  </li>
+  <li>
+    Ant es/tabs/style/index.js lines 566–583: close-button style omits padding.
+  </li>
+  <li>
+    Ant dist/reset.css lines 152–162: unlayered form color/font inheritance.
+    This can override layered utilities in both kits.
+  </li>
+  <li>
+    MUI styles/createThemeWithVars.js lines 66,123: default mui prefix. Ant
+    es/theme/useToken.js line 97: configured prefix or getPrefixCls().
+  </li>
+  <li>
+    Nexus packages/tailwind/nexus.css lines 10–12 imports only Tailwind
+    theme/utilities, prefixed nx; no Preflight import.
+  </li>
+</ul>
+<h2>Visual evidence</h2>
+<p>
+  Ant editable tabs: shadcn globals on the left, Nexus on the right. Compare
+  tab/close-button widths; audit headers are native HTML and not part of the
+  component under test.
+</p>
+<div class="pair">
+  <img
+    src="ant-tabs-shadcn.png"
+    alt="Ant editable tabs after shadcn globals"
+  /><img src="ant-tabs-nexus.png" alt="Ant editable tabs after Nexus" />
+</div>
+<p>
+  <a href="ant-tabs-none.png">Baseline without either kit</a> ·
+  <a href="mui-accordion-shadcn.png">Plain-text accordion with shadcn</a> ·
+  <a href="mui-accordion-nexus.png">Accordion with Nexus</a>
+</p>
+<h2>Coverage and reproducibility</h2>
+<p>
+  Source scan: 167 entries (79 Nexus modules including supporting modules, 24
+  installed shadcn modules, 64 upstream registry entries). This records variable
+  consumers, native tags and state selectors; it is not a pass claim for every
+  export. One upstream toast entry was unavailable for this preset.
+</p>
+<p>
+  Expanded runtime matrix: 76 MUI + 134 Ant fixture cases × light/dark ×
+  CSS-variable mode on/off × Nexus/shadcn = 1,680 before/after cases. Causal
+  matrix adds a MUI Typography control and compares full shadcn, no-Preflight
+  shadcn and Nexus: 633 cases. Total this round: 2,313 case runs, plus focused
+  screenshots. Each sample waits for font loading and transitions. Raw property
+  changes are not failure counts.
+</p>
+<p>
+  Covered additional families: Select, Slider, Tabs, Accordion/Collapse, Table,
+  Pagination, Breadcrumbs, List/Menu, Avatar, Badge, Divider, Skeleton and
+  Rating/Rate. Existing button/input/typography/choice/alert/card/link/progress
+  variants were rerun. Source coverage is broader than runtime coverage. This
+  does not certify every interaction, pseudo-element, responsive composition or
+  exported subpart. Previously verified shared overlay/Ant-reset failures remain
+  excluded from a Nexus-only success claim.
+</p>
+<p>
+  Guidance: reused the bundled design-token-reactivity guidance for
+  scope/consumer tracing; runtime cascade and no-Preflight controls verify the
+  conclusions. No product UI, dependency version, commit or push was changed.
+</p>
+<ul>
+  <li><a href="expanded-runtime.json">Expanded runtime evidence</a></li>
+  <li><a href="causal-controls.json">No-Preflight causal controls</a></li>
+  <li><a href="runtime-css-rules.json">Runtime stylesheet rules</a></li>
+  <li><a href="variable-overlaps.json">Variable-name comparison</a></li>
+  <li>
+    <a href="source-consumer-map.json">167-entry source consumer/state map</a>
+  </li>
+</ul>

@@ -1,0 +1,7 @@
+.tilted-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nx-spacing-3);
+  margin-block: calc(var(--nx-spacing-5) + var(--nx-spacing-4)) 0;
+}

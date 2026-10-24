@@ -1,0 +1,68 @@
+/* Rotation is independent of the existing translate entrance animation. */
+.tilted-journey .workbench-journey.journey-compact .journey-grid,
+.tilted-journey .workbench-journey.journey-compact .journey-tools {
+  gap: 0;
+  padding-block: var(--nx-spacing-3);
+  padding-inline: var(--nx-spacing-3);
+  isolation: isolate;
+}
+.tilted-journey .journey-tile,
+.tilted-journey .journey-tool {
+  position: relative;
+  box-sizing: border-box;
+  border: calc(var(--nx-borderwidth-default) * 3) solid
+    var(--nx-color-background);
+  rotate: -6deg;
+  transform-origin: 50% 65%;
+  transition:
+    width var(--lab-expand, var(--nx-motion-duration-slow))
+      cubic-bezier(0.2, 0.8, 0.2, 1),
+    rotate var(--lab-expand, var(--nx-motion-duration-slow))
+      cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform var(--lab-expand, var(--nx-motion-duration-slow))
+      cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tilted-journey .journey-tile + .journey-tile {
+  margin-inline-start: calc(
+    var(--lab-gap, calc(var(--nx-spacing-4) * 0.5)) - 20px
+  );
+}
+.tilted-journey .journey-tool + .journey-tool {
+  margin-inline-start: calc(
+    var(--lab-tool-gap, calc(var(--nx-spacing-4) * 0.5)) - 20px
+  );
+}
+.tilted-journey .journey-tile:nth-child(3n + 2),
+.tilted-journey .journey-tool:nth-child(3n + 2) {
+  rotate: 5deg;
+}
+.tilted-journey .journey-tile:nth-child(3n),
+.tilted-journey .journey-tool:nth-child(3n) {
+  rotate: -3deg;
+}
+.tilted-journey .journey-tile[data-active='true'],
+.tilted-journey .journey-tile:hover,
+.tilted-journey .journey-tile:focus-visible,
+.tilted-journey .journey-tool:hover {
+  z-index: 10;
+  rotate: 0deg;
+  transform: translateY(-3px);
+}
+
+.tilted-journey {
+  container: tilted / inline-size;
+}
+@container tilted (max-width: 40rem) {
+  .tilted-journey .workbench-journey.journey-compact .journey-grid {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: visible;
+    row-gap: var(--nx-spacing-4);
+  }
+  .tilted-journey .journey-tile:first-child {
+    margin-inline-start: 0;
+  }
+  .tilted-journey .journey-tile:last-child {
+    margin-inline-end: 0;
+  }
+}

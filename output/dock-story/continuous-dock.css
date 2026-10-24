@@ -1,0 +1,40 @@
+.continuous-dock .context-dock-bar {
+  animation: none;
+}
+.continuous-dock .context-dock-bar > button {
+  z-index: 3;
+  transition: color 120ms;
+}
+.continuous-dock .context-tool-label {
+  transition: none;
+}
+.continuous-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 3px var(--markup-shadow))
+    drop-shadow(0 12px 16px var(--markup-shadow));
+}
+.continuous-surface path {
+  fill: var(--markup-face);
+  stroke: var(--markup-rim);
+  stroke-width: 1;
+}
+.continuous-dock .continuous-content {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+.continuous-content > div {
+  width: 100%;
+}
+.continuous-dock .context-panel-heading button {
+  background: var(--markup-shell);
+}

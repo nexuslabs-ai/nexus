@@ -1,0 +1,169 @@
+Library,Component/module,Scope,Evidence,Status
+nexus,packages/react/src/components/accordion/accordion.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/alert/alert.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/alert-dialog/alert-dialog.tsx,local source scan,"63:const AlertDialogPortal = AlertDialogPrimitive.Portal; | 129:<AlertDialogPortal> | 148:</AlertDialogPortal> | 409:AlertDialogPortal,",not individually exercised
+nexus,packages/react/src/components/appearance/appearance-settings/appearance-settings.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/brand-color-field/brand-color-field.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/color-field/color-field.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/config-preview/config-preview.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/provider/factory.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/provider/provider.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/provider/script.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/setting-row/setting-row.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/appearance/theme-quick-control/theme-quick-control.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/aspect-ratio/aspect-ratio.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/attachment/attachment.tsx,local source scan,"270:className={cn('nx:relative nx:z-20', className)} | 387:'nx:absolute nx:inset-0 nx:z-10 nx:cursor-pointer nx:rounded-[inherit] nx:border-0 nx:bg-transparent nx:p-0 nx:no-underline',",not individually exercised
+nexus,packages/react/src/components/avatar/avatar.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/badge/badge.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/breadcrumb/breadcrumb.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/bubble/bubble.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/button/button.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/button-group/button-group.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/card/card.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/carousel/carousel.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/chart/chart.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/checkbox/checkbox.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/choice-card/choice-card.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/choice-row/choice-row.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/collapsible/collapsible.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/combobox/combobox.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/command/command.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/context-menu/context-menu.tsx,local source scan,"43:const ContextMenuPortal = ContextMenuPrimitive.Portal; | 120:'nx:z-popover nx:min-w-32 nx:overflow-hidden', | 153:<ContextMenuPrimitive.Portal> | 157:'nx:z-popover nx:max-h-(--radix-context-menu-content-available-height)', | 166:</ContextMenuPrimitive.Portal> | 467:ContextMenuPortal,",not individually exercised
+nexus,packages/react/src/components/date-picker/date-picker.tsx,local source scan,"354:className=""nx:relative nx:z-10 nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-1""",not individually exercised
+nexus,packages/react/src/components/description-list/description-list.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/dialog/dialog.tsx,local source scan,"62:const DialogPortal = DialogPrimitive.Portal; | 156:<DialogPortal> | 187:</DialogPortal> | 365:DialogPortal,",not individually exercised
+nexus,packages/react/src/components/drawer/drawer.tsx,local source scan,"45:const DrawerPortal = DrawerPrimitive.Portal; | 69:'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay', | 107:<DrawerPortal> | 112:'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-hidden nx:bg-container nx:shadow-lg', | 129:</DrawerPortal> | 266:DrawerPortal,",not individually exercised
+nexus,packages/react/src/components/dropdown-menu/dropdown-menu.tsx,local source scan,"43:const DropdownMenuPortal = DropdownMenuPrimitive.Portal; | 120:'nx:z-popover nx:min-w-32 nx:overflow-hidden', | 157:<DropdownMenuPrimitive.Portal> | 162:'nx:z-popover nx:max-h-(--radix-dropdown-menu-content-available-height)', | 171:</DropdownMenuPrimitive.Portal> | 472:DropdownMenuPortal,",not individually exercised
+nexus,packages/react/src/components/empty-state/empty-state.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/field/field.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/filter-builder/filter-builder.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/filter-chip/filter-chip.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/filter-condition/filter-condition.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/hide/hide.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/hover-card/hover-card.tsx,local source scan,"84:<HoverCardPrimitive.Portal> | 90:'nx:z-popover nx:w-64 nx:p-container nx:outline-none', | 97:</HoverCardPrimitive.Portal>",not individually exercised
+nexus,packages/react/src/components/input/input.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/input-group/input-group.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/input-otp/input-otp.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/item/item.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/kbd/kbd.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/label/label.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/marker/marker.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/menubar/menubar.tsx,local source scan,"62:const MenubarPortal = MenubarPrimitive.Portal; | 158:'nx:z-popover nx:min-w-32 nx:overflow-hidden', | 195:<MenubarPrimitive.Portal> | 202:'nx:z-popover nx:min-w-48 nx:overflow-hidden', | 210:</MenubarPrimitive.Portal> | 490:MenubarPortal,",not individually exercised
+nexus,packages/react/src/components/message/message.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/message-scroller/message-scroller.tsx,local source scan,"333:'nx:absolute nx:inset-x-0 nx:z-sticky nx:mx-auto nx:rounded-full nx:[&_svg]:size-4 nx:data-[active=false]:invisible',",not individually exercised
+nexus,packages/react/src/components/multi-select/multi-select.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/native-select/native-select.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/navigation-menu/navigation-menu.tsx,local source scan,"198:<div className=""nx:absolute nx:top-full nx:left-0 nx:isolate nx:z-popover nx:flex nx:justify-center""> | 259:'nx:top-full nx:z-1 nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',",not individually exercised
+nexus,packages/react/src/components/page-header/page-header.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/pagination/pagination.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/popover/popover.tsx,local source scan,"61:<PopoverPrimitive.Portal> | 67:'nx:z-popover nx:w-72 nx:p-container nx:outline-none', | 74:</PopoverPrimitive.Portal>",not individually exercised
+nexus,packages/react/src/components/progress/progress.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/radio-group/radio-group.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/resizable/resizable.tsx,local source scan,"68:<div className=""nx:z-10 nx:flex nx:h-4 nx:w-3 nx:items-center nx:justify-center nx:rounded-sm nx:border-default nx:border-border-default nx:bg-border-default"">",not individually exercised
+nexus,packages/react/src/components/scroll-area/scroll-area.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/select/select.tsx,local source scan,"180:<SelectPrimitive.Portal> | 184:'nx:relative nx:z-popover nx:max-h-96 nx:min-w-32 nx:overflow-hidden', | 209:</SelectPrimitive.Portal>",not individually exercised
+nexus,packages/react/src/components/separator/separator.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/sheet/sheet.tsx,local source scan,"47:const SheetPortal = DialogPrimitive.Portal; | 69:'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay', | 86:'nx:fixed nx:z-modal nx:flex nx:flex-col nx:overflow-hidden', | 152:<SheetPortal> | 171:</SheetPortal> | 333:SheetPortal,",not individually exercised
+nexus,packages/react/src/components/show/show.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/sidebar/sidebar.tsx,local source scan,"331:'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:md:flex', | 408:'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:border-0 nx:bg-transparent nx:p-0 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:md:flex',",not individually exercised
+nexus,packages/react/src/components/skeleton/skeleton.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/slider/slider.tsx,local source scan,49:'nx:pointer-events-none nx:absolute nx:z-10 nx:size-1.5 nx:rounded-full nx:bg-muted-foreground-subtle nx:opacity-50 nx:transition-colors nx:duration-fast nx:data-disabled:bg-disabled-foreground nx:data-[orientation=horizontal]:top-1/2 nx:data-[orientation=horizontal]:-translate-x-1/2 nx:data-[orientation=horizontal]:-translate-y-1/2 nx:data-[orientation=vertical]:left-1/2 nx:data-[orientation=vertical]:-translate-x-1/2 nx:data-[orientation=vertical]:translate-y-1/2';,not individually exercised
+nexus,packages/react/src/components/sonner/sonner.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/spinner/spinner.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/switch/switch.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/table/table.tsx,local source scan,"273:stickyHeader && 'nx:sticky nx:top-0 nx:z-sticky nx:bg-container',",not individually exercised
+nexus,packages/react/src/components/tabs/tabs.tsx,local source scan,"175:'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0', | 195:'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',",not individually exercised
+nexus,packages/react/src/components/textarea/textarea.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/toggle/toggle.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/toggle-group/toggle-group.tsx,local source scan,"100:base: 'nx:relative nx:rounded-none nx:not-disabled:hover:z-10 nx:not-disabled:data-[state=on]:z-20 nx:not-disabled:aria-invalid:z-30 nx:not-disabled:aria-invalid:data-[state=on]:z-40 nx:[&&&&:focus-visible]:z-50',",not individually exercised
+nexus,packages/react/src/components/toolbar/toolbar.tsx,local source scan,,not individually exercised
+nexus,packages/react/src/components/tooltip/tooltip.tsx,local source scan,"84:<TooltipPrimitive.Portal> | 89:'nx:z-popover nx:overflow-hidden', | 98:</TooltipPrimitive.Portal>",not individually exercised
+shadcn,examples/shadcn-app/components/ui/alert.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/avatar.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/badge.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/button.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/card.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/checkbox.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/dialog.tsx,local source scan,"22:function DialogPortal({ | 24:}: React.ComponentProps<typeof DialogPrimitive.Portal>) { | 25:return <DialogPrimitive.Portal data-slot=""dialog-portal"" {...props} /> | 42:""fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"", | 59:<DialogPortal> | 64:""fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", | 84:</DialogPortal> | 165:DialogPortal,",not individually exercised
+shadcn,examples/shadcn-app/components/ui/dropdown-menu.tsx,local source scan,"14:function DropdownMenuPortal({ | 16:}: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) { | 18:<DropdownMenuPrimitive.Portal data-slot=""dropdown-menu-portal"" {...props} /> | 40:<DropdownMenuPrimitive.Portal> | 45:className={cn(""z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", className )} | 48:</DropdownMenuPrimitive.Portal> | 246:className={cn(""z-50 min-w-[96px] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", className )} | 254:DropdownMenuPortal,",not individually exercised
+shadcn,examples/shadcn-app/components/ui/input.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/label.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/popover.tsx,local source scan,"26:<PopoverPrimitive.Portal> | 32:""z-50 flex w-72 origin-(--radix-popover-content-transform-origin) flex-col gap-2.5 rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", | 37:</PopoverPrimitive.Portal>",not individually exercised
+shadcn,examples/shadcn-app/components/ui/progress.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/radio-group.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/select.tsx,local source scan,"67:<SelectPrimitive.Portal> | 71:className={cn(""relative z-50 max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", position ===""popper""&&""data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"", className )} | 88:</SelectPrimitive.Portal>",not individually exercised
+shadcn,examples/shadcn-app/components/ui/separator.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/sheet.tsx,local source scan,"26:function SheetPortal({ | 28:}: React.ComponentProps<typeof SheetPrimitive.Portal>) { | 29:return <SheetPrimitive.Portal data-slot=""sheet-portal"" {...props} /> | 40:""fixed inset-0 z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"", | 59:<SheetPortal> | 65:""fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg transition duration-200 ease-in-out data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-sm data-[side=right]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-[side=bottom]:data-open:slide-in-from-bottom-10 data-[side=left]:data-open:slide-in-from-left-10 data-[side=right]:data-open:slide-in-from-right-10 data-[side=top]:data-open:slide-in-from-top-10 data-closed:animate-out data-closed:fade-out-0 data-[side=bottom]:data-closed:slide-out-to-bottom-10 data-[side=left]:data-closed:slide-out-to-left-10 data-[side=right]:data-closed:slide-out-to-right-10 data-[side=top]:data-closed:slide-out-to-top-10"", | 85:</SheetPortal>",not individually exercised
+shadcn,examples/shadcn-app/components/ui/sidebar.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/skeleton.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/sonner.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/switch.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/table.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/tabs.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/textarea.tsx,local source scan,,not individually exercised
+shadcn,examples/shadcn-app/components/ui/tooltip.tsx,local source scan,"39:<TooltipPrimitive.Portal> | 44:""z-50 inline-flex w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"", | 50:<TooltipPrimitive.Arrow className=""z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground"" /> | 52:</TooltipPrimitive.Portal>",not individually exercised
+shadcn radix-nova,accordion,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/accordion.json,source scanned; not runtime tested
+shadcn radix-nova,alert,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/alert.json,source scanned; not runtime tested
+shadcn radix-nova,alert-dialog,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/alert-dialog.json,source scanned; not runtime tested
+shadcn radix-nova,aspect-ratio,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/aspect-ratio.json,source scanned; not runtime tested
+shadcn radix-nova,attachment,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/attachment.json,source scanned; not runtime tested
+shadcn radix-nova,avatar,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/avatar.json,source scanned; not runtime tested
+shadcn radix-nova,badge,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/badge.json,source scanned; not runtime tested
+shadcn radix-nova,breadcrumb,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/breadcrumb.json,source scanned; not runtime tested
+shadcn radix-nova,bubble,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/bubble.json,source scanned; not runtime tested
+shadcn radix-nova,button,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/button.json,source scanned; not runtime tested
+shadcn radix-nova,button-group,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/button-group.json,source scanned; not runtime tested
+shadcn radix-nova,calendar,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/calendar.json,source scanned; not runtime tested
+shadcn radix-nova,card,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/card.json,source scanned; not runtime tested
+shadcn radix-nova,carousel,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/carousel.json,source scanned; not runtime tested
+shadcn radix-nova,chart,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/chart.json,source scanned; not runtime tested
+shadcn radix-nova,checkbox,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/checkbox.json,source scanned; not runtime tested
+shadcn radix-nova,code-block,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/code-block.json,source scanned; not runtime tested
+shadcn radix-nova,collapsible,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/collapsible.json,source scanned; not runtime tested
+shadcn radix-nova,combobox,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/combobox.json,source scanned; not runtime tested
+shadcn radix-nova,command,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/command.json,source scanned; not runtime tested
+shadcn radix-nova,context-menu,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/context-menu.json,source scanned; not runtime tested
+shadcn radix-nova,dialog,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/dialog.json,source scanned; not runtime tested
+shadcn radix-nova,direction,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/direction.json,source scanned; not runtime tested
+shadcn radix-nova,drawer,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/drawer.json,source scanned; not runtime tested
+shadcn radix-nova,dropdown-menu,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/dropdown-menu.json,source scanned; not runtime tested
+shadcn radix-nova,empty,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/empty.json,source scanned; not runtime tested
+shadcn radix-nova,field,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/field.json,source scanned; not runtime tested
+shadcn radix-nova,form,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/form.json,source scanned; not runtime tested
+shadcn radix-nova,hover-card,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/hover-card.json,source scanned; not runtime tested
+shadcn radix-nova,input,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/input.json,source scanned; not runtime tested
+shadcn radix-nova,input-group,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/input-group.json,source scanned; not runtime tested
+shadcn radix-nova,input-otp,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/input-otp.json,source scanned; not runtime tested
+shadcn radix-nova,item,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/item.json,source scanned; not runtime tested
+shadcn radix-nova,kbd,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/kbd.json,source scanned; not runtime tested
+shadcn radix-nova,label,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/label.json,source scanned; not runtime tested
+shadcn radix-nova,marker,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/marker.json,source scanned; not runtime tested
+shadcn radix-nova,menubar,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/menubar.json,source scanned; not runtime tested
+shadcn radix-nova,message,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/message.json,source scanned; not runtime tested
+shadcn radix-nova,message-scroller,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/message-scroller.json,source scanned; not runtime tested
+shadcn radix-nova,native-select,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/native-select.json,source scanned; not runtime tested
+shadcn radix-nova,navigation-menu,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/navigation-menu.json,source scanned; not runtime tested
+shadcn radix-nova,pagination,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/pagination.json,source scanned; not runtime tested
+shadcn radix-nova,popover,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/popover.json,source scanned; not runtime tested
+shadcn radix-nova,progress,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/progress.json,source scanned; not runtime tested
+shadcn radix-nova,questionnaire,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/questionnaire.json,source scanned; not runtime tested
+shadcn radix-nova,radio-group,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/radio-group.json,source scanned; not runtime tested
+shadcn radix-nova,resizable,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/resizable.json,source scanned; not runtime tested
+shadcn radix-nova,scroll-area,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/scroll-area.json,source scanned; not runtime tested
+shadcn radix-nova,select,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/select.json,source scanned; not runtime tested
+shadcn radix-nova,separator,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/separator.json,source scanned; not runtime tested
+shadcn radix-nova,sheet,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/sheet.json,source scanned; not runtime tested
+shadcn radix-nova,sidebar,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/sidebar.json,source scanned; not runtime tested
+shadcn radix-nova,skeleton,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/skeleton.json,source scanned; not runtime tested
+shadcn radix-nova,slider,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/slider.json,source scanned; not runtime tested
+shadcn radix-nova,sonner,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/sonner.json,source scanned; not runtime tested
+shadcn radix-nova,spinner,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/spinner.json,source scanned; not runtime tested
+shadcn radix-nova,switch,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/switch.json,source scanned; not runtime tested
+shadcn radix-nova,table,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/table.json,source scanned; not runtime tested
+shadcn radix-nova,tabs,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/tabs.json,source scanned; not runtime tested
+shadcn radix-nova,textarea,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/textarea.json,source scanned; not runtime tested
+shadcn radix-nova,toast,official registry source scan,HTTP Error 404: Not Found,source unavailable for radix-nova
+shadcn radix-nova,toggle,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/toggle.json,source scanned; not runtime tested
+shadcn radix-nova,toggle-group,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/toggle-group.json,source scanned; not runtime tested
+shadcn radix-nova,tooltip,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/tooltip.json,source scanned; not runtime tested
+shadcn radix-nova,trace,official registry source scan,https://ui.shadcn.com/r/styles/radix-nova/trace.json,source scanned; not runtime tested

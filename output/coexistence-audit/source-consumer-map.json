@@ -1,0 +1,2025 @@
+[
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/accordion/accordion.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-disabled",
+      "data-slot",
+      "data-state=open",
+      "data-variant"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/alert/alert.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-label",
+      "data-layout",
+      "data-presentation",
+      "data-slot",
+      "data-slot=alert",
+      "data-variant"
+    ],
+    "native_tags": ["button", "div", "h2", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/alert-dialog/alert-dialog.tsx",
+    "variables": [],
+    "state_selectors": [
+      "data-orientation",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/appearance-settings/appearance-settings.tsx",
+    "variables": [],
+    "state_selectors": ["aria-label", "data-slot"],
+    "native_tags": ["div", "p"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/brand-color-field/brand-color-field.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "aria-label", "data-slot"],
+    "native_tags": ["div", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/color-field/color-field.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-slot"
+    ],
+    "native_tags": ["div", "input"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/config-preview/config-preview.tsx",
+    "variables": [],
+    "state_selectors": [],
+    "native_tags": ["code", "div", "pre"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/factory.tsx",
+    "variables": [],
+    "state_selectors": [],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/provider.tsx",
+    "variables": [],
+    "state_selectors": [
+      "data-nexus-appearance-prefs",
+      "data-nexus-appearance-theme"
+    ],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/provider/script.tsx",
+    "variables": [],
+    "state_selectors": ["data-nexus-appearance-script"],
+    "native_tags": ["script"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/setting-row/setting-row.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "p", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/appearance/theme-quick-control/theme-quick-control.tsx",
+    "variables": [],
+    "state_selectors": ["aria-label", "aria-pressed", "data-slot"],
+    "native_tags": ["button", "div", "p", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/aspect-ratio/aspect-ratio.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["img"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/attachment/attachment.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-label",
+      "aria-labelledby",
+      "data-orientation",
+      "data-slot",
+      "data-state",
+      "data-variant"
+    ],
+    "native_tags": ["a", "div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/avatar/avatar.tsx",
+    "variables": ["--nx-typography-size-base"],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-label",
+      "data-ring",
+      "data-shape",
+      "data-size",
+      "data-slot",
+      "data-slot=avatar",
+      "data-status"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/badge/badge.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-label",
+      "aria-labelledby",
+      "aria-live",
+      "data-caps",
+      "data-fill",
+      "data-icon-only",
+      "data-number",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-current",
+      "aria-hidden",
+      "aria-label",
+      "data-slot"
+    ],
+    "native_tags": ["button", "li", "nav", "ol", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/bubble/bubble.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-disabled=true",
+      "data-align",
+      "data-bubble-part",
+      "data-bubble-part=reactions",
+      "data-side",
+      "data-side=bottom",
+      "data-side=top",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["button", "div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/button/button.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-busy",
+      "aria-disabled",
+      "aria-hidden",
+      "data-icon-only",
+      "data-loading",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["a", "button", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/button-group/button-group.tsx",
+    "variables": [],
+    "state_selectors": ["data-orientation", "data-size", "data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/card/card.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "h2", "p"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/carousel/carousel.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-label",
+      "aria-roledescription",
+      "data-orientation",
+      "data-slot"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/chart/chart.tsx",
+    "variables": ["--color-", "--nx-color-chart-categorical-1"],
+    "state_selectors": ["data-chart", "data-slot"],
+    "native_tags": ["div", "itemConfig", "span", "string"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/checkbox/checkbox.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-slot"
+    ],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/choice-card/choice-card.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-describedby",
+      "aria-invalid=true",
+      "aria-labelledby",
+      "data-slot",
+      "data-slot=checkbox",
+      "data-slot=radio",
+      "data-state=checked",
+      "data-state=indeterminate",
+      "data-variant"
+    ],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/choice-row/choice-row.tsx",
+    "variables": [],
+    "state_selectors": ["aria-describedby", "aria-labelledby", "data-slot"],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/collapsible/collapsible.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/combobox/combobox.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-selected",
+      "data-slot"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/command/command.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-label",
+      "data-disabled",
+      "data-selected",
+      "data-slot"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/context-menu/context-menu.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-disabled",
+      "data-inset",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/date-picker/date-picker.tsx",
+    "variables": [
+      "--nx-spacing-10",
+      "--nx-spacing-12",
+      "--nx-spacing-14",
+      "--nx-spacing-6",
+      "--nx-spacing-8"
+    ],
+    "state_selectors": [
+      "aria-disabled",
+      "aria-selected",
+      "data-cell-size",
+      "data-day",
+      "data-outside",
+      "data-range-end",
+      "data-range-middle",
+      "data-range-start",
+      "data-selected-single",
+      "data-selected=true",
+      "data-slot",
+      "data-today"
+    ],
+    "native_tags": ["div", "span", "th", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/description-list/description-list.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["dd", "div", "dl", "dt"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/dialog/dialog.tsx",
+    "variables": [],
+    "state_selectors": ["data-orientation", "data-slot", "data-variant"],
+    "native_tags": ["div", "p", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/drawer/drawer.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/dropdown-menu/dropdown-menu.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-disabled",
+      "data-inset",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/empty-state/empty-state.tsx",
+    "variables": [],
+    "state_selectors": ["data-bordered", "data-slot", "data-variant"],
+    "native_tags": ["div", "h2", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/field/field.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-atomic",
+      "aria-hidden",
+      "aria-required",
+      "data-content",
+      "data-optional",
+      "data-orientation",
+      "data-slot",
+      "data-slot=checkbox",
+      "data-slot=field",
+      "data-slot=radio",
+      "data-variant"
+    ],
+    "native_tags": [
+      "div",
+      "fieldset",
+      "label",
+      "legend",
+      "li",
+      "p",
+      "span",
+      "string",
+      "typeof",
+      "ul"
+    ],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-builder/filter-builder.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-describedby",
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-disabled",
+      "data-node-id",
+      "data-slot"
+    ],
+    "native_tags": ["div", "p", "span", "string", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-chip/filter-chip.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "aria-label", "data-slot"],
+    "native_tags": ["button", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/filter-condition/filter-condition.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "aria-label", "data-slot"],
+    "native_tags": ["button", "div", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/hide/hide.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/hover-card/hover-card.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["a", "p"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input/input.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-invalid",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["input", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input-group/input-group.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-invalid=true",
+      "data-align",
+      "data-align=block",
+      "data-align=inline",
+      "data-size",
+      "data-size=default",
+      "data-size=lg",
+      "data-size=sm",
+      "data-slot",
+      "data-slot=input",
+      "data-variant"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/input-otp/input-otp.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "data-active", "data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/item/item.tsx",
+    "variables": [],
+    "state_selectors": [
+      "data-item-part",
+      "data-item-part=content",
+      "data-item-part=description",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["div", "img", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/kbd/kbd.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["kbd"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/label/label.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/marker/marker.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-disabled",
+      "aria-hidden",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["h3", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/menubar/menubar.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-disabled",
+      "data-inset",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/message/message.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-busy",
+      "data-align",
+      "data-placeholder",
+      "data-slot"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/message-scroller/message-scroller.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-label",
+      "data-active",
+      "data-at-end",
+      "data-at-start",
+      "data-direction",
+      "data-slot"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/multi-select/multi-select.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-expanded",
+      "aria-haspopup",
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-checked",
+      "data-selected-item",
+      "data-slot"
+    ],
+    "native_tags": ["button", "div", "span", "string", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/native-select/native-select.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["div", "optgroup", "option", "select", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/navigation-menu/navigation-menu.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "data-slot", "data-viewport"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/page-header/page-header.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "h2", "header", "p"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/pagination/pagination.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-current",
+      "aria-hidden",
+      "aria-label",
+      "data-active",
+      "data-slot"
+    ],
+    "native_tags": ["a", "li", "nav", "span", "ul"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/popover/popover.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["p"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/progress/progress.tsx",
+    "variables": [],
+    "state_selectors": ["aria-label", "aria-labelledby", "data-slot"],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/radio-group/radio-group.tsx",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "aria-invalid", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/resizable/resizable.tsx",
+    "variables": [],
+    "state_selectors": ["aria-label", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/scroll-area/scroll-area.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/select/select.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "data-disabled",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/separator/separator.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "span"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sheet/sheet.tsx",
+    "variables": [],
+    "state_selectors": ["data-side", "data-slot"],
+    "native_tags": ["div", "p", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/show/show.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["aside"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sidebar/sidebar.tsx",
+    "variables": ["--sidebar-width-icon"],
+    "state_selectors": [
+      "aria-current",
+      "aria-disabled",
+      "aria-label",
+      "aria-labelledby",
+      "data-active",
+      "data-collapsible",
+      "data-collapsible=offcanvas",
+      "data-narrow",
+      "data-side",
+      "data-side=left",
+      "data-side=right",
+      "data-size",
+      "data-slot",
+      "data-state",
+      "data-state=collapsed",
+      "data-variant"
+    ],
+    "native_tags": [
+      "a",
+      "button",
+      "div",
+      "li",
+      "main",
+      "nav",
+      "span",
+      "typeof",
+      "ul"
+    ],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/skeleton/skeleton.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/slider/slider.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "aria-label",
+      "aria-labelledby",
+      "data-disabled",
+      "data-orientation",
+      "data-range-end",
+      "data-range-start",
+      "data-size",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/sonner/sonner.tsx",
+    "variables": [
+      "--nx-color-border-default",
+      "--nx-color-container",
+      "--nx-color-error-background",
+      "--nx-color-error-border",
+      "--nx-color-error-foreground",
+      "--nx-color-foreground",
+      "--nx-color-information-background",
+      "--nx-color-information-border",
+      "--nx-color-information-foreground",
+      "--nx-color-success-background",
+      "--nx-color-success-border",
+      "--nx-color-success-foreground",
+      "--nx-color-warning-background",
+      "--nx-color-warning-border",
+      "--nx-color-warning-foreground",
+      "--nx-radius-md",
+      "--nx-z-index-toast"
+    ],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["button", "div", "style", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/spinner/spinner.tsx",
+    "variables": [],
+    "state_selectors": ["aria-label", "data-slot"],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/switch/switch.tsx",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-size", "data-slot"],
+    "native_tags": ["div", "label", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/table/table.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-sort=ascending",
+      "aria-sort=descending",
+      "data-slot",
+      "data-state",
+      "data-state=selected",
+      "data-sticky-header",
+      "data-striped",
+      "data-table-density",
+      "data-variant"
+    ],
+    "native_tags": [
+      "caption",
+      "div",
+      "table",
+      "tbody",
+      "td",
+      "tfoot",
+      "th",
+      "thead",
+      "tr"
+    ],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/tabs/tabs.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-size",
+      "data-slot",
+      "data-state",
+      "data-variant"
+    ],
+    "native_tags": ["p", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/textarea/textarea.tsx",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot", "data-variant"],
+    "native_tags": ["textarea", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toggle/toggle.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-invalid",
+      "aria-label",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toggle-group/toggle-group.tsx",
+    "variables": ["--nx-spacing-"],
+    "state_selectors": [
+      "aria-invalid",
+      "aria-label",
+      "data-orientation",
+      "data-size",
+      "data-slot",
+      "data-slot=toggle",
+      "data-spacing",
+      "data-variant",
+      "data-variant=default"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/toolbar/toolbar.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-label",
+      "aria-labelledby",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "nexus",
+    "module": "packages/react/src/components/tooltip/tooltip.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/alert.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/avatar.tsx",
+    "variables": [],
+    "state_selectors": ["data-size", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/badge.tsx",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot", "data-variant"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/button.tsx",
+    "variables": ["--foreground", "--radius-md", "--secondary"],
+    "state_selectors": [
+      "aria-expanded",
+      "aria-invalid",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/card.tsx",
+    "variables": [],
+    "state_selectors": ["data-size", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/checkbox.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-checked",
+      "aria-invalid",
+      "data-checked",
+      "data-slot"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/dialog.tsx",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/dropdown-menu.tsx",
+    "variables": [],
+    "state_selectors": [
+      "data-closed",
+      "data-disabled",
+      "data-inset",
+      "data-open",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/input.tsx",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot"],
+    "native_tags": ["input"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/label.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/popover.tsx",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/progress.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/radio-group.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-checked",
+      "aria-invalid",
+      "data-checked",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/select.tsx",
+    "variables": ["--radius-md"],
+    "state_selectors": [
+      "aria-invalid",
+      "data-align-trigger",
+      "data-closed",
+      "data-disabled",
+      "data-open",
+      "data-placeholder",
+      "data-position",
+      "data-size",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/separator.tsx",
+    "variables": [],
+    "state_selectors": ["data-horizontal", "data-slot", "data-vertical"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sheet.tsx",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-side", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sidebar.tsx",
+    "variables": [
+      "--sidebar-accent",
+      "--sidebar-border",
+      "--sidebar-width",
+      "--sidebar-width-icon"
+    ],
+    "state_selectors": [
+      "aria-disabled",
+      "aria-expanded",
+      "aria-label",
+      "data-active",
+      "data-collapsible",
+      "data-collapsible=offcanvas",
+      "data-mobile",
+      "data-open",
+      "data-side",
+      "data-side=left",
+      "data-side=right",
+      "data-sidebar",
+      "data-size",
+      "data-slot",
+      "data-state",
+      "data-state=collapsed",
+      "data-variant"
+    ],
+    "native_tags": ["button", "div", "li", "main", "span", "typeof", "ul"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/skeleton.tsx",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/sonner.tsx",
+    "variables": ["--border", "--popover", "--popover-foreground", "--radius"],
+    "state_selectors": [],
+    "native_tags": [],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/switch.tsx",
+    "variables": [],
+    "state_selectors": [
+      "aria-invalid",
+      "data-checked",
+      "data-disabled",
+      "data-size",
+      "data-slot",
+      "data-unchecked"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/table.tsx",
+    "variables": [],
+    "state_selectors": ["aria-expanded", "data-slot"],
+    "native_tags": [
+      "caption",
+      "div",
+      "table",
+      "tbody",
+      "td",
+      "tfoot",
+      "th",
+      "thead",
+      "tr"
+    ],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/tabs.tsx",
+    "variables": [],
+    "state_selectors": [
+      "data-active",
+      "data-horizontal",
+      "data-orientation",
+      "data-slot",
+      "data-variant",
+      "data-vertical"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/textarea.tsx",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot"],
+    "native_tags": ["textarea"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn",
+    "module": "examples/shadcn-app/components/ui/tooltip.tsx",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; per-component runtime coverage not implied"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "item",
+    "variables": [],
+    "state_selectors": [
+      "data-size",
+      "data-slot",
+      "data-slot=item",
+      "data-variant"
+    ],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "switch",
+    "variables": [],
+    "state_selectors": [
+      "aria-invalid",
+      "data-checked",
+      "data-disabled",
+      "data-size",
+      "data-slot",
+      "data-unchecked"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "empty",
+    "variables": [],
+    "state_selectors": ["data-slot", "data-variant"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "sheet",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-side", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "direction",
+    "variables": [],
+    "state_selectors": [],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "trace",
+    "variables": ["--radix-collapsible-content-height"],
+    "state_selectors": [
+      "aria-expanded",
+      "aria-hidden",
+      "data-closed",
+      "data-open",
+      "data-slot",
+      "data-slot=trace",
+      "data-status",
+      "data-status=error"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "drawer",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "aspect-ratio",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "sidebar",
+    "variables": [
+      "--sidebar-accent",
+      "--sidebar-border",
+      "--sidebar-width",
+      "--sidebar-width-icon"
+    ],
+    "state_selectors": [
+      "aria-disabled",
+      "aria-expanded",
+      "aria-label",
+      "data-active",
+      "data-collapsible",
+      "data-collapsible=offcanvas",
+      "data-mobile",
+      "data-open",
+      "data-side",
+      "data-side=left",
+      "data-side=right",
+      "data-sidebar",
+      "data-size",
+      "data-slot",
+      "data-state",
+      "data-state=collapsed",
+      "data-variant"
+    ],
+    "native_tags": ["button", "div", "li", "main", "span", "typeof", "ul"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "marker",
+    "variables": [],
+    "state_selectors": ["aria-hidden", "data-slot", "data-variant"],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "input-group",
+    "variables": ["--radius"],
+    "state_selectors": [
+      "aria-invalid",
+      "aria-invalid=true",
+      "data-align",
+      "data-align=block",
+      "data-align=inline",
+      "data-size",
+      "data-slot",
+      "data-slot=input"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "field",
+    "variables": [],
+    "state_selectors": [
+      "data-checked",
+      "data-content",
+      "data-disabled",
+      "data-horizontal",
+      "data-orientation",
+      "data-slot",
+      "data-slot=checkbox",
+      "data-slot=field",
+      "data-slot=radio",
+      "data-variant",
+      "data-variant=legend"
+    ],
+    "native_tags": [
+      "div",
+      "fieldset",
+      "legend",
+      "li",
+      "p",
+      "span",
+      "typeof",
+      "ul"
+    ],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "scroll-area",
+    "variables": [],
+    "state_selectors": [
+      "data-horizontal",
+      "data-orientation",
+      "data-slot",
+      "data-vertical"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "sonner",
+    "variables": ["--border", "--popover", "--popover-foreground", "--radius"],
+    "state_selectors": [],
+    "native_tags": [],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "attachment",
+    "variables": [],
+    "state_selectors": [
+      "data-orientation",
+      "data-size",
+      "data-slot",
+      "data-state",
+      "data-variant"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "spinner",
+    "variables": [],
+    "state_selectors": ["aria-label", "data-slot"],
+    "native_tags": [],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "tooltip",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "input",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot"],
+    "native_tags": ["input"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "slider",
+    "variables": [],
+    "state_selectors": [
+      "data-disabled",
+      "data-horizontal",
+      "data-slot",
+      "data-vertical"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "radio-group",
+    "variables": [],
+    "state_selectors": [
+      "aria-checked",
+      "aria-invalid",
+      "data-checked",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "breadcrumb",
+    "variables": [],
+    "state_selectors": [
+      "aria-current",
+      "aria-disabled",
+      "aria-hidden",
+      "aria-label",
+      "data-slot"
+    ],
+    "native_tags": ["li", "nav", "ol", "span"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "dropdown-menu",
+    "variables": [],
+    "state_selectors": [
+      "data-closed",
+      "data-disabled",
+      "data-inset",
+      "data-open",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "alert",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "native-select",
+    "variables": ["--radius-md"],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "data-size",
+      "data-slot"
+    ],
+    "native_tags": ["div", "optgroup", "option", "select"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "code-block",
+    "variables": [],
+    "state_selectors": [
+      "aria-label",
+      "aria-live",
+      "data-copied",
+      "data-numbered",
+      "data-size",
+      "data-slot",
+      "data-slot=code",
+      "data-variant",
+      "data-wrap"
+    ],
+    "native_tags": ["code", "div", "pre", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "chart",
+    "variables": [],
+    "state_selectors": ["data-chart", "data-slot"],
+    "native_tags": ["div", "itemConfig", "keyof", "span", "style", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "context-menu",
+    "variables": [],
+    "state_selectors": [
+      "data-closed",
+      "data-disabled",
+      "data-inset",
+      "data-open",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "dialog",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "checkbox",
+    "variables": [],
+    "state_selectors": [
+      "aria-checked",
+      "aria-invalid",
+      "data-checked",
+      "data-slot"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "collapsible",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "input-otp",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-active", "data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "button-group",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden=true",
+      "data-horizontal",
+      "data-orientation",
+      "data-slot",
+      "data-slot=button",
+      "data-slot=select",
+      "data-vertical"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "carousel",
+    "variables": [],
+    "state_selectors": ["aria-roledescription", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "menubar",
+    "variables": [],
+    "state_selectors": [
+      "aria-expanded",
+      "data-closed",
+      "data-disabled",
+      "data-inset",
+      "data-open",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "card",
+    "variables": [],
+    "state_selectors": ["data-size", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "command",
+    "variables": [],
+    "state_selectors": ["data-selected", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "button",
+    "variables": ["--foreground", "--radius-md", "--secondary"],
+    "state_selectors": [
+      "aria-expanded",
+      "aria-invalid",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "table",
+    "variables": [],
+    "state_selectors": ["aria-expanded", "data-slot"],
+    "native_tags": [
+      "caption",
+      "div",
+      "table",
+      "tbody",
+      "td",
+      "tfoot",
+      "th",
+      "thead",
+      "tr"
+    ],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "alert-dialog",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-size", "data-slot"],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "textarea",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot"],
+    "native_tags": ["textarea"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "accordion",
+    "variables": [],
+    "state_selectors": [
+      "aria-expanded",
+      "data-closed",
+      "data-open",
+      "data-slot"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "skeleton",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "tabs",
+    "variables": [],
+    "state_selectors": [
+      "data-active",
+      "data-horizontal",
+      "data-orientation",
+      "data-slot",
+      "data-variant",
+      "data-vertical"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "avatar",
+    "variables": [],
+    "state_selectors": ["data-size", "data-slot"],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "progress",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "popover",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["div", "p", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "combobox",
+    "variables": ["--anchor-width", "--available-height"],
+    "state_selectors": [
+      "aria-invalid",
+      "data-chips",
+      "data-closed",
+      "data-disabled",
+      "data-empty",
+      "data-highlighted",
+      "data-open",
+      "data-pressed",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "bubble",
+    "variables": ["--foreground", "--muted", "--primary", "--secondary"],
+    "state_selectors": [
+      "data-align",
+      "data-side",
+      "data-slot",
+      "data-slot=bubble",
+      "data-variant"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "resizable",
+    "variables": [],
+    "state_selectors": ["aria-orientation=horizontal", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "kbd",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["kbd"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "calendar",
+    "variables": ["--radius-md"],
+    "state_selectors": [
+      "aria-disabled",
+      "aria-selected",
+      "data-day",
+      "data-range-end",
+      "data-range-middle",
+      "data-range-start",
+      "data-selected-single",
+      "data-selected=true",
+      "data-slot"
+    ],
+    "native_tags": ["div", "td", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "pagination",
+    "variables": [],
+    "state_selectors": [
+      "aria-current",
+      "aria-hidden",
+      "aria-label",
+      "data-active",
+      "data-icon",
+      "data-slot"
+    ],
+    "native_tags": ["a", "li", "nav", "span", "typeof", "ul"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "toggle-group",
+    "variables": ["--gap", "--radius-md"],
+    "state_selectors": [
+      "data-horizontal",
+      "data-orientation",
+      "data-size",
+      "data-slot",
+      "data-spacing",
+      "data-variant",
+      "data-vertical"
+    ],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "label",
+    "variables": [],
+    "state_selectors": ["data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "form",
+    "variables": [],
+    "state_selectors": [],
+    "native_tags": [],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "hover-card",
+    "variables": [],
+    "state_selectors": ["data-closed", "data-open", "data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "questionnaire",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "aria-invalid",
+      "data-checked",
+      "data-disabled",
+      "data-invalid",
+      "data-size",
+      "data-slot",
+      "data-slot=questionnaire",
+      "data-variant"
+    ],
+    "native_tags": ["div", "span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "navigation-menu",
+    "variables": [],
+    "state_selectors": [
+      "aria-hidden",
+      "data-active",
+      "data-closed",
+      "data-open",
+      "data-popup-open",
+      "data-slot",
+      "data-viewport"
+    ],
+    "native_tags": ["div", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "toggle",
+    "variables": ["--radius-md"],
+    "state_selectors": ["aria-invalid", "aria-pressed", "data-slot"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "message-scroller",
+    "variables": [],
+    "state_selectors": [
+      "data-autoscrolling",
+      "data-direction",
+      "data-pending-scroll",
+      "data-size",
+      "data-slot",
+      "data-variant"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "separator",
+    "variables": [],
+    "state_selectors": ["data-horizontal", "data-slot", "data-vertical"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "badge",
+    "variables": [],
+    "state_selectors": ["aria-invalid", "data-slot", "data-variant"],
+    "native_tags": ["typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "message",
+    "variables": [],
+    "state_selectors": ["data-align", "data-slot"],
+    "native_tags": ["div"],
+    "status": "source scanned; upstream version not runtime mounted"
+  },
+  {
+    "library": "shadcn-upstream",
+    "module": "select",
+    "variables": ["--radius-md"],
+    "state_selectors": [
+      "aria-invalid",
+      "data-align-trigger",
+      "data-closed",
+      "data-disabled",
+      "data-open",
+      "data-placeholder",
+      "data-position",
+      "data-size",
+      "data-slot"
+    ],
+    "native_tags": ["span", "typeof"],
+    "status": "source scanned; upstream version not runtime mounted"
+  }
+]

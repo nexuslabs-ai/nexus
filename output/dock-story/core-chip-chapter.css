@@ -1,0 +1,292 @@
+.chip-flow {
+  --chip-row-gap: clamp(4px, 0.5cqi, 8px);
+  --chip-output-gap: clamp(8px, 1cqi, 16px);
+  --chip-trace: color-mix(in srgb, var(--nx-color-foreground) 16%, transparent);
+  --chip-space: var(--framework-column-gap);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr) minmax(0, 0.8fr);
+}
+.chip-token-container,
+.chip-core {
+  position: relative;
+  display: grid;
+  /* Three inputs above, nine below; subtract their unequal internal gaps. */
+  grid-template-rows:
+    minmax(0, calc((100% - var(--chip-space) - 2 * var(--chip-row-gap)) / 4))
+    minmax(0, 1fr);
+  gap: var(--chip-space);
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: var(--chip-space);
+  background: var(--framework-surface);
+  border-radius: var(--canvas-radius, 14px);
+}
+.chip-core {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.chip-token-lane {
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--chip-row-gap);
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.chip-flow .framework-token {
+  font-family: inherit;
+  border-radius: 8px;
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 6%,
+    var(--nx-color-background)
+  );
+}
+.chip-flow .framework-token::after,
+.chip-flow .chip-destination::before {
+  content: none;
+}
+.chip-module {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 6%,
+    var(--nx-color-background)
+  );
+  color: var(--nx-color-foreground);
+  font: inherit;
+  font-weight: 500;
+  text-align: center;
+  text-wrap: balance;
+  line-height: 1.4;
+}
+.chip-engine {
+  grid-area: 1 / 1 / 2 / 2;
+}
+.chip-colors {
+  grid-area: 1 / 2 / 2 / 3;
+}
+.chip-presets {
+  grid-area: 2 / 1 / 3 / 2;
+}
+.chip-values {
+  grid-area: 2 / 2 / 3 / 3;
+}
+.chip-shared {
+  grid-area: 1 / 3 / 3 / 4;
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 9%,
+    var(--nx-color-background)
+  );
+}
+.chip-trace {
+  position: absolute;
+  inset-inline-start: 100%;
+  inset-block-start: 50%;
+  inline-size: var(--chip-space);
+  block-size: 1px;
+  background: var(--chip-trace);
+  transform: translateY(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  transition: background-color 180ms ease;
+}
+.chip-trace-input {
+  inline-size: calc(3 * var(--chip-space));
+}
+.chip-trace-output {
+  inset-inline-start: auto;
+  inset-inline-end: 100%;
+  inline-size: calc(2 * var(--chip-space));
+  --chip-phase: 660ms;
+}
+.chip-engine > .chip-trace,
+.chip-presets > .chip-trace {
+  --chip-phase: 220ms;
+}
+.chip-colors > .chip-trace,
+.chip-values > .chip-trace {
+  --chip-phase: 440ms;
+}
+.chip-trace > i {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--nx-color-foreground),
+    transparent
+  );
+  opacity: 0;
+  transform: translateX(-100%);
+}
+.chip-trace[data-flowing='true'],
+.chip-destination[data-active='true'] > .chip-trace {
+  background: color-mix(in srgb, var(--nx-color-foreground) 28%, transparent);
+}
+.chip-flow[data-flow-motion='true'] .chip-trace[data-flowing='true'] > i {
+  animation: chip-signal 2200ms linear infinite;
+  animation-delay: var(--chip-phase, 0ms);
+}
+@keyframes chip-signal {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  5% {
+    opacity: 0.85;
+  }
+  25% {
+    opacity: 0.85;
+    transform: translateX(100%);
+  }
+  26%,
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+.chip-flow .framework-token,
+.chip-module {
+  transition: background-color 180ms ease;
+  cursor: default;
+}
+.chip-flow .framework-token[data-flowing='true'],
+.chip-module[data-flowing='true'],
+.chip-destination[data-flowing='true'] {
+  background: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 10%,
+    var(--nx-color-background)
+  );
+}
+.chip-flow .framework-token:focus-visible,
+.chip-module:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+.chip-destination > :is(svg, strong, .chip-status) {
+  transition: opacity 180ms ease;
+}
+.chip-destination[data-planned='true'] > :is(svg, strong, .chip-status) {
+  opacity: 0.72;
+}
+.chip-destination[data-planned='true']:is(:hover, :focus-visible)
+  > :is(svg, strong, .chip-status) {
+  opacity: 0.9;
+}
+[data-reduce-motion='true'] .chip-flow .chip-trace > i {
+  animation: none;
+}
+.chip-flow .framework-destinations {
+  gap: var(--chip-output-gap);
+}
+.chip-destination {
+  min-inline-size: 0;
+  gap: 6px;
+}
+.chip-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-inline-size: 100%;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--nx-color-foreground) 8%, transparent);
+  color: var(--nx-color-muted-foreground);
+  font-size: inherit;
+  line-height: 1.3;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+@container framework (max-height: 640px) and (min-width: 701px) {
+  .chip-flow {
+    --framework-label-size: 12px;
+    --chip-row-gap: 2px;
+  }
+  .chip-flow .framework-token-group,
+  .chip-flow .framework-core-column,
+  .chip-flow .framework-output-group {
+    gap: 12px;
+  }
+  .chip-module {
+    padding: 8px;
+  }
+  .chip-flow .framework-token {
+    gap: 6px;
+    line-height: 1.1;
+  }
+  .chip-flow .framework-token > svg {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+  .chip-destination {
+    display: grid;
+    grid-template-columns: 24px auto;
+    grid-template-rows: auto auto;
+    align-content: center;
+    justify-content: center;
+    column-gap: 8px;
+    row-gap: 2px;
+  }
+  .chip-destination > svg {
+    grid-area: 1 / 1 / 3 / 2;
+  }
+  .chip-destination > strong {
+    grid-area: 1 / 2;
+  }
+  .chip-status {
+    grid-area: 2 / 2;
+    justify-self: center;
+  }
+  .chip-destination > svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+}
+@container framework (max-width: 700px) {
+  .chip-flow {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 2fr) minmax(0, 0.85fr);
+    --chip-row-gap: 2px;
+  }
+  .chip-flow .framework-column-label {
+    display: block;
+    line-height: 16px;
+  }
+  .chip-flow .framework-token-group,
+  .chip-flow .framework-core-column,
+  .chip-flow .framework-output-group {
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 8px;
+  }
+  .chip-module {
+    padding: 4px 2px;
+    border-radius: 6px;
+    line-height: 1.3;
+  }
+  .chip-flow .framework-token {
+    flex-direction: row;
+    gap: 2px;
+    padding-inline: 2px;
+    border-radius: 6px;
+    line-height: 1.2;
+  }
+  .chip-destination {
+    gap: 4px;
+    padding-inline: 2px;
+  }
+  .chip-status {
+    padding-inline: 3px;
+    border-radius: 4px;
+  }
+  .chip-flow .framework-destinations {
+    --chip-output-gap: 8px;
+  }
+}

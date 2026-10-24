@@ -1,0 +1,36 @@
+html,
+body,
+#root,
+.appearance-preview {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+body {
+  font-family: var(--nx-typography-family-font-sans);
+}
+.appearance-preview.story-page {
+  background: transparent;
+}
+.appearance-preview .story-box-grid {
+  /* The parent owns the original viewport grid, including its breakpoints. */
+  grid-template-columns: var(--preview-columns);
+  grid-template-rows: var(--preview-rows);
+  gap: var(--preview-gap);
+  mask-image: none;
+}
+.appearance-preview .showcase-grid > .showcase-card {
+  /* Remove the prototype surface overrides; reveal Nexus Card's utility layer. */
+  border: revert-layer;
+  border-radius: revert-layer;
+  background: revert-layer;
+  color: revert-layer;
+  box-shadow: revert-layer;
+}
+
+.appearance-preview .showcase-body {
+  padding: revert-layer;
+}
+.appearance-preview .showcase-stack {
+  gap: revert-layer;
+}

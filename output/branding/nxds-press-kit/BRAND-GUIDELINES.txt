@@ -1,0 +1,56 @@
+NEXUS DESIGN SYSTEM — BRAND FOUNDATION
+22 October 2026 | monospace nx: code-block identity
+
+CONFIRMED IDENTITY
+Product: Nexus Design System. Handle: nxds. Company: Nexus Labs.
+Primary lockup: JetBrains Mono Regular nx: inside a softly rounded code-block tile, followed by Nexus Design System in DM Sans600.
+The mark is now derived from the code typeface, replacing the geometric letter construction. Supplied SVGs contain outlined glyphs so no installed font is required.
+Use the full lockup in the header and footer. Narrow headers show the compact tile with an accessible name.
+
+GEOMETRY
+Full lockup viewBox:660 x88. Code tile: x1,y12,138 x64,R10. nx: uses JetBrains Mono400 at60 units, start x16, baseline60 in the full lockup. Keep natural monospace advances. Product name begins at x160.
+Square app icon:400 x400; tile inset8,R56. The code mark is centered in the square. Same geometry in both themes.
+Do not stretch or substitute another monospace face.
+
+USAGE AND ASSETS
+source/mark.svg: full lockup master, including outlined DM Sans name.
+source/icon.svg: square app-icon master. source/monogram.svg: outlined JetBrains Mono nx: artwork.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: identical full lockups retained under existing public filenames.
+svg/nx-icon-*.svg: compact square icons. PNG/ICO versions have opaque theme backgrounds.
+Light ink: #171717. Dark ink: #FAFAFA. Tile fill6% and border14% of ink. SVG masters inherit currentColor.
+Website component: apps/docs/app/_components/NexusCodeLockup.tsx. Header mark64 x30 CSS px, with product name alongside when space permits.
+Keep at least one colon-dot width of clear space around the bare monogram. Check16px and32px icon exports before using at small sizes.
+
+TYPOGRAPHY
+Product name: DM Sans600. Website headings/body: DM Sans. Code text: JetBrains Mono.
+Fonts and SIL Open Font License notices are included. Exported logo SVGs use paths and require no installed fonts; live website product name uses the existing appearance font.
+
+APPROVED POSITIONING
+Audience: people building products who need a consistent design system they can make their own. Speak most directly to frontend developers, design engineers, and product teams maintaining a growing interface; remain welcoming to individual builders.
+Problem: keeping interfaces consistent as products gain screens, themes, states, frameworks, and contributors.
+Core promise: a design system you can own and shape, with consistency built in.
+
+Positioning statement:
+Nexus Design System is an open-source foundation for building consistent interfaces that feel like your product. Shared tokens coordinate the design, customizable components give you control, and executable stories make behavior inspectable.
+
+Reasons to choose Nexus:
+Consistency — one foundation for design decisions, carried through shared tokens.
+Control — customizable appearance and open-source implementation that teams can inspect and adapt.
+Confidence — component states and tested behavior can be explored alongside executable examples.
+
+Feature-to-benefit translation:
+Shared tokens: make design decisions once and carry them across the interface.
+Framework-independent foundation: retain a design language when implementation technologies differ.
+Open source: inspect, adapt, and own the implementation.
+Customization: express the product's identity rather than inherit a library's default look.
+Executable stories: inspect states and exercised behavior alongside examples.
+
+Communication direction:
+Lead with the outcome; use framework support, appearance demonstrations and Storybook examples as evidence.
+Proposed headline, not yet a locked tagline: Your design language. Every component.
+Proposed supporting copy: Build consistent interfaces with shared tokens, customizable components, and open-source code you own.
+
+Claim boundaries:
+Distinguish the framework-independent foundation from currently available component bindings. Do not promise support for all frameworks based on planned bindings.
+Describe tested stories and behaviors according to actual coverage. Do not imply that executable stories guarantee every state or behavior is tested.
+This approval establishes positioning, not an independent audit of current feature or test coverage.

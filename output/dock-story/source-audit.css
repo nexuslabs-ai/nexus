@@ -1,0 +1,28 @@
+/* Review overlay only. It never changes the page's geometry or hit testing. */
+[data-nexus-audit] {
+  outline: 1px solid #f04452 !important;
+  outline-offset: -1px;
+}
+[data-nexus-audit-kind='consumer'] {
+  color: #f04452 !important;
+}
+[data-nexus-audit]:focus-visible {
+  outline-width: 3px !important;
+  outline-offset: 2px;
+}
+.nexus-source-audit {
+  position: fixed;
+  top: calc(var(--story-header-height, 64px) + 12px);
+  left: 16px;
+  max-width: min(360px, calc(100vw - 32px));
+  z-index: 100;
+}
+.nexus-source-audit p {
+  margin: 0 0 12px;
+}
+.nexus-source-audit p:last-child {
+  margin-bottom: 0;
+}
+.source-audit-key {
+  color: #e63646;
+}

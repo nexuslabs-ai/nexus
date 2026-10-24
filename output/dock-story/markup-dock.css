@@ -1,0 +1,120 @@
+.markup-dock {
+  --markup-shell: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 5%,
+    var(--nx-color-background)
+  );
+  --markup-face: var(--nx-color-background);
+  --markup-rim: color-mix(in srgb, var(--nx-color-foreground) 9%, transparent);
+  --markup-shine: #ffffffb3;
+  --markup-shadow: #00000014;
+}
+.markup-dock[data-theme='dark'] {
+  --markup-shell: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 7%,
+    var(--nx-color-background)
+  );
+  --markup-face: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 12%,
+    var(--nx-color-background)
+  );
+  --markup-shine: #ffffff12;
+  --markup-shadow: #00000040;
+}
+.markup-dock .context-dock-bar {
+  padding: 8px;
+  border-color: var(--markup-rim);
+  background: var(--markup-shell);
+  box-shadow:
+    inset 0 1px 0 var(--markup-shine),
+    0 2px 4px var(--markup-shadow),
+    0 12px 32px var(--markup-shadow);
+}
+.markup-dock .context-dock-bar > button {
+  color: var(--nx-color-muted-foreground);
+}
+.markup-dock .context-dock-bar > button::before {
+  content: '';
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--markup-rim);
+  border-radius: 50%;
+  background: var(--markup-face);
+  box-shadow:
+    inset 0 1px 0 var(--markup-shine),
+    0 2px 3px var(--markup-shadow);
+  transition:
+    opacity 120ms,
+    transform 180ms;
+}
+.markup-dock .context-dock-bar > button[data-active='true'] {
+  color: var(--nx-color-foreground);
+}
+.markup-dock .context-dock-bar > button[data-active='true']::before {
+  opacity: 0;
+}
+.markup-dock .context-dock-bar > button:hover::before {
+  transform: translateY(-2px);
+}
+.markup-dock .context-dock-selection {
+  border: 1px solid var(--markup-rim);
+  background: var(--markup-face);
+  box-shadow:
+    inset 0 1px 0 var(--markup-shine),
+    0 3px 6px var(--markup-shadow);
+}
+.markup-dock .context-panel {
+  padding: 16px;
+  border-color: var(--markup-rim);
+  border-radius: 24px;
+  background: var(--markup-shell);
+  backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 var(--markup-shine),
+    0 4px 8px var(--markup-shadow),
+    0 20px 48px var(--markup-shadow);
+}
+.markup-dock .context-panel-pointer {
+  width: 18px;
+  height: 18px;
+  bottom: -8px;
+  border-color: var(--markup-rim);
+  border-bottom-right-radius: 6px;
+  background: var(--markup-shell);
+}
+.markup-dock .context-panel-heading {
+  padding: 0 2px 14px;
+}
+.markup-dock .context-panel-heading button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--markup-face);
+  opacity: 1;
+}
+.markup-dock .context-panel-content {
+  padding-bottom: 2px;
+}
+@container (max-width: 480px) {
+  .markup-dock .context-dock-bar {
+    padding-inline: 6px;
+  }
+  .markup-dock .context-dock-bar > button {
+    min-width: 34px;
+    padding-inline: 4px;
+  }
+  .markup-dock .context-dock-bar > button::before {
+    width: 34px;
+    height: 34px;
+  }
+  .markup-dock .context-tool-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+[data-reduce-motion='true'] .markup-dock .context-dock-bar > button::before {
+  transition: none;
+}

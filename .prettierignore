@@ -23,3 +23,9 @@ packages/catalog/releases/
 
 # Untracked git worktree copies under .claude (full-repo clones, not part of the tree)
 .claude/worktrees/
+
+# Preserve captured comparison sources and third-party audit fixtures verbatim.
+output/dock-story/*-baseline/
+output/dock-story/original/
+output/coexistence-audit/library-check/
+output/dock-story/hero-adoption-built/

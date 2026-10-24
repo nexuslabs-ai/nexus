@@ -1,0 +1,41 @@
+.cta-journey {
+  container-type: inline-size;
+  font-family: var(--nx-typography-family-font-sans);
+}
+.cta-journey-intro {
+  text-align: center;
+  padding-block: var(--lab-top, var(--nx-spacing-24)) var(--nx-spacing-16);
+}
+.cta-journey .cta-journey-intro .journey-title {
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 2),
+    calc(var(--nx-typography-size-base) * 1) + 3cqi,
+    var(--lab-title, calc(var(--nx-typography-size-base) * 3))
+  );
+}
+.cta-journey[data-mode='dark'] .journey-title {
+  color: var(--nx-color-foreground);
+}
+.cta-journey-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nx-spacing-3);
+  margin-top: var(--nx-spacing-6);
+}
+.cta-journey .workbench-journey.journey-compact {
+  padding-top: var(--nx-spacing-10);
+  padding-bottom: var(--nx-spacing-12);
+  border-top: var(--nx-borderwidth-default) solid var(--nx-color-border-default);
+}
+.cta-journey .journey-heading {
+  font-size: var(--lab-heading, calc(var(--nx-typography-size-base) * 1));
+}
+.cta-journey .journey-tile {
+  width: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+}
+.cta-journey .journey-tool {
+  width: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
+}

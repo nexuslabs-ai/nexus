@@ -6,6 +6,7 @@
 @import '@nxds/tailwind';
 /* Animations used by Dialog / Dropdown / Select / Tooltip */
 @import 'tw-animate-css';
+@import './brand-fonts.css';
 
 /* Generate the nx: utilities used in MDX content and in the shipped
    @nxds/react components by scanning their source directly. We deliberately do

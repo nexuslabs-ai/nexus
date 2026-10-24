@@ -1,0 +1,13 @@
+NEXUS DESIGN SYSTEM — PRESS KIT
+22 October 2026
+
+Primary logo: JetBrains Mono nx: code-block tile followed by Nexus Design System.
+source/mark.svg: full lockup, entirely vector paths.
+source/monogram.svg: outlined JetBrains Mono nx: artwork.
+source/icon.svg: compact square icon master.
+svg/nx-logo*.svg and svg/nxds-website-wordmark*.svg: full lockup.
+png/nx-logo-*: transparent full-lockup exports.
+svg/nx-icon-*, png/nx-icon-*, favicon/: compact nx: icons.
+fonts/: DM Sans and JetBrains Mono with licenses.
+BRAND-GUIDELINES.txt: geometry, usage, typography and positioning.
+Run node source/export.cjs from the repository checkout to regenerate raster exports from supplied SVGs. Requires the repository sharp dependency.

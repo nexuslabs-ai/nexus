@@ -1,0 +1,67 @@
+body {
+  margin: 0;
+}
+.adoption-workspace {
+  box-sizing: border-box;
+  padding: 20px;
+  min-block-size: 100svh;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.adoption-workspace-header {
+  display: grid;
+  gap: 10px;
+}
+.adoption-overline {
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+.adoption-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.adoption-title-row h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+.adoption-addition {
+  min-block-size: 104px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  border-block-start: 1px solid var(--separator);
+  padding-block-start: 18px;
+}
+.adoption-addition-label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.adoption-addition-hint,
+.adoption-local-note {
+  font-size: 11px;
+}
+.adoption-empty-addition {
+  font-size: 12px;
+  line-height: 1.8;
+  opacity: 0.65;
+}
+.adoption-local-note {
+  margin-block-start: 0;
+  opacity: 0.7;
+}
+html[data-highlight='true']
+  [data-changed='true']:not([data-probe='workspace']) {
+  outline: 1px dashed #f07878;
+  outline-offset: 4px;
+}

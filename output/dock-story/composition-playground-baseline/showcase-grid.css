@@ -1,0 +1,462 @@
+.showcase-grid > .showcase-card {
+  /* The existing grid gives each card a definite width and height. */
+  container: showcase-card / size;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding: 0;
+  border: var(--canvas-border, 1px) solid var(--nx-color-border-default);
+  border-radius: var(--canvas-radius, 14px);
+  background: color-mix(
+    in srgb,
+    var(--canvas-accent) var(--canvas-tint, 0%),
+    var(--nx-color-background)
+  );
+  color: var(--nx-color-foreground);
+  box-shadow: 0 calc(var(--canvas-shadow, 0px) / 4) var(--canvas-shadow, 0px)
+    #0002;
+}
+.showcase-grid > .showcase-card:first-child {
+  grid-row: span 2;
+}
+.showcase-body {
+  width: 100%;
+  max-width: 580px;
+  padding: 20px;
+  min-width: 0;
+  margin: auto;
+}
+.showcase-heading {
+  margin-bottom: 16px;
+}
+.showcase-prose,
+.showcase-status {
+  color: var(--nx-color-muted-foreground);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+.showcase-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.showcase-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.showcase-between,
+.showcase-check,
+.showcase-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.showcase-between {
+  justify-content: space-between;
+}
+.showcase-actions {
+  flex-wrap: wrap;
+}
+.showcase-check {
+  align-items: flex-start;
+}
+.showcase-check > button {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.showcase-check label {
+  line-height: 1.5;
+}
+.showcase-rule {
+  height: 1px;
+  margin: 24px 0;
+}
+.showcase-stack .showcase-rule {
+  margin: 2px 0;
+}
+.showcase-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.showcase-person strong,
+.showcase-mail-item strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+.showcase-person small,
+.showcase-mail-item small,
+.showcase-file small {
+  display: block;
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.showcase-member {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px;
+  align-items: center;
+  gap: 12px;
+}
+.showcase-status {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.showcase-file + .showcase-status,
+.showcase-table-wrap + .showcase-status {
+  margin-top: 12px;
+}
+.showcase-metric {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 12px 0;
+}
+.showcase-metric > strong,
+.showcase-price {
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+.showcase-metric strong > span {
+  font-size: 22px;
+  color: var(--nx-color-muted-foreground);
+}
+.showcase-price {
+  margin-block: 24px;
+}
+.showcase-price > span {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: var(--nx-color-muted-foreground);
+}
+.showcase-chart {
+  height: 84px;
+  width: 100%;
+  min-width: 0;
+}
+.showcase-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 124px;
+  overflow: auto;
+  padding: 2px;
+  margin-bottom: 12px;
+}
+.showcase-message {
+  max-width: 88%;
+  align-self: start;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.showcase-message p {
+  border-radius: 12px;
+  background: var(--nx-color-muted);
+  padding: 10px 14px;
+  margin: 8px 0 0;
+}
+.showcase-message-self {
+  align-self: end;
+}
+.showcase-message-self p {
+  background: var(--nx-color-secondary-background);
+  color: var(--nx-color-secondary-foreground);
+}
+.showcase-message small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--nx-color-muted-foreground);
+}
+.showcase-composer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.showcase-composer input {
+  min-width: 0;
+}
+.showcase-composer button {
+  flex-shrink: 0;
+}
+.showcase-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 32px;
+}
+.showcase-task-list [data-done='true'] label {
+  text-decoration: line-through;
+  color: var(--nx-color-muted-foreground);
+}
+.showcase-mail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-block: 20px;
+}
+.showcase-mail-item {
+  width: 100%;
+  height: auto;
+  min-height: 66px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: start;
+  white-space: normal;
+  padding: 12px;
+}
+.showcase-file {
+  height: auto;
+  min-height: 56px;
+  text-align: start;
+  justify-content: start;
+  padding: 12px;
+  white-space: normal;
+}
+.showcase-file > span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.showcase-table-wrap {
+  overflow-x: auto;
+  margin-block: 20px 0;
+}
+.showcase-grid[data-treatment='Soft'] > .showcase-card {
+  background: color-mix(
+    in srgb,
+    var(--canvas-accent) 9%,
+    var(--nx-color-background)
+  );
+}
+.showcase-grid[data-treatment='Solid'] > .showcase-card {
+  background: var(--nx-color-muted);
+}
+@container showcase-card (max-width: 300px) {
+  .showcase-heading {
+    margin-bottom: 12px;
+  }
+  .showcase-metric > strong,
+  .showcase-price {
+    font-size: 30px;
+  }
+  .showcase-between {
+    flex-wrap: wrap;
+  }
+}
+@container showcase-card (max-width: 210px) {
+  .showcase-body {
+    padding: 12px;
+  }
+  .showcase-body button {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .showcase-heading p {
+    display: none;
+  }
+  .showcase-person strong {
+    font-size: 12px;
+  }
+  .showcase-person small {
+    display: none;
+  }
+  .showcase-member {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .showcase-member > div:last-child {
+    max-width: 110px;
+  }
+  .showcase-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .showcase-person {
+    gap: 6px;
+  }
+  .showcase-composer {
+    flex-wrap: wrap;
+  }
+  .showcase-mail-item {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+.showcase-team .showcase-stack {
+  gap: 10px;
+}
+.showcase-expanded {
+  display: none;
+}
+.showcase-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.showcase-fieldset legend {
+  padding: 0;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.showcase-templates {
+  gap: 12px;
+}
+.showcase-chart-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  border-top: 1px solid var(--nx-color-border-default);
+  padding-top: 24px;
+  margin: 24px 0 0;
+}
+.showcase-chart-summary dt {
+  color: var(--nx-color-muted-foreground);
+  font-size: 12px;
+}
+.showcase-chart-summary dd {
+  margin: 8px 0 0;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.showcase-team-permissions {
+  border-top: 1px solid var(--nx-color-border-default);
+  padding-top: 20px;
+}
+.showcase-team-permissions p,
+.showcase-preferences .showcase-between p {
+  margin-top: 4px;
+  font-size: 12px;
+}
+.showcase-delivery {
+  border-top: 1px solid var(--nx-color-border-default);
+  padding-top: 24px;
+}
+/* The tall layout follows the card, so it also works in other dock categories. */
+@container showcase-card (min-height: 440px) and (min-width: 280px) {
+  .showcase-body {
+    max-width: none;
+    margin: 0;
+    padding: 32px;
+  }
+  .showcase-heading {
+    margin-bottom: 28px;
+  }
+  .showcase-stack,
+  .showcase-team .showcase-stack {
+    gap: 20px;
+  }
+  .showcase-member {
+    min-height: 44px;
+  }
+  .showcase-activity .showcase-body,
+  .showcase-conversation .showcase-body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .showcase-activity-tabs,
+  .showcase-activity-period[data-state='active'] {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .showcase-activity-tabs > [role='tablist'] {
+    align-self: start;
+    flex-shrink: 0;
+  }
+  .showcase-metric {
+    margin-block: 20px;
+  }
+  .showcase-chart {
+    flex: 1;
+    min-height: 120px;
+  }
+  .showcase-messages {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .showcase-conversation .showcase-composer {
+    flex-shrink: 0;
+    margin-bottom: var(--story-dock-clearance, 112px);
+  }
+}
+@container showcase-card (min-height: 600px) and (min-width: 280px) {
+  .showcase-expanded {
+    display: block;
+  }
+  .showcase-field.showcase-expanded {
+    display: flex;
+  }
+  .showcase-member.showcase-expanded,
+  .showcase-chart-summary {
+    display: grid;
+  }
+  .showcase-project .showcase-expanded,
+  .showcase-preferences .showcase-quiet {
+    display: none;
+  }
+}
+/* Reveal form sections only when the two-row project card has room. */
+@container showcase-card (min-height: 750px) and (min-width: 280px) {
+  .showcase-project .showcase-project-brief,
+  .showcase-preferences .showcase-quiet {
+    display: flex;
+  }
+  .showcase-project textarea {
+    min-height: 112px;
+  }
+}
+@container showcase-card (min-height: 1000px) and (min-width: 280px) {
+  .showcase-project .showcase-project-template {
+    display: block;
+  }
+}
+@container showcase-card (min-height: 1250px) and (min-width: 280px) {
+  .showcase-project .showcase-project-team {
+    display: block;
+  }
+  .showcase-project > .showcase-body > .showcase-stack {
+    gap: 32px;
+  }
+}
+.showcase-grid[data-layout='Grid'] > .showcase-card,
+.showcase-grid[data-layout='Columns'] > .showcase-card {
+  grid-row: auto;
+}
+.showcase-grid[data-layout='Columns'] > .showcase-card:nth-child(n + 4) {
+  display: none;
+}
+@container showcase-card (max-height: 360px) {
+  .showcase-body {
+    margin-block: 0;
+  }
+  .showcase-heading {
+    margin-bottom: 12px;
+  }
+  .showcase-messages {
+    max-height: 64px;
+  }
+  .showcase-message .showcase-person {
+    display: none;
+  }
+  .showcase-volume {
+    display: none;
+  }
+}

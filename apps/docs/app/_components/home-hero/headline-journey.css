@@ -1,0 +1,60 @@
+.headline-journey {
+  container-type: inline-size;
+}
+.headline-journey .workbench-journey .journey-title,
+.headline-journey .workbench-journey .journey-heading {
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 1.75),
+    calc(var(--nx-typography-size-base) * 1) + 3cqi,
+    var(--lab-title, calc(var(--nx-typography-size-base) * 3))
+  );
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.headline-journey .workbench-journey .journey-sequence {
+  gap: var(--lab-section, var(--nx-spacing-2));
+}
+.headline-journey .journey-workbench,
+.headline-journey .journey-build {
+  width: 100%;
+  max-width: 100%;
+}
+.headline-journey .journey-workbench {
+  display: grid;
+  row-gap: var(--lab-heading-gap, var(--nx-spacing-2));
+}
+.headline-journey .journey-build {
+  display: grid;
+  row-gap: var(--lab-tool-heading-gap, var(--nx-spacing-2));
+}
+.headline-journey .workbench-journey.journey-compact .journey-grid {
+  margin-block: 0;
+  padding-block: 0;
+  min-height: 0;
+}
+.headline-journey .workbench-journey.journey-compact .journey-tools {
+  margin-block: 0;
+  gap: var(--lab-tool-gap, var(--nx-spacing-2));
+}
+.headline-journey .journey-tile,
+.headline-journey .journey-tool {
+  width: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tile, calc(var(--nx-spacing-4) * 3.75));
+}
+.headline-journey .journey-tool {
+  width: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
+  height: var(--lab-tool, calc(var(--nx-spacing-4) * 3.75));
+}
+.headline-journey [data-mode='dark'] .journey-heading {
+  color: var(--nx-color-foreground);
+}
+
+.headline-journey .headline-open-source {
+  margin-block-end: var(--nx-spacing-4);
+  height: var(--nx-spacing-8);
+  padding: var(--nx-spacing-1) var(--nx-spacing-4);
+  border: 0;
+}

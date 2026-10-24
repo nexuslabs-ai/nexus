@@ -1,0 +1,8 @@
+Source: modern-web-guidance search "responsive component layout"; retrieved responsive-design.
+Decision: reuse existing wrapping tile rows and scroll/static layout; fixed-viewBox SVG component miniatures reserve their proportions. No new environment queries.
+Verification: docs typecheck and scoped lint pass. Browser checked desktop, light/dark, mobile 390px, no horizontal overflow or page errors. Existing variants retained for comparison.
+
+Live controls refinement:
+Source: modern-web-guidance search "accessible dialog focus"; retrieved accessibility.
+Decision: reuse Nexus Button, Dialog and Select primitives with accessible names and normal focus management. Keep controls in a compact wrapping row; do not add environment queries.
+Verification: clicked Save, opened Dialog and dismissed with Escape, selected Team, checked both themes and 390px layout with no overflow or page errors. Docs typecheck passed.

@@ -1,0 +1,296 @@
+.context-dock {
+  --dock-surface: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 4%,
+    var(--nx-color-background)
+  );
+  --dock-highlight: color-mix(
+    in srgb,
+    var(--nx-color-foreground) 7%,
+    var(--dock-surface)
+  );
+  position: relative;
+  width: min(100%, 640px);
+  isolation: isolate;
+  z-index: 5;
+}
+.context-dock-bar {
+  display: flex;
+  height: 72px;
+  padding: 6px;
+  gap: 4px;
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: 20px;
+  background: var(--dock-surface);
+  box-shadow:
+    0 8px 24px #00000012,
+    0 1px 3px #0000000a;
+  animation: dock-tools-in 240ms ease-out both;
+}
+.context-dock-bar > button {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 2px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--nx-color-muted-foreground);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color 160ms,
+    transform 160ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.context-dock-bar > button:hover,
+.context-dock-bar > button[data-active='true'] {
+  color: var(--nx-color-foreground);
+}
+.context-dock-bar > button:active {
+  transform: scale(0.96);
+}
+.context-dock-selection {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: var(--dock-highlight);
+  box-shadow:
+    0 1px 2px #0000000a,
+    inset 0 1px 0 #ffffff06;
+}
+.context-tool-icon,
+.context-tool-label {
+  position: relative;
+}
+.context-tool-icon {
+  display: flex;
+}
+.context-tool-icon > i {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--dock-surface);
+  border-radius: 50%;
+  position: absolute;
+  right: -3px;
+  bottom: -2px;
+}
+.context-tool-label {
+  font-size: clamp(9px, 1.8vw, 11px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.context-panel-layer {
+  position: absolute;
+  width: 100%;
+  bottom: calc(100% + 14px);
+  pointer-events: none;
+}
+.context-panel {
+  position: relative;
+  width: min(100%, 440px);
+  left: clamp(0px, calc(var(--tool-x) - 220px), max(0px, calc(100% - 440px)));
+  padding: 20px;
+  border: 1px solid var(--nx-color-border-default);
+  border-radius: 20px;
+  background: var(--dock-surface);
+  box-shadow:
+    0 12px 48px #00000026,
+    0 2px 6px #0000000a;
+  pointer-events: auto;
+  transition: left 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.context-panel-pointer {
+  position: absolute;
+  left: var(--tool-x);
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--dock-surface);
+  border-right: 1px solid var(--nx-color-border-default);
+  border-bottom: 1px solid var(--nx-color-border-default);
+  border-bottom-right-radius: 4px;
+  transform: translateX(-50%) rotate(45deg);
+  transition: left 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.context-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.context-panel-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+.context-panel-heading button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--nx-color-muted-foreground);
+  cursor: pointer;
+}
+.context-panel-heading button:hover {
+  background: var(--dock-highlight);
+}
+.context-panel-content {
+  display: grid;
+  gap: 20px;
+}
+.dock-control {
+  display: grid;
+  gap: 12px;
+}
+.dock-control-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--nx-color-muted-foreground);
+}
+.dock-control-label output {
+  color: var(--nx-color-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.dock-control input[type='range'] {
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--nx-color-foreground);
+  cursor: pointer;
+}
+.dock-choice-group {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--nx-color-background);
+  border-radius: 10px;
+}
+.dock-choice-group button {
+  flex: 1;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--nx-color-muted-foreground);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.dock-choice-group button[aria-pressed='true'] {
+  background: var(--dock-highlight);
+  color: var(--nx-color-foreground);
+}
+.dock-color-controls {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 24px;
+}
+.dock-swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+.dock-swatches button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--swatch);
+  cursor: pointer;
+}
+.dock-swatches button[aria-pressed='true'] {
+  outline: 1px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+.dock-color-values {
+  display: grid;
+  gap: 18px;
+  align-content: center;
+  min-width: 0;
+}
+.dock-color-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.dock-color-field > span {
+  color: var(--nx-color-muted-foreground);
+  flex: 1;
+}
+.dock-color-field output {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.dock-color-field input {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.dock-radius-samples {
+  display: flex;
+  gap: 20px;
+  padding-block: 4px;
+}
+.dock-radius-samples span {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--nx-color-muted-foreground);
+  background: var(--dock-highlight);
+}
+.dock-source {
+  display: grid;
+  gap: 12px;
+}
+.dock-source pre {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.dock-source > button {
+  justify-self: start;
+  font: inherit;
+  font-size: 12px;
+  padding: 8px 12px;
+  color: inherit;
+  background: var(--dock-highlight);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.context-dock button:focus-visible,
+.context-dock input:focus-visible {
+  outline: 2px solid var(--nx-color-foreground);
+  outline-offset: 3px;
+}
+@keyframes dock-tools-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+[data-reduce-motion='true'] .context-dock * {
+  animation: none;
+  transition: none;
+}

@@ -1,0 +1,73 @@
+.hero-lab .workbench-journey {
+  padding-top: var(--lab-top);
+}
+.hero-lab .journey-title {
+  font-size: clamp(
+    calc(var(--nx-typography-size-base) * 2),
+    4vw,
+    var(--lab-title)
+  );
+}
+@media (min-width: 64rem) {
+  .hero-lab .journey-title {
+    font-size: var(--lab-title);
+  }
+}
+.hero-lab .journey-heading {
+  font-size: var(--lab-heading);
+}
+.hero-lab .journey-label {
+  font-size: var(--lab-label);
+}
+.hero-lab .journey-sequence {
+  gap: var(--lab-section);
+}
+.hero-lab .journey-grid {
+  gap: var(--lab-gap);
+  margin-top: var(--lab-heading-gap);
+}
+.hero-lab .journey-tile {
+  border-radius: var(--lab-radius);
+}
+.hero-lab .journey-tile .journey-idle-icon {
+  width: var(--lab-icon);
+  height: var(--lab-icon);
+  margin: calc(var(--lab-icon) / -2) 0 0 calc(var(--lab-icon) / -2);
+}
+.hero-lab .journey-face-icon {
+  width: var(--lab-icon);
+  height: var(--lab-icon);
+}
+.hero-lab .journey-compact .journey-grid {
+  margin-top: calc(var(--lab-heading-gap) - 8px);
+  min-height: calc(var(--lab-tile) + 16px);
+}
+.hero-lab .journey-compact .journey-tile {
+  width: var(--lab-tile);
+  height: var(--lab-tile);
+  transition-duration: var(--lab-expand);
+}
+.hero-lab .journey-compact .journey-tile[data-active='true'] {
+  width: var(--lab-expanded);
+}
+.hero-lab .journey-tools {
+  gap: var(--lab-tool-gap);
+  margin-top: var(--lab-tool-heading-gap);
+  width: auto;
+  display: flex;
+}
+.hero-lab .journey-tool {
+  width: var(--lab-tool);
+  height: var(--lab-tool);
+}
+
+.hero-lab
+  .workbench-journey:not(.journey-compact):not(.journey-wheel)
+  .journey-workbench {
+  width: min(100%, calc(var(--lab-tile) * 5 + var(--lab-gap) * 4 + 40px));
+}
+
+/* The native iteration control is the only version switcher in this studio. */
+body:has(.hero-lab) .dialkit-preset-manager {
+  display: none;
+}

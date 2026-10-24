@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>nx: — Custom code marks</title
+  ><style>
+    @font-face {
+      font-family: Name;
+      src: url(name.woff2);
+      font-weight: 600;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #eae9e5;
+      color: #171717;
+      font:
+        14px/1.5 Name,
+        sans-serif;
+    }
+    main {
+      max-width: 1320px;
+      padding: 40px 24px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 28px;
+      letter-spacing: -0.8px;
+      margin: 0 0 8px;
+    }
+    .intro {
+      font: 14px/1.6 sans-serif;
+      color: #666;
+      margin: 0 0 32px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 20px;
+    }
+    article {
+      background: #fafaf8;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    header {
+      padding: 24px 24px 0;
+    }
+    header > span {
+      font: 11px monospace;
+      color: #777;
+    }
+    h2 {
+      font-size: 20px;
+      margin: 8px 0;
+    }
+    header p {
+      font: 13px/1.6 sans-serif;
+      color: #666;
+      min-height: 42px;
+      margin: 0;
+    }
+    .enlarged {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .enlarged svg {
+      width: 232px;
+      height: 120px;
+    }
+    .caption {
+      text-align: center;
+      font: 10px sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #777;
+      padding-bottom: 28px;
+    }
+    .sample {
+      padding: 24px 20px 32px;
+      border-top: 1px solid #8882;
+    }
+    .dark {
+      background: #171717;
+      color: #fafafa;
+    }
+    .label {
+      font: 10px sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      opacity: 0.5;
+      margin-bottom: 22px;
+    }
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lockup svg {
+      width: 58px;
+      height: 30px;
+      flex: none;
+    }
+    .lockup span {
+      font:
+        600 16px/1 Name,
+        sans-serif;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
+    footer {
+      font: 13px sans-serif;
+      color: #666;
+      margin-top: 24px;
+    }
+  </style>
+  <main>
+    <h1>nx: / Custom code marks</h1>
+    <p class="intro">
+      Three drawn constructions. One code block. Same name, scale, and spacing
+      for a fair comparison.
+    </p>
+    <div class="grid">
+      <article>
+        <header>
+          <span>01</span>
+          <h2>Soft terminal</h2>
+          <p>Open lowercase n, diagonal x, round colon.</p>
+        </header>
+        <div class="enlarged">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 58 30"
+            role="img"
+            aria-label="nx:"
+          >
+            <rect
+              x=".5"
+              y=".5"
+              width="57"
+              height="29"
+              rx="6"
+              fill="currentColor"
+              fill-opacity=".06"
+              stroke="currentColor"
+              stroke-opacity=".18"
+            />
+            <g
+              transform="translate(6.370689655172413 3.8793103448275854) scale(0.5172413793103449)"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 33V10M5 19C5 5 29 5 29 19V33" />
+                <path d="M42 10L64 33M64 10L42 33" />
+              </g>
+              <circle cx="82" cy="14" r="3.5" fill="currentColor" />
+              <circle cx="82" cy="29" r="3.5" fill="currentColor" />
+            </g>
+          </svg>
+        </div>
+        <div class="caption">Construction preview · 4×</div>
+        <div class="sample light">
+          <div class="label">light / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(6.370689655172413 3.8793103448275854) scale(0.5172413793103449)"
+              >
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 33V10M5 19C5 5 29 5 29 19V33" />
+                  <path d="M42 10L64 33M64 10L42 33" />
+                </g>
+                <circle cx="82" cy="14" r="3.5" fill="currentColor" />
+                <circle cx="82" cy="29" r="3.5" fill="currentColor" />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+        <div class="sample dark">
+          <div class="label">dark / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(6.370689655172413 3.8793103448275854) scale(0.5172413793103449)"
+              >
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 33V10M5 19C5 5 29 5 29 19V33" />
+                  <path d="M42 10L64 33M64 10L42 33" />
+                </g>
+                <circle cx="82" cy="14" r="3.5" fill="currentColor" />
+                <circle cx="82" cy="29" r="3.5" fill="currentColor" />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+      </article>
+      <article>
+        <header>
+          <span>02</span>
+          <h2>Cut terminal</h2>
+          <p>Flat terminals and matching diagonal cuts.</p>
+        </header>
+        <div class="enlarged">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 58 30"
+            role="img"
+            aria-label="nx:"
+          >
+            <rect
+              x=".5"
+              y=".5"
+              width="57"
+              height="29"
+              rx="6"
+              fill="currentColor"
+              fill-opacity=".06"
+              stroke="currentColor"
+              stroke-opacity=".18"
+            />
+            <g
+              transform="translate(0.4423076923076934 2.884615384615385) scale(0.5769230769230769)"
+            >
+              <path
+                fill="currentColor"
+                d="M4 34V9H10V13Q14 8 21 8Q34 8 34 21V34H27V21Q27 14 20 14Q11 14 11 23V34ZM44 9H52L60 18 68 9H76L64 21 77 34H68L60 25 52 34H43L56 21Z"
+              />
+              <path fill="currentColor" d="M88 9H95V16H88ZM88 27H95V34H88Z" />
+            </g>
+          </svg>
+        </div>
+        <div class="caption">Construction preview · 4×</div>
+        <div class="sample light">
+          <div class="label">light / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(0.4423076923076934 2.884615384615385) scale(0.5769230769230769)"
+              >
+                <path
+                  fill="currentColor"
+                  d="M4 34V9H10V13Q14 8 21 8Q34 8 34 21V34H27V21Q27 14 20 14Q11 14 11 23V34ZM44 9H52L60 18 68 9H76L64 21 77 34H68L60 25 52 34H43L56 21Z"
+                />
+                <path fill="currentColor" d="M88 9H95V16H88ZM88 27H95V34H88Z" />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+        <div class="sample dark">
+          <div class="label">dark / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(0.4423076923076934 2.884615384615385) scale(0.5769230769230769)"
+              >
+                <path
+                  fill="currentColor"
+                  d="M4 34V9H10V13Q14 8 21 8Q34 8 34 21V34H27V21Q27 14 20 14Q11 14 11 23V34ZM44 9H52L60 18 68 9H76L64 21 77 34H68L60 25 52 34H43L56 21Z"
+                />
+                <path fill="currentColor" d="M88 9H95V16H88ZM88 27H95V34H88Z" />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+      </article>
+      <article>
+        <header>
+          <span>03</span>
+          <h2>Joined rhythm</h2>
+          <p>A continuous n-to-x stroke and short colon bars.</p>
+        </header>
+        <div class="enlarged">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 58 30"
+            role="img"
+            aria-label="nx:"
+          >
+            <rect
+              x=".5"
+              y=".5"
+              width="57"
+              height="29"
+              rx="6"
+              fill="currentColor"
+              fill-opacity=".06"
+              stroke="currentColor"
+              stroke-opacity=".18"
+            />
+            <g
+              transform="translate(5.206896551724135 3.8793103448275854) scale(0.5172413793103449)"
+            >
+              <path
+                d="M5 33V10M5 20C5 6 29 6 29 20V27Q29 33 35 33H39Q43 33 47 28L63 11M44 11L65 33"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="6"
+                stroke-linecap="square"
+                stroke-linejoin="round"
+              />
+              <rect
+                x="80"
+                y="10"
+                width="10"
+                height="5"
+                rx="1.5"
+                fill="currentColor"
+              />
+              <rect
+                x="80"
+                y="28"
+                width="10"
+                height="5"
+                rx="1.5"
+                fill="currentColor"
+              />
+            </g>
+          </svg>
+        </div>
+        <div class="caption">Construction preview · 4×</div>
+        <div class="sample light">
+          <div class="label">light / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(5.206896551724135 3.8793103448275854) scale(0.5172413793103449)"
+              >
+                <path
+                  d="M5 33V10M5 20C5 6 29 6 29 20V27Q29 33 35 33H39Q43 33 47 28L63 11M44 11L65 33"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="square"
+                  stroke-linejoin="round"
+                />
+                <rect
+                  x="80"
+                  y="10"
+                  width="10"
+                  height="5"
+                  rx="1.5"
+                  fill="currentColor"
+                />
+                <rect
+                  x="80"
+                  y="28"
+                  width="10"
+                  height="5"
+                  rx="1.5"
+                  fill="currentColor"
+                />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+        <div class="sample dark">
+          <div class="label">dark / actual header size</div>
+          <div class="lockup">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 58 30"
+              role="img"
+              aria-label="nx:"
+            >
+              <rect
+                x=".5"
+                y=".5"
+                width="57"
+                height="29"
+                rx="6"
+                fill="currentColor"
+                fill-opacity=".06"
+                stroke="currentColor"
+                stroke-opacity=".18"
+              />
+              <g
+                transform="translate(5.206896551724135 3.8793103448275854) scale(0.5172413793103449)"
+              >
+                <path
+                  d="M5 33V10M5 20C5 6 29 6 29 20V27Q29 33 35 33H39Q43 33 47 28L63 11M44 11L65 33"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="square"
+                  stroke-linejoin="round"
+                />
+                <rect
+                  x="80"
+                  y="10"
+                  width="10"
+                  height="5"
+                  rx="1.5"
+                  fill="currentColor"
+                />
+                <rect
+                  x="80"
+                  y="28"
+                  width="10"
+                  height="5"
+                  rx="1.5"
+                  fill="currentColor"
+                />
+              </g></svg
+            ><span>Nexus Design System</span>
+          </div>
+        </div>
+      </article>
+    </div>
+    <footer>Exploration only. Website and press kit unchanged.</footer>
+  </main>
+</html>
