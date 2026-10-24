@@ -36,7 +36,7 @@ const OVERLAYS = new Set(['dialog']);
 // Attributes that hold generated ids or inline styles, that Radix and Reka add
 // for their own bookkeeping, or that `name` already covers (aria-label).
 const SKIPPED_ATTRIBUTE =
-  /^(?:id|style|aria-(?:controls|labelledby|describedby|owns|activedescendant|label)|data-(?:radix|reka)-.*|data-(?:active|dismissable-layer))$/;
+  /^(?:id|style|aria-(?:controls|labelledby|describedby|owns|activedescendant|label)|data-(?:radix|reka)-.*|data-(?:active|dismissable-layer|slider-impl))$/;
 // ARIA states where `"false"` means the same as leaving the attribute out.
 const FALSE_IS_ABSENT =
   /^aria-(?:busy|disabled|hidden|invalid|readonly|required)$/;

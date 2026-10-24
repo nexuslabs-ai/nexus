@@ -46,11 +46,9 @@ export const planned = [
   'setting-row',
   'sheet',
   'sidebar',
-  'slider',
   'sonner',
   'table',
   'theme-quick-control',
-  'toggle-group',
   'toolbar',
   'tooltip',
 ];
@@ -79,11 +77,13 @@ export const shared = [
   'separator',
   'show',
   'skeleton',
+  'slider',
   'spinner',
   'switch',
   'tabs',
   'textarea',
   'toggle',
+  'toggle-group',
 ];
 
 const NATIVE_MODEL_VALUE =
@@ -139,8 +139,10 @@ export const behaviourOnlyIn: Record<
     'input/VModel': V_MODEL,
     'native-select/VModel': V_MODEL,
     'radio-group/VModel': V_MODEL,
+    'slider/VModel': V_MODEL,
     'switch/VModel': V_MODEL,
     'textarea/VModel': V_MODEL,
+    'toggle-group/VModel': V_MODEL,
     'switch/ThumbSlot': 'the #thumb slot is Vue-only API (see vueOnlyApi)',
     'tabs/IndicatorFollowsActiveTab':
       "pins Reka's horizontal indicator geometry; React's measured indicator is pinned by UnderlineVariant",
@@ -155,6 +157,8 @@ export const behaviourDifferences: Record<string, string> = {
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
+  'toggle-group/ControlledDisabledTransition':
+    "clearing a single selection emits '' from Radix and undefined from Reka",
 };
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
@@ -169,6 +173,8 @@ export const vueOnlyDeclarations: Record<string, string> = {
     'Vue injection key ButtonGroup provides to its Buttons and ButtonGroupText; React passes the same size through context',
   'tabs/index.ts#TabsListKey':
     'Vue injection key the list provides to its triggers; React passes the same state through context',
+  'toggle-group/index.ts#ToggleGroupKey':
+    'Vue injection key the group provides to its items; React passes the same state through context',
 };
 
 /** Files Vue copies from React byte for byte, as `[react, vue]` repo paths. */
