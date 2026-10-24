@@ -83,7 +83,12 @@ function describeElement(element: Element) {
     .sort();
   const classes = [...element.classList].sort().join(' ');
   const name = computeAccessibleName(element);
-  const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+  // A textarea shows its value; its text content is only the default value.
+  const content =
+    element instanceof HTMLTextAreaElement
+      ? element.value
+      : element.textContent;
+  const text = content?.replace(/\s+/g, ' ').trim() ?? '';
   return `<${element.tagName.toLowerCase()} ${attributes.join(' ')}> class="${classes}" name="${name}" text="${text}"`;
 }
 

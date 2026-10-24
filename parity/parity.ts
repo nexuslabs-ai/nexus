@@ -41,12 +41,10 @@ export const planned = [
   'message',
   'message-scroller',
   'multi-select',
-  'native-select',
   'navigation-menu',
   'page-header',
   'pagination',
   'popover',
-  'radio-group',
   'resizable',
   'scroll-area',
   'select',
@@ -56,9 +54,7 @@ export const planned = [
   'slider',
   'sonner',
   'table',
-  'textarea',
   'theme-quick-control',
-  'toggle',
   'toggle-group',
   'toolbar',
   'tooltip',
@@ -77,14 +73,23 @@ export const shared = [
   'input',
   'kbd',
   'label',
+  'native-select',
   'progress',
+  'radio-group',
   'separator',
   'show',
   'skeleton',
   'spinner',
   'switch',
   'tabs',
+  'textarea',
+  'toggle',
 ];
+
+const NATIVE_MODEL_VALUE =
+  "v-model value; React's native value prop is inherited from its props type";
+const NATIVE_DEFAULT_VALUE =
+  "starting value without v-model; React's native defaultValue is inherited from its props type";
 
 /**
  * Props, slots and events only the Vue part declares, as `{Part}.{name}`.
@@ -96,13 +101,17 @@ export const vueOnlyApi: Record<string, string> = {
     'native <button> attribute React inherits from its props type; Vue declares it so the spinner state can read it',
   'Button.type':
     "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
-  'Input.modelValue':
-    "v-model value; React's native value prop is inherited from its props type",
-  'Input.defaultValue':
-    "starting value without v-model; React's native defaultValue is inherited from its props type",
+  'Input.defaultValue': NATIVE_DEFAULT_VALUE,
+  'Input.modelValue': NATIVE_MODEL_VALUE,
+  'NativeSelect.defaultValue': NATIVE_DEFAULT_VALUE,
+  'NativeSelect.modelValue': NATIVE_MODEL_VALUE,
   'Switch.thumb':
     'slot for custom thumb content; React renders the thumb itself with no way to compose it',
+  'Textarea.defaultValue': NATIVE_DEFAULT_VALUE,
+  'Textarea.modelValue': NATIVE_MODEL_VALUE,
 };
+
+const V_MODEL = 'v-model binding, a Vue idiom with no React counterpart';
 
 /** Play stories only one framework has, as `{slug}/{Story}`. */
 export const behaviourOnlyIn: Record<
@@ -114,9 +123,12 @@ export const behaviourOnlyIn: Record<
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
   },
   vue: {
-    'checkbox/VModel': 'v-model binding, a Vue idiom with no React counterpart',
-    'input/VModel': 'v-model binding, a Vue idiom with no React counterpart',
-    'switch/VModel': 'v-model binding, a Vue idiom with no React counterpart',
+    'checkbox/VModel': V_MODEL,
+    'input/VModel': V_MODEL,
+    'native-select/VModel': V_MODEL,
+    'radio-group/VModel': V_MODEL,
+    'switch/VModel': V_MODEL,
+    'textarea/VModel': V_MODEL,
     'switch/ThumbSlot': 'the #thumb slot is Vue-only API (see vueOnlyApi)',
     'tabs/IndicatorFollowsActiveTab':
       "pins Reka's horizontal indicator geometry; React's measured indicator is pinned by UnderlineVariant",
@@ -133,10 +145,12 @@ const TABS_INDICATOR =
 export const behaviourDifferences: Record<string, string> = {
   'checkbox/Disabled': DOCS_STORY_SPY,
   'checkbox/WithLabel': DOCS_STORY_SPY,
+  'radio-group/Disabled': DOCS_STORY_SPY,
   'switch/Small': DOCS_STORY_SPY,
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
+  'toggle/Disabled': DOCS_STORY_SPY,
 };
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
