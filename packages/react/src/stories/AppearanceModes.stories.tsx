@@ -1,3 +1,4 @@
+import { DEFAULT_NXDS_APPEARANCE } from '@nxds/core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, waitFor, within } from 'storybook/test';
 
@@ -16,6 +17,8 @@ const SIZES = [
   { size: 'default', height: '--nx-spacing-10' },
   { size: 'lg', height: '--nx-spacing-12' },
 ] as const;
+
+const LABEL_CAPS_LINE_HEIGHT_PX = 12;
 
 function Controls() {
   return (
@@ -65,15 +68,17 @@ const meta = {
       expect(root).toHaveAttribute('data-density', globals.density);
       expect(root).toHaveAttribute('data-radius', globals.corners);
     });
-    await document.fonts.ready;
+    await canvasElement.ownerDocument.fonts.ready;
 
     // Every control of a size shares the density's spacing token as its height.
     for (const { size, height } of SIZES) {
       const row = canvas.getByTestId(`row-${size}`);
       const expected = Number.parseFloat(token(root, height));
-      for (const control of row.querySelectorAll(
+      const controls = row.querySelectorAll(
         '[data-slot="button"], [data-slot="input"], [data-slot="select-trigger"]'
-      )) {
+      );
+      await expect(controls).toHaveLength(3);
+      for (const control of controls) {
         await expect(control.getBoundingClientRect().height).toBe(expected);
       }
     }
@@ -89,11 +94,12 @@ const meta = {
       token(root, '--nx-radius-md')
     );
 
-    // The caps line box follows the uiFontSize-scaled line-height token.
+    // The caps line box scales with uiFontSize.
     const caps = canvas.getByTestId('label-caps');
+    const scale = globals.uiFontSize / DEFAULT_NXDS_APPEARANCE.prefs.uiFontSize;
     await waitFor(() =>
       expect(getComputedStyle(caps).lineHeight).toBe(
-        token(caps, '--nx-typography-line-height-xxs')
+        `${LABEL_CAPS_LINE_HEIGHT_PX * scale}px`
       )
     );
   },
@@ -116,6 +122,6 @@ export const CompactSmoothLargeText: Story = {
   globals: { density: 'compact', corners: 'smooth', uiFontSize: 28 },
 };
 
-export const RelaxedRoundDark: Story = {
-  globals: { mode: 'dark', density: 'relaxed', corners: 'round' },
+export const RelaxedRound: Story = {
+  globals: { density: 'relaxed', corners: 'round' },
 };

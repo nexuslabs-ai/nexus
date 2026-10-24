@@ -491,7 +491,6 @@ export const OpenCloseInteraction: Story = {
     });
     await userEvent.click(dismissButton);
 
-    // The dialog plays its exit before it unmounts
     await expectExitBeforeUnmount(dialog);
 
     // Reopen and close with the corner close button
