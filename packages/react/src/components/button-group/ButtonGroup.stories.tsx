@@ -186,15 +186,26 @@ export const WithSeparator: Story = {
   },
 };
 
-// The group is a role=group region that advertises its orientation. Rendered
-// with no `orientation` prop so it exercises the default — a regression guard
-// for the default `data-orientation` emit.
+// The group is a role=group region that advertises its orientation. The first
+// group sets no `orientation` or `size`, a regression guard for the default
+// emits. In the second, an explicit `size` beats the group's, and a Button
+// nested in a wrapper still inherits it.
 export const WithDataAttributes: Story = {
   render: () => (
-    <ButtonGroup>
-      <Button variant="outline">One</Button>
-      <Button variant="outline">Two</Button>
-    </ButtonGroup>
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4">
+      <ButtonGroup>
+        <Button variant="outline">One</Button>
+        <Button variant="outline">Two</Button>
+      </ButtonGroup>
+      <ButtonGroup size="sm">
+        <Button variant="outline" size="lg">
+          Large
+        </Button>
+        <span>
+          <Button variant="outline">Nested</Button>
+        </span>
+      </ButtonGroup>
+    </div>
   ),
   play: async ({ canvasElement }) => {
     const group = canvasElement.querySelector('[data-slot="button-group"]');
@@ -202,6 +213,15 @@ export const WithDataAttributes: Story = {
     await expect(group).toHaveAttribute('role', 'group');
     await expect(group).toHaveAttribute('data-orientation', 'horizontal');
     await expect(group).toHaveAttribute('data-size', 'default');
+
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'Large' })).toHaveAttribute(
+      'data-size',
+      'lg'
+    );
+    await expect(
+      canvas.getByRole('button', { name: 'Nested' })
+    ).toHaveAttribute('data-size', 'sm');
   },
 };
 

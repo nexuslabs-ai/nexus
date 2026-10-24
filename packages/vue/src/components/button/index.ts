@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
+import type { InjectionKey } from 'vue';
 
 export { default as Button, type ButtonProps } from './Button.vue';
 
@@ -47,3 +48,9 @@ export const buttonVariants = cva(
 );
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
+
+/** Size shared from a ButtonGroup to its members. */
+export type ButtonGroupSize = 'sm' | 'default' | 'lg';
+
+export const ButtonGroupKey: InjectionKey<{ size: ButtonGroupSize }> =
+  Symbol('button-group');

@@ -36,7 +36,7 @@ const OVERLAYS = new Set(['dialog']);
 // Attributes that hold generated ids or inline styles, that Radix and Reka add
 // for their own bookkeeping, or that `name` already covers (aria-label).
 const SKIPPED_ATTRIBUTE =
-  /^(?:id|style|aria-(?:controls|labelledby|describedby|owns|activedescendant|label)|data-(?:radix|reka)-.*|data-(?:active|dismissable-layer))$/;
+  /^(?:id|style|aria-(?:controls|labelledby|describedby|owns|activedescendant|label)|data-(?:radix|reka)-.*|data-(?:active|dismissable-layer|slider-impl))$/;
 // ARIA states where `"false"` means the same as leaving the attribute out.
 const FALSE_IS_ABSENT =
   /^aria-(?:busy|disabled|hidden|invalid|readonly|required)$/;
@@ -64,8 +64,17 @@ function docsStories<TStory extends { tags?: string[] }>(
   );
 }
 
+/** The shared component a part belongs to: the longest slug its `data-slot` starts with. */
+function ownerOf(slot: string) {
+  return shared
+    .filter((slug) => slot === slug || slot.startsWith(`${slug}-`))
+    .reduce<
+      string | undefined
+    >((longest, slug) => (!longest || slug.length > longest.length ? slug : longest), undefined);
+}
+
 function isOwnSlot(slot: string, slug: string) {
-  return slot === slug || slot.startsWith(`${slug}-`);
+  return ownerOf(slot) === slug;
 }
 
 /** One element as a line, so a mismatch prints as a readable line diff. */

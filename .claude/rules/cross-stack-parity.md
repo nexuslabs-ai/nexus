@@ -32,6 +32,7 @@ These are the same API in each framework's idiom, not differences.
 
 | React                  | Vue                         |
 | ---------------------- | --------------------------- |
+| `children` prop        | default slot                |
 | `ReactNode` prop       | kebab-case slot             |
 | own `on*` prop         | own emit                    |
 | `asChild` (Radix Slot) | `as-child` (Reka Primitive) |

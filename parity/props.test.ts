@@ -24,7 +24,9 @@ import { shared, vueOnlyApi } from './parity.ts';
 
 interface VuePartApi {
   entry: ComponentEntry;
+  /** Named slots; the default slot is `hasDefaultSlot`. */
   slots: string[];
+  hasDefaultSlot: boolean;
   events: string[];
   inheritsAsChild: boolean;
 }
@@ -73,10 +75,11 @@ function packageReExports(slug: string) {
 function vueContract(vueProgram: VueProgram, slug: string) {
   const parts = componentParts(vueProgram, slug).map(
     (part): VuePartApi => ({
-      entry: partEntry(part, vueProgram.localAliases),
+      entry: partEntry(vueProgram, part),
       slots: part.meta.slots
         .map((slot) => slot.name)
         .filter((name) => name !== 'default'),
+      hasDefaultSlot: part.meta.slots.some((slot) => slot.name === 'default'),
       events: part.meta.events
         .filter((event) => isOwnDeclaration(event.getDeclarations()))
         .map((event) => event.name),
@@ -88,13 +91,19 @@ function vueContract(vueProgram: VueProgram, slug: string) {
 
 interface VueName {
   prop: PropEntry;
-  kind: 'slot' | 'emit' | 'asChild' | 'prop';
+  kind: 'defaultSlot' | 'slot' | 'emit' | 'asChild' | 'prop';
   vueName: string;
 }
 
-/** The Vue API each React prop maps to: a kebab-case slot, an emit, `as-child`, or the same prop. */
+/**
+ * The Vue API each React prop maps to: the default slot for `children`, a
+ * kebab-case slot, an emit, `as-child`, or the same prop.
+ */
 function vueNames(react: ComponentEntry) {
   return react.props.map((prop): VueName => {
+    if (prop.name === 'children' && REACT_NODE.test(prop.type)) {
+      return { prop, kind: 'defaultSlot', vueName: 'default' };
+    }
     if (REACT_NODE.test(prop.type)) {
       return { prop, kind: 'slot', vueName: kebab(prop.name) };
     }
@@ -123,6 +132,10 @@ function partDrift(react: ComponentEntry, vue: VuePartApi) {
       .map((prop) => [prop.name, prop])
   );
   for (const { prop, kind, vueName } of vueNames(react)) {
+    if (kind === 'defaultSlot') {
+      if (!vue.hasDefaultSlot) drift.push(`${at(prop.name)}: no default slot`);
+      continue;
+    }
     if (kind === 'slot') {
       if (!vue.slots.includes(vueName)) {
         drift.push(`${at(prop.name)}: no #${vueName} slot`);

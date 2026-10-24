@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Primitive, type PrimitiveProps } from 'reka-ui';
-import { Comment, computed, type HTMLAttributes, Text, type VNode } from 'vue';
+import { computed, type HTMLAttributes, inject, type VNode } from 'vue';
 
+import { renderedNodes } from '../../lib/slots';
 import { cn } from '../../lib/utils';
 import Spinner from '../spinner/Spinner.vue';
 
-import { type ButtonVariants, buttonVariants } from '.';
+import { ButtonGroupKey, type ButtonVariants, buttonVariants } from '.';
 
 export interface ButtonProps extends PrimitiveProps {
   variant?: ButtonVariants['variant'];
@@ -20,7 +21,6 @@ export interface ButtonProps extends PrimitiveProps {
 const props = withDefaults(defineProps<ButtonProps>(), {
   as: 'button',
   variant: 'default',
-  size: 'default',
   loading: false,
   type: 'button',
 });
@@ -35,18 +35,20 @@ function isIconButtonSize(size: ButtonVariants['size']) {
   return size === 'icon-sm' || size === 'icon' || size === 'icon-lg';
 }
 
+const group = inject(ButtonGroupKey, undefined);
+const size = computed(() => props.size ?? group?.size ?? 'default');
 const isDisabled = computed(() => props.disabled || props.loading);
-const iconOnly = computed(() => isIconButtonSize(props.size));
+const iconOnly = computed(() => isIconButtonSize(size.value));
 // `type` and `disabled` mean nothing on another tag, which also stays focusable.
 const isNativeButton = computed(() => props.as === 'button');
 const sharedAttrs = computed(() => ({
   'data-slot': 'button',
   'data-variant': props.variant,
-  'data-size': props.size,
+  'data-size': size.value,
   'data-icon-only': iconOnly.value || undefined,
   'data-loading': props.loading || undefined,
   class: cn(
-    buttonVariants({ variant: props.variant, size: props.size }),
+    buttonVariants({ variant: props.variant, size: size.value }),
     props.class
   ),
   'aria-busy': props.loading || undefined,
@@ -57,11 +59,7 @@ const sharedAttrs = computed(() => ({
 // native `<button>`, as React's Slot does.
 function rendersAsChild() {
   if (!props.asChild) return false;
-  const nodes = (slots.default?.() ?? []).filter(
-    (node) =>
-      node.type !== Comment &&
-      !(node.type === Text && !String(node.children).trim())
-  );
+  const nodes = renderedNodes(slots.default?.());
   return nodes.length === 1 && typeof nodes[0]?.type !== 'symbol';
 }
 </script>
