@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 import { Label } from '../label/label';
 
 import { Input } from './input';
@@ -495,6 +495,16 @@ export const FocusBlurInteraction: Story = {
   },
 };
 
+// A plain `value` attribute renders as the field's value.
+export const StaticValue: Story = {
+  render: () => <Input aria-label="Account id" value="acct_1024" readOnly />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Account id' });
+    await expect(input).toHaveValue('acct_1024');
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     size: 'lg',
@@ -509,7 +519,7 @@ export const WithDataAttributes: Story = {
     await expect(input).toHaveAttribute('data-variant', 'bordered');
     await expect(input).toHaveClass('nx:bg-container');
     await expect(input).toHaveClass('nx:enabled:hover:bg-container-hover');
-    await expect(unpairedAutofillClasses(input)).toEqual([]);
+    await expectAutofillPaired(input);
   },
 };
 

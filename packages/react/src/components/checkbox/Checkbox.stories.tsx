@@ -43,7 +43,7 @@ export const WithLabel: Story = {
       </div>
     );
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const checkbox = canvas.getByRole('checkbox', {
       name: 'Accept terms and conditions',
@@ -54,7 +54,6 @@ export const WithLabel: Story = {
 
     await userEvent.click(label);
     await expect(checkbox).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
   },
 };
 
@@ -129,7 +128,7 @@ export const Disabled: Story = {
     'aria-label': 'Disabled checkbox',
     disabled: true,
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const checkbox = canvas.getByRole('checkbox');
 
@@ -141,7 +140,6 @@ export const Disabled: Story = {
     // Click should not toggle
     await userEvent.click(checkbox);
     await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
-    await expect(args.onCheckedChange).not.toHaveBeenCalled();
   },
 };
 
@@ -308,6 +306,24 @@ export const KeyboardInteraction: Story = {
     await userEvent.keyboard(' ');
     await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
     await expect(args.onCheckedChange).toHaveBeenCalledWith(false);
+  },
+};
+
+export const DisabledInteraction: Story = {
+  args: {
+    'aria-label': 'Disabled checkbox',
+    disabled: true,
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const checkbox = canvas.getByRole('checkbox');
+
+    await expect(checkbox).toBeDisabled();
+
+    // Click should not toggle
+    await userEvent.click(checkbox);
+    await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
+    await expect(args.onCheckedChange).not.toHaveBeenCalled();
   },
 };
 

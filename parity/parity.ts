@@ -7,7 +7,6 @@ export const planned = [
   'accordion',
   'alert-dialog',
   'appearance-settings',
-  'aspect-ratio',
   'attachment',
   'avatar',
   'brand-color-field',
@@ -16,7 +15,6 @@ export const planned = [
   'button-group',
   'carousel',
   'chart',
-  'checkbox',
   'choice-card',
   'choice-row',
   'collapsible',
@@ -34,41 +32,29 @@ export const planned = [
   'filter-builder',
   'filter-chip',
   'filter-condition',
-  'hide',
   'hover-card',
-  'input',
   'input-group',
   'input-otp',
   'item',
-  'kbd',
-  'label',
   'marker',
   'menubar',
   'message',
   'message-scroller',
   'multi-select',
-  'native-select',
   'navigation-menu',
   'page-header',
   'pagination',
   'popover',
-  'progress',
-  'radio-group',
   'resizable',
   'scroll-area',
   'select',
-  'separator',
   'setting-row',
   'sheet',
-  'show',
   'sidebar',
-  'skeleton',
   'slider',
   'sonner',
   'table',
-  'textarea',
   'theme-quick-control',
-  'toggle',
   'toggle-group',
   'toolbar',
   'tooltip',
@@ -77,14 +63,33 @@ export const planned = [
 /** Components both packages ship, appearance aside: it has its own contract. */
 export const shared = [
   'alert',
+  'aspect-ratio',
   'badge',
   'button',
   'card',
+  'checkbox',
   'dialog',
+  'hide',
+  'input',
+  'kbd',
+  'label',
+  'native-select',
+  'progress',
+  'radio-group',
+  'separator',
+  'show',
+  'skeleton',
   'spinner',
   'switch',
   'tabs',
+  'textarea',
+  'toggle',
 ];
+
+const NATIVE_MODEL_VALUE =
+  "v-model value; React's native value prop is inherited from its props type";
+const NATIVE_DEFAULT_VALUE =
+  "starting value without v-model; React's native defaultValue is inherited from its props type";
 
 /**
  * Props, slots and events only the Vue part declares, as `{Part}.{name}`.
@@ -96,9 +101,17 @@ export const vueOnlyApi: Record<string, string> = {
     'native <button> attribute React inherits from its props type; Vue declares it so the spinner state can read it',
   'Button.type':
     "native <button> attribute React inherits from its props type; Vue declares it to default to 'button'",
+  'Input.defaultValue': NATIVE_DEFAULT_VALUE,
+  'Input.modelValue': NATIVE_MODEL_VALUE,
+  'NativeSelect.defaultValue': NATIVE_DEFAULT_VALUE,
+  'NativeSelect.modelValue': NATIVE_MODEL_VALUE,
   'Switch.thumb':
     'slot for custom thumb content; React renders the thumb itself with no way to compose it',
+  'Textarea.defaultValue': NATIVE_DEFAULT_VALUE,
+  'Textarea.modelValue': NATIVE_MODEL_VALUE,
 };
+
+const V_MODEL = 'v-model binding, a Vue idiom with no React counterpart';
 
 /** Play stories only one framework has, as `{slug}/{Story}`. */
 export const behaviourOnlyIn: Record<
@@ -110,7 +123,12 @@ export const behaviourOnlyIn: Record<
       'opens a DropdownMenu inside the dialog, and DropdownMenu is planned for Vue',
   },
   vue: {
-    'switch/VModel': 'v-model binding, a Vue idiom with no React counterpart',
+    'checkbox/VModel': V_MODEL,
+    'input/VModel': V_MODEL,
+    'native-select/VModel': V_MODEL,
+    'radio-group/VModel': V_MODEL,
+    'switch/VModel': V_MODEL,
+    'textarea/VModel': V_MODEL,
     'switch/ThumbSlot': 'the #thumb slot is Vue-only API (see vueOnlyApi)',
     'tabs/IndicatorFollowsActiveTab':
       "pins Reka's horizontal indicator geometry; React's measured indicator is pinned by UnderlineVariant",
@@ -125,8 +143,6 @@ export const behaviourDifferences: Record<string, string> = {
   'tabs/DisabledTabInteraction': TABS_INDICATOR,
   'tabs/UnderlineVariant': TABS_INDICATOR,
   'tabs/VerticalIndicatorFollowsActiveTab': TABS_INDICATOR,
-  'switch/Small':
-    "a Vue docs story renders without args, so it can't spy on the emit; ClickInteraction asserts it",
 };
 
 /** Parts whose rendered element differs by design, by `data-slot`; the rendered check skips them. */
@@ -144,6 +160,23 @@ export const vueOnlyDeclarations: Record<string, string> = {
 /** Files Vue copies from React byte for byte, as `[react, vue]` repo paths. */
 export const copies: [react: string, vue: string][] = [
   ['packages/react/src/lib/utils.ts', 'packages/vue/src/lib/utils.ts'],
+  ['packages/react/src/lib/motion.ts', 'packages/vue/src/lib/motion.ts'],
+  [
+    'packages/react/src/lib/field-size.ts',
+    'packages/vue/src/lib/field-size.ts',
+  ],
+  [
+    'packages/react/src/lib/responsive-visibility.ts',
+    'packages/vue/src/lib/responsive-visibility.ts',
+  ],
+  [
+    'packages/react/src/components/progress/progress.css',
+    'packages/vue/src/components/progress/progress.css',
+  ],
+  [
+    'packages/react/src/stories/support/autofill-pairing.ts',
+    'packages/vue/src/stories/support/autofill-pairing.ts',
+  ],
   [
     'packages/react/src/stories/support/story-height-test-utils.ts',
     'packages/vue/src/stories/support/story-height-test-utils.ts',

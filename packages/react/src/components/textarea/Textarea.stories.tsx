@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 import { Label } from '../label/label';
 
 import { Textarea } from './textarea';
@@ -333,7 +333,7 @@ export const WithDataAttributes: Story = {
     await expect(textarea).toHaveAttribute('data-variant', 'bordered');
     await expect(textarea).toHaveClass('nx:bg-container');
     await expect(textarea).toHaveClass('nx:enabled:hover:bg-container-hover');
-    await expect(unpairedAutofillClasses(textarea)).toEqual([]);
+    await expectAutofillPaired(textarea);
   },
 };
 

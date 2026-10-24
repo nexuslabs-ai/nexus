@@ -167,7 +167,7 @@ export const Small: Story = {
     size: 'sm',
     'aria-label': 'Toggle switch',
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const switchEl = canvas.getByRole('switch');
 
@@ -176,7 +176,6 @@ export const Small: Story = {
     // The smaller control still toggles (geometry-only size change).
     await userEvent.click(switchEl);
     await expect(switchEl).toHaveAttribute('data-state', 'checked');
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
   },
 };
 

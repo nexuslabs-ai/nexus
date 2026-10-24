@@ -1,8 +1,17 @@
+import type { HTMLAttributes, ReactNode } from 'react';
+
 import {
-  type ResponsiveVisibilityProps,
   visibilityClassName,
+  type VisibilityProps,
 } from '../../lib/responsive-visibility';
 import { cn } from '../../lib/utils';
+
+/**
+ * Props for Hide.
+ */
+type HideProps = HTMLAttributes<HTMLElement> & {
+  children: ReactNode;
+} & VisibilityProps;
 
 /**
  * Hides its children while a width condition matches. The opposite of `<Show>`.
@@ -28,7 +37,7 @@ function Hide({
   containerAbove,
   containerBelow,
   ...props
-}: ResponsiveVisibilityProps) {
+}: HideProps) {
   return (
     <Comp
       data-slot="hide"
@@ -46,4 +55,4 @@ function Hide({
   );
 }
 
-export { Hide, type ResponsiveVisibilityProps as HideProps };
+export { Hide, type HideProps };

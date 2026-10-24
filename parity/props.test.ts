@@ -10,11 +10,11 @@ import {
 } from '@nxds/source-model/roots.mjs';
 import {
   componentParts,
-  createVueChecker,
+  createVueProgram,
   isOwnDeclaration,
   parseFile,
   partEntry,
-  type VueChecker,
+  type VueProgram,
 } from '@nxds/source-model/vue-sources.ts';
 import path from 'node:path';
 import ts from 'typescript';
@@ -70,10 +70,10 @@ function packageReExports(slug: string) {
   });
 }
 
-function vueContract(checker: VueChecker, slug: string) {
-  const parts = componentParts(checker, slug).map(
+function vueContract(vueProgram: VueProgram, slug: string) {
+  const parts = componentParts(vueProgram, slug).map(
     (part): VuePartApi => ({
-      entry: partEntry(part),
+      entry: partEntry(part, vueProgram.localAliases),
       slots: part.meta.slots
         .map((slot) => slot.name)
         .filter((name) => name !== 'default'),
@@ -189,7 +189,7 @@ function interfaceKeys(file: string) {
 const contracts = new Map<string, Contract>();
 
 beforeAll(() => {
-  const checker = createVueChecker();
+  const vueProgram = createVueProgram();
   const reactFiles = new Map(
     (reactPropsFiles() as PropsFile[]).map((file) => [file.slug, file])
   );
@@ -198,7 +198,7 @@ beforeAll(() => {
     if (!react) throw new Error(`@nxds/react has no props file for ${slug}.`);
     contracts.set(slug, {
       react: new Map(react.components.map((entry) => [entry.name, entry])),
-      vue: vueContract(checker, slug),
+      vue: vueContract(vueProgram, slug),
       vueReExports: new Set(packageReExports(slug)),
     });
   }

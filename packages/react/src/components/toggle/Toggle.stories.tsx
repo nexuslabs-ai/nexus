@@ -195,7 +195,7 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-// A disabled toggle does not respond to clicks.
+// A disabled toggle shows muted colors.
 export const Disabled: Story = {
   tags: ['docs'],
   parameters: {
@@ -205,6 +205,24 @@ export const Disabled: Story = {
       },
     },
   },
+  render: () => (
+    <Toggle aria-label="Bold" disabled>
+      <IconBold />
+    </Toggle>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: 'Bold' });
+    await expect(toggle).toBeDisabled();
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(toggle).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(toggle).opacity).toBe('1');
+  },
+};
+
+// A disabled toggle ignores clicks.
+export const DisabledInteraction: Story = {
   args: { onPressedChange: fn() },
   render: (args) => (
     <Toggle aria-label="Bold" disabled onPressedChange={args.onPressedChange}>
@@ -215,13 +233,9 @@ export const Disabled: Story = {
     const canvas = within(canvasElement);
     const toggle = canvas.getByRole('button', { name: 'Bold' });
     await expect(toggle).toBeDisabled();
-
-    // Disabled state uses a semantic text token at full opacity (not a fade).
-    await expect(toggle).toHaveClass('nx:disabled:text-disabled-foreground');
-    await expect(getComputedStyle(toggle).opacity).toBe('1');
-
-    // No click: a disabled toggle has pointer-events: none, which makes
-    // userEvent.click throw. The disabled attribute is the sufficient signal.
+    // pointerEventsCheck: 0 clicks through the disabled toggle's pointer-events: none.
+    await userEvent.click(toggle, { pointerEventsCheck: 0 });
+    await expect(toggle).toHaveAttribute('data-state', 'off');
     await expect(args.onPressedChange).not.toHaveBeenCalled();
   },
 };

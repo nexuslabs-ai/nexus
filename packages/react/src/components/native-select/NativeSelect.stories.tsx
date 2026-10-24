@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { unpairedAutofillClasses } from '../../stories/support/autofill-pairing';
+import { expectAutofillPaired } from '../../stories/support/autofill-pairing';
 
 import {
   NativeSelect,
@@ -303,6 +303,21 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+// With no value set, the browser selects the first option.
+export const WithoutDefaultValue: Story = {
+  render: () => (
+    <NativeSelect aria-label="Plan">
+      <NativeSelectOption value="free">Free</NativeSelectOption>
+      <NativeSelectOption value="pro">Pro</NativeSelectOption>
+    </NativeSelect>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const select = canvas.getByRole('combobox', { name: 'Plan' });
+    await expect(select).toHaveValue('free');
+  },
+};
+
 // The wrapper, control, and icon carry data-slot hooks; the control carries data-size.
 export const WithDataAttributes: Story = {
   render: () => (
@@ -320,7 +335,7 @@ export const WithDataAttributes: Story = {
     await expect(select).toHaveAttribute('data-variant', 'bordered');
     await expect(select).toHaveClass('nx:bg-container');
     await expect(select).toHaveClass('nx:enabled:hover:bg-container-hover');
-    await expect(unpairedAutofillClasses(select)).toEqual([]);
+    await expectAutofillPaired(select);
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();

@@ -168,6 +168,16 @@ export default tseslint.config(
       'vue/require-default-prop': 'off',
     },
   },
+  // Field primitives render a bare control; the consumer's Label `for`, or an
+  // `aria-label` that falls through, names it. The exemption lives here so
+  // copied source lints clean in apps without vuejs-accessibility.
+  {
+    files: [
+      'packages/vue/src/components/native-select/NativeSelect.vue',
+      'packages/vue/src/components/textarea/Textarea.vue',
+    ],
+    rules: { 'vuejs-accessibility/form-control-has-label': 'off' },
+  },
 
   // Import sorting
   {

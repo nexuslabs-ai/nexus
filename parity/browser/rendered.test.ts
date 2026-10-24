@@ -24,10 +24,10 @@ type ReactModule = StoryModule<ReactMeta, ReactStory>;
 type VueModule = StoryModule<VueMeta, VueStory>;
 
 const reactModules = import.meta.glob<ReactModule>(
-  '../../packages/react/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.tsx'
+  '../../packages/react/src/components/*/*.stories.tsx'
 );
 const vueModules = import.meta.glob<VueModule>(
-  '../../packages/vue/src/components/{alert,badge,button,card,dialog,spinner,switch,tabs}/*.stories.ts'
+  '../../packages/vue/src/components/*/*.stories.ts'
 );
 
 /** Components whose content portals into `document.body` once opened. */
@@ -70,17 +70,25 @@ function isOwnSlot(slot: string, slug: string) {
 
 /** One element as a line, so a mismatch prints as a readable line diff. */
 function describeElement(element: Element) {
+  // Reka repeats a native `disabled` as `aria-disabled="true"`; Radix doesn't.
+  const isNativelyDisabled = element.hasAttribute('disabled');
   const attributes = [...element.attributes]
     .filter(({ name }) => /^(?:data-|aria-|role$)/.test(name))
     .filter(({ name }) => !SKIPPED_ATTRIBUTE.test(name))
     .filter(
       ({ name, value }) => !(FALSE_IS_ABSENT.test(name) && value === 'false')
     )
+    .filter(({ name }) => !(name === 'aria-disabled' && isNativelyDisabled))
     .map(({ name, value }) => `${name}="${value}"`)
     .sort();
   const classes = [...element.classList].sort().join(' ');
   const name = computeAccessibleName(element);
-  const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+  // A textarea shows its value; its text content is only the default value.
+  const content =
+    element instanceof HTMLTextAreaElement
+      ? element.value
+      : element.textContent;
+  const text = content?.replace(/\s+/g, ' ').trim() ?? '';
   return `<${element.tagName.toLowerCase()} ${attributes.join(' ')}> class="${classes}" name="${name}" text="${text}"`;
 }
 
@@ -184,12 +192,12 @@ async function renderTree(
 
 describe('rendered docs stories', () => {
   it('reads one story file per shared component in each framework', () => {
-    expect(Object.keys(reactModules).map(slugOf).sort()).toEqual(
-      [...shared].sort()
+    const count = (modules: Record<string, unknown>, slug: string) =>
+      Object.keys(modules).filter((file) => slugOf(file) === slug).length;
+    const unread = shared.filter(
+      (slug) => count(reactModules, slug) !== 1 || count(vueModules, slug) !== 1
     );
-    expect(Object.keys(vueModules).map(slugOf).sort()).toEqual(
-      [...shared].sort()
-    );
+    expect(unread).toEqual([]);
   });
 
   it('allows only rendered differences that belong to a shared component', () => {

@@ -164,7 +164,7 @@ export const Disabled: Story = {
       </div>
     </RadioGroup>
   ),
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const one = canvas.getByRole('radio', { name: 'Option one' });
     const two = canvas.getByRole('radio', { name: 'Option two' });
@@ -178,7 +178,6 @@ export const Disabled: Story = {
 
     // Clicking a disabled option does not change the selection
     await userEvent.click(two);
-    await expect(args.onValueChange).not.toHaveBeenCalled();
     await expect(two).toHaveAttribute('data-state', 'unchecked');
   },
 };
@@ -286,6 +285,27 @@ export const KeyboardInteraction: Story = {
     await userEvent.keyboard(' ');
     await waitFor(() => expect(two).toHaveAttribute('data-state', 'checked'));
     await expect(args.onValueChange).toHaveBeenCalledWith('two');
+  },
+};
+
+export const DisabledInteraction: Story = {
+  args: { disabled: true },
+  render: (args) => (
+    <RadioGroup {...args} aria-label="Pick one">
+      <RadioGroupItem value="one" aria-label="Option one" />
+      <RadioGroupItem value="two" aria-label="Option two" />
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const two = canvas.getByRole('radio', { name: 'Option two' });
+
+    await expect(two).toBeDisabled();
+
+    // Clicking a disabled option does not select it
+    await userEvent.click(two);
+    await expect(two).toHaveAttribute('data-state', 'unchecked');
+    await expect(args.onValueChange).not.toHaveBeenCalled();
   },
 };
 

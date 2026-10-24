@@ -1,8 +1,17 @@
+import type { HTMLAttributes, ReactNode } from 'react';
+
 import {
-  type ResponsiveVisibilityProps,
   visibilityClassName,
+  type VisibilityProps,
 } from '../../lib/responsive-visibility';
 import { cn } from '../../lib/utils';
+
+/**
+ * Props for Show.
+ */
+type ShowProps = HTMLAttributes<HTMLElement> & {
+  children: ReactNode;
+} & VisibilityProps;
 
 /**
  * Shows its children only while a width condition matches. Children stay
@@ -28,7 +37,7 @@ function Show({
   containerAbove,
   containerBelow,
   ...props
-}: ResponsiveVisibilityProps) {
+}: ShowProps) {
   return (
     <Comp
       data-slot="show"
@@ -46,4 +55,4 @@ function Show({
   );
 }
 
-export { Show, type ResponsiveVisibilityProps as ShowProps };
+export { Show, type ShowProps };
