@@ -36,7 +36,7 @@ function ComparisonPair({ reveal, leftLabel, rightLabel, children }) {
         <strong>{rightLabel}</strong>
       </div>
       <div className="adoption-reveal-stage">
-        <div className="adoption-reveal-layers" inert="">
+        <div className="adoption-reveal-layers" inert>
           {children}
         </div>
         <div className="adoption-reveal-divider" aria-hidden="true">
